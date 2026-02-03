@@ -1,0 +1,39 @@
+{
+  "name": "CVKiko",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "typecheck": "nuxt typecheck",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.35",
+    "@ai-sdk/vue": "^3.0.69",
+    "@iconify-json/lucide": "^1.2.87",
+    "@iconify-json/simple-icons": "^1.2.68",
+    "@libsql/client": "^0.17.0",
+    "@nuxt/ui": "^4.4.0",
+    "ai": "^6.0.69",
+    "drizzle-orm": "^0.45.1",
+    "jspdf": "^4.1.0",
+    "nuxt": "^4.3.0",
+    "tailwindcss": "^4.1.18",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^1.13.0",
+    "@types/uuid": "^10.0.0",
+    "drizzle-kit": "^0.31.8",
+    "eslint": "^9.39.2",
+    "typescript": "^5.9.3",
+    "vue-tsc": "^3.2.4"
+  }
+}

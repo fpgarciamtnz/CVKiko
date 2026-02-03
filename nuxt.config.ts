@@ -1,0 +1,36 @@
+// https://nuxt.com/docs/api/configuration/nuxt-config
+export default defineNuxtConfig({
+  modules: [
+    '@nuxt/eslint',
+    '@nuxt/ui'
+  ],
+
+  devtools: {
+    enabled: true
+  },
+
+  css: ['~/assets/css/main.css'],
+
+  compatibilityDate: '2025-01-15',
+
+  runtimeConfig: {
+    // AI Provider config (choose one)
+    // For Groq (free): GROQ_API_KEY
+    // For Cloudflare Workers AI: CF_ACCOUNT_ID + CF_API_TOKEN
+    // For Anthropic: ANTHROPIC_API_KEY
+    aiProvider: process.env.AI_PROVIDER || 'cloudflare', // 'cloudflare' | 'groq' | 'anthropic'
+    groqApiKey: process.env.GROQ_API_KEY || '',
+    cfAccountId: process.env.CF_ACCOUNT_ID || '',
+    cfApiToken: process.env.CF_API_TOKEN || '',
+    anthropicApiKey: process.env.ANTHROPIC_API_KEY || ''
+  },
+
+  eslint: {
+    config: {
+      stylistic: {
+        commaDangle: 'never',
+        braceStyle: '1tbs'
+      }
+    }
+  }
+})
