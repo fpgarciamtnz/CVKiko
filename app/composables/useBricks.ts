@@ -7,6 +7,7 @@ export interface Brick {
   content: string
   tags: string[]
   frontmatter: BrickFrontmatter
+  structuredData: Record<string, unknown> // Type-specific structured data
   isActive: boolean
   sortOrder: number
   createdAt: string

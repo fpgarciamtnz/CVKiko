@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
     content?: string
     tags?: string[]
     frontmatter?: Record<string, unknown>
+    structuredData?: Record<string, unknown>
     sortOrder?: number
     isActive?: boolean
   }>(event)
@@ -27,6 +28,7 @@ export default defineEventHandler(async (event) => {
     content: body.content ?? '',
     tags: body.tags ?? [],
     frontmatter: body.frontmatter ?? {},
+    structuredData: body.structuredData ?? {},
     sortOrder: body.sortOrder ?? 0,
     isActive: body.isActive ?? true
   }

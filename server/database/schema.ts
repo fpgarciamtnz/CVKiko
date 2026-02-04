@@ -15,16 +15,16 @@ export const settings = sqliteTable('settings', {
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
 
-// ============ BRICKS (Markdown-based) ============
+// ============ BRICKS (Structured data + optional markdown) ============
 export const bricks = sqliteTable('bricks', {
   id: text('id').primaryKey(),
   type: text('type', { enum: ['experience', 'education', 'project', 'skill', 'publication', 'custom'] }).notNull(),
   title: text('title').notNull(),
-  // Markdown content - the main flexible content
+  // Markdown content - for custom type or generated display
   content: text('content').default(''),
   // Tags for filtering and AI matching
   tags: text('tags', { mode: 'json' }).$type<string[]>().default([]),
-  // Frontmatter for structured metadata (dates, links, etc.)
+  // Frontmatter for quick metadata access (derived from structuredData)
   frontmatter: text('frontmatter', { mode: 'json' }).$type<{
     subtitle?: string
     location?: string
@@ -35,6 +35,8 @@ export const bricks = sqliteTable('bricks', {
     role?: string
     [key: string]: unknown
   }>().default({}),
+  // NEW: Structured data - type-specific fields stored as JSON
+  structuredData: text('structured_data', { mode: 'json' }).$type<Record<string, unknown>>().default({}),
   sortOrder: integer('sort_order').default(0),
   isActive: integer('is_active', { mode: 'boolean' }).default(true),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
