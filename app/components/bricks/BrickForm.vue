@@ -240,12 +240,12 @@ function handleSubmit() {
 
     <!-- Type-specific form -->
     <div class="min-h-[300px]">
-      <ExperienceForm v-if="selectedType === 'experience'" v-model="experienceData" />
-      <EducationForm v-else-if="selectedType === 'education'" v-model="educationData" />
-      <ProjectForm v-else-if="selectedType === 'project'" v-model="projectData" />
-      <SkillForm v-else-if="selectedType === 'skill'" v-model="skillData" />
-      <PublicationForm v-else-if="selectedType === 'publication'" v-model="publicationData" />
-      <CustomForm v-else-if="selectedType === 'custom'" v-model="customData" />
+      <BricksFormsExperienceForm v-if="selectedType === 'experience'" v-model="experienceData" />
+      <BricksFormsEducationForm v-else-if="selectedType === 'education'" v-model="educationData" />
+      <BricksFormsProjectForm v-else-if="selectedType === 'project'" v-model="projectData" />
+      <BricksFormsSkillForm v-else-if="selectedType === 'skill'" v-model="skillData" />
+      <BricksFormsPublicationForm v-else-if="selectedType === 'publication'" v-model="publicationData" />
+      <BricksFormsCustomForm v-else-if="selectedType === 'custom'" v-model="customData" />
     </div>
 
     <USeparator />
