@@ -103,14 +103,16 @@ export function usePdfExport() {
       for (const brick of typeBricks) {
         checkPageBreak(25)
 
+        const fm = brick.frontmatter
+
         // Title and dates on same line
         doc.setFontSize(11)
         doc.setFont('helvetica', 'bold')
         const title = brick.title
         doc.text(title, margin, y)
 
-        if (brick.startDate) {
-          const dateStr = formatDateRange(brick.startDate, brick.endDate)
+        if (fm.startDate) {
+          const dateStr = formatDateRange(fm.startDate, fm.endDate)
           doc.setFont('helvetica', 'normal')
           const dateWidth = doc.getTextWidth(dateStr)
           doc.text(dateStr, pageWidth - margin - dateWidth, y)
@@ -118,22 +120,22 @@ export function usePdfExport() {
         y += 5
 
         // Subtitle (company/school)
-        if (brick.subtitle) {
+        if (fm.subtitle) {
           doc.setFontSize(10)
           doc.setFont('helvetica', 'italic')
-          let subtitleText = brick.subtitle
-          if (brick.location) {
-            subtitleText += ` | ${brick.location}`
+          let subtitleText = fm.subtitle
+          if (fm.location) {
+            subtitleText += ` | ${fm.location}`
           }
           doc.text(subtitleText, margin, y)
           y += 4
         }
 
-        // Description
-        if (brick.description) {
+        // Description - use content field
+        if (brick.content) {
           doc.setFontSize(10)
           doc.setFont('helvetica', 'normal')
-          const descLines = doc.splitTextToSize(brick.description, contentWidth)
+          const descLines = doc.splitTextToSize(brick.content, contentWidth)
           // Limit to avoid overflow
           const maxLines = Math.min(descLines.length, 6)
           for (let i = 0; i < maxLines; i++) {
@@ -144,7 +146,7 @@ export function usePdfExport() {
         }
 
         // Tags
-        if (brick.tags?.length && type !== 'skill') {
+        if (brick.tags?.length) {
           doc.setFontSize(9)
           doc.setFont('helvetica', 'normal')
           doc.setTextColor(100, 100, 100)
@@ -156,10 +158,10 @@ export function usePdfExport() {
         }
 
         // URL
-        if (brick.url) {
+        if (fm.url) {
           doc.setFontSize(9)
           doc.setTextColor(0, 0, 238)
-          doc.text(brick.url, margin, y)
+          doc.text(fm.url, margin, y)
           doc.setTextColor(0, 0, 0)
           y += 4
         }

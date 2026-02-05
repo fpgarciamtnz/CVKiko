@@ -30,37 +30,37 @@ const tags = ref<string[]>(props.brick?.tags || [])
 // Structured data for each type
 const experienceData = ref<ExperienceData>(
   props.brick?.type === 'experience' && props.brick.structuredData
-    ? (props.brick.structuredData as ExperienceData)
+    ? (props.brick.structuredData as unknown as ExperienceData)
     : (BRICK_TYPE_CONFIG.experience.defaultData() as ExperienceData)
 )
 
 const educationData = ref<EducationData>(
   props.brick?.type === 'education' && props.brick.structuredData
-    ? (props.brick.structuredData as EducationData)
+    ? (props.brick.structuredData as unknown as EducationData)
     : (BRICK_TYPE_CONFIG.education.defaultData() as EducationData)
 )
 
 const projectData = ref<ProjectData>(
   props.brick?.type === 'project' && props.brick.structuredData
-    ? (props.brick.structuredData as ProjectData)
+    ? (props.brick.structuredData as unknown as ProjectData)
     : (BRICK_TYPE_CONFIG.project.defaultData() as ProjectData)
 )
 
 const skillData = ref<SkillData>(
   props.brick?.type === 'skill' && props.brick.structuredData
-    ? (props.brick.structuredData as SkillData)
+    ? (props.brick.structuredData as unknown as SkillData)
     : (BRICK_TYPE_CONFIG.skill.defaultData() as SkillData)
 )
 
 const publicationData = ref<PublicationData>(
   props.brick?.type === 'publication' && props.brick.structuredData
-    ? (props.brick.structuredData as PublicationData)
+    ? (props.brick.structuredData as unknown as PublicationData)
     : (BRICK_TYPE_CONFIG.publication.defaultData() as PublicationData)
 )
 
 const customData = ref<CustomData>(
   props.brick?.type === 'custom' && props.brick.structuredData
-    ? (props.brick.structuredData as CustomData)
+    ? (props.brick.structuredData as unknown as CustomData)
     : (BRICK_TYPE_CONFIG.custom.defaultData() as CustomData)
 )
 

@@ -72,7 +72,8 @@ function removeLink(index: number) {
 
 function updateLink(index: number, field: 'label' | 'url', value: string) {
   const updated = [...data.value.links]
-  updated[index] = { ...updated[index], [field]: value }
+  const currentLink = updated[index] ?? { label: '', url: '' }
+  updated[index] = { label: currentLink.label, url: currentLink.url, [field]: value }
   data.value = { ...data.value, links: updated }
 }
 

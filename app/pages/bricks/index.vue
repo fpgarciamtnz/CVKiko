@@ -13,11 +13,11 @@ const editingBrick = ref<Brick | null>(null)
 const deleteConfirmBrick = ref<Brick | null>(null)
 
 const tabs = computed(() => [
-  { label: 'All', value: 'all', count: bricks.value.length },
+  { label: 'All', value: 'all' as const, icon: undefined as string | undefined, count: bricks.value.length },
   ...BRICK_TYPES.map(type => ({
     label: BRICK_TYPE_CONFIG[type].label,
     value: type,
-    icon: BRICK_TYPE_CONFIG[type].icon,
+    icon: BRICK_TYPE_CONFIG[type].icon as string | undefined,
     count: bricksByType.value[type]?.length || 0
   }))
 ])
@@ -95,7 +95,7 @@ async function handleDelete() {
       :items="tabs"
       class="mb-6"
     >
-      <template #item="{ item }">
+      <template #default="{ item }">
         <div class="flex items-center gap-2">
           <UIcon
             v-if="item.icon"
@@ -175,7 +175,7 @@ async function handleDelete() {
     </UModal>
 
     <!-- Delete Confirmation Modal -->
-    <UModal v-model:open="deleteConfirmBrick">
+    <UModal :open="!!deleteConfirmBrick" @update:open="val => { if (!val) deleteConfirmBrick = null }">
       <template #content>
         <UCard>
           <template #header>

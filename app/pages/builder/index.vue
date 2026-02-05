@@ -23,11 +23,11 @@ const activeTab = ref<BrickType | 'all'>('all')
 const showChat = ref(true)
 
 const tabs = computed(() => [
-  { label: 'All', value: 'all', count: bricks.value.length },
+  { label: 'All', value: 'all' as const, icon: undefined as string | undefined, count: bricks.value.length },
   ...BRICK_TYPES.map(type => ({
     label: BRICK_TYPE_CONFIG[type].label,
     value: type,
-    icon: BRICK_TYPE_CONFIG[type].icon,
+    icon: BRICK_TYPE_CONFIG[type].icon as string | undefined,
     count: bricksByType.value[type]?.length || 0
   }))
 ])
@@ -95,7 +95,7 @@ function handleDownloadPdf() {
           :items="tabs"
           size="xs"
         >
-          <template #item="{ item }">
+          <template #default="{ item }">
             <div class="flex items-center gap-1">
               <UIcon
                 v-if="item.icon"
