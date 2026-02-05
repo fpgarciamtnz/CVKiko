@@ -11,13 +11,16 @@ const emit = defineEmits<{
 
 const data = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 </script>
 
 <template>
   <div class="space-y-6">
-    <UFormField label="Content (Markdown)" hint="Free-form content using Markdown syntax">
+    <UFormField
+      label="Content (Markdown)"
+      hint="Free-form content using Markdown syntax"
+    >
       <UTextarea
         v-model="data.content"
         :rows="12"

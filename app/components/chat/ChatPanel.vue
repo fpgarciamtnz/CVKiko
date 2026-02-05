@@ -35,7 +35,10 @@ const suggestedIds = computed(() => extractBrickIds(analysisResult.value))
   <div class="flex flex-col h-full">
     <div class="p-4 border-b">
       <h3 class="font-semibold flex items-center gap-2">
-        <UIcon name="i-lucide-bot" class="w-5 h-5 text-primary" />
+        <UIcon
+          name="i-lucide-bot"
+          class="w-5 h-5 text-primary"
+        />
         AI Assistant
       </h3>
       <p class="text-sm text-gray-500 mt-1">
@@ -61,7 +64,10 @@ const suggestedIds = computed(() => extractBrickIds(analysisResult.value))
         block
         @click="handleAnalyze"
       >
-        <UIcon name="i-lucide-sparkles" class="w-4 h-4 mr-2" />
+        <UIcon
+          name="i-lucide-sparkles"
+          class="w-4 h-4 mr-2"
+        />
         Analyze & Suggest Bricks
       </UButton>
 
@@ -75,9 +81,14 @@ const suggestedIds = computed(() => extractBrickIds(analysisResult.value))
       />
 
       <!-- Analysis Result -->
-      <div v-if="hasAnalyzed && !analyzing" class="mt-6">
+      <div
+        v-if="hasAnalyzed && !analyzing"
+        class="mt-6"
+      >
         <div class="flex items-center justify-between mb-2">
-          <h4 class="font-medium">Analysis Results</h4>
+          <h4 class="font-medium">
+            Analysis Results
+          </h4>
           <UButton
             v-if="suggestedIds.length > 0"
             size="sm"
@@ -91,21 +102,31 @@ const suggestedIds = computed(() => extractBrickIds(analysisResult.value))
         <div
           class="prose prose-sm dark:prose-invert max-w-none bg-gray-50 dark:bg-gray-800 rounded-lg p-4"
         >
-          <div class="whitespace-pre-wrap">{{ analysisResult }}</div>
+          <div class="whitespace-pre-wrap">
+            {{ analysisResult }}
+          </div>
         </div>
       </div>
 
       <!-- Loading State -->
-      <div v-if="analyzing" class="mt-6">
+      <div
+        v-if="analyzing"
+        class="mt-6"
+      >
         <div class="flex items-center gap-2 text-gray-500">
-          <UIcon name="i-lucide-loader-2" class="w-4 h-4 animate-spin" />
+          <UIcon
+            name="i-lucide-loader-2"
+            class="w-4 h-4 animate-spin"
+          />
           <span>Analyzing job description...</span>
         </div>
         <div
           v-if="analysisResult"
           class="mt-4 prose prose-sm dark:prose-invert max-w-none bg-gray-50 dark:bg-gray-800 rounded-lg p-4"
         >
-          <div class="whitespace-pre-wrap">{{ analysisResult }}</div>
+          <div class="whitespace-pre-wrap">
+            {{ analysisResult }}
+          </div>
         </div>
       </div>
     </div>

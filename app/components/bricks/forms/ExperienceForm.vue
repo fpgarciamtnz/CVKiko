@@ -12,7 +12,7 @@ const emit = defineEmits<{
 
 const data = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 
 // Dynamic list management
@@ -86,7 +86,11 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
   <div class="space-y-6">
     <!-- Basic Info -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <UFormField label="Job Title" required hint="Your role at this company">
+      <UFormField
+        label="Job Title"
+        required
+        hint="Your role at this company"
+      >
         <UInput
           v-model="data.jobTitle"
           placeholder="e.g., Senior Software Engineer"
@@ -94,7 +98,10 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
         />
       </UFormField>
 
-      <UFormField label="Company" required>
+      <UFormField
+        label="Company"
+        required
+      >
         <UInput
           v-model="data.company"
           placeholder="e.g., Google"
@@ -121,17 +128,32 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
       </UFormField>
 
       <div class="grid grid-cols-2 gap-2">
-        <UFormField label="Start Date" required>
-          <UInput v-model="data.startDate" type="month" />
+        <UFormField
+          label="Start Date"
+          required
+        >
+          <UInput
+            v-model="data.startDate"
+            type="month"
+          />
         </UFormField>
-        <UFormField label="End Date" hint="Empty = current">
-          <UInput v-model="data.endDate" type="month" />
+        <UFormField
+          label="End Date"
+          hint="Empty = current"
+        >
+          <UInput
+            v-model="data.endDate"
+            type="month"
+          />
         </UFormField>
       </div>
     </div>
 
     <!-- Responsibilities -->
-    <UFormField label="Responsibilities" hint="What were your main duties? Use action verbs (Led, Developed, Managed...)">
+    <UFormField
+      label="Responsibilities"
+      hint="What were your main duties? Use action verbs (Led, Developed, Managed...)"
+    >
       <div class="space-y-2">
         <div
           v-for="(resp, index) in data.responsibilities"
@@ -166,7 +188,10 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
     </UFormField>
 
     <!-- Achievements -->
-    <UFormField label="Achievements" hint="Quantify your impact! Use metrics (%, $, numbers)">
+    <UFormField
+      label="Achievements"
+      hint="Quantify your impact! Use metrics (%, $, numbers)"
+    >
       <div class="space-y-2">
         <div
           v-for="(ach, index) in data.achievements"
@@ -201,7 +226,10 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
     </UFormField>
 
     <!-- Technologies -->
-    <UFormField label="Technologies Used" hint="Tools, languages, and frameworks you used">
+    <UFormField
+      label="Technologies Used"
+      hint="Tools, languages, and frameworks you used"
+    >
       <div class="space-y-2">
         <div class="flex gap-2">
           <UInput
@@ -210,11 +238,17 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
             class="flex-1"
             @keydown.enter.prevent="addTech"
           />
-          <UButton variant="soft" @click="addTech">
+          <UButton
+            variant="soft"
+            @click="addTech"
+          >
             Add
           </UButton>
         </div>
-        <div v-if="data.technologies.length" class="flex flex-wrap gap-1">
+        <div
+          v-if="data.technologies.length"
+          class="flex flex-wrap gap-1"
+        >
           <UBadge
             v-for="tech in data.technologies"
             :key="tech"
@@ -225,7 +259,10 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
             @click="removeTech(tech)"
           >
             <template #trailing>
-              <UIcon name="i-lucide-x" class="w-3 h-3" />
+              <UIcon
+                name="i-lucide-x"
+                class="w-3 h-3"
+              />
             </template>
           </UBadge>
         </div>

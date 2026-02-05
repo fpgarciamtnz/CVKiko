@@ -11,8 +11,6 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  compatibilityDate: '2025-01-15',
-
   runtimeConfig: {
     // AI Provider config (choose one)
     // For Groq (free): GROQ_API_KEY
@@ -24,6 +22,8 @@ export default defineNuxtConfig({
     cfApiToken: process.env.CF_API_TOKEN || '',
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || ''
   },
+
+  compatibilityDate: '2025-01-15',
 
   eslint: {
     config: {

@@ -36,8 +36,12 @@ const stats = computed(() => {
     <!-- Quick Stats -->
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
       <UCard class="text-center">
-        <div class="text-3xl font-bold text-primary">{{ stats.total }}</div>
-        <div class="text-sm text-gray-500">Total Bricks</div>
+        <div class="text-3xl font-bold text-primary">
+          {{ stats.total }}
+        </div>
+        <div class="text-sm text-gray-500">
+          Total Bricks
+        </div>
       </UCard>
       <UCard
         v-for="type in BRICK_TYPES"
@@ -52,7 +56,9 @@ const stats = computed(() => {
           />
           <span class="text-2xl font-bold">{{ stats.byType[type] }}</span>
         </div>
-        <div class="text-xs text-gray-500">{{ BRICK_TYPE_CONFIG[type].pluralLabel }}</div>
+        <div class="text-xs text-gray-500">
+          {{ BRICK_TYPE_CONFIG[type].pluralLabel }}
+        </div>
       </UCard>
     </div>
 
@@ -61,14 +67,23 @@ const stats = computed(() => {
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-layers" class="w-5 h-5 text-primary" />
-            <h2 class="font-semibold">Manage Bricks</h2>
+            <UIcon
+              name="i-lucide-layers"
+              class="w-5 h-5 text-primary"
+            />
+            <h2 class="font-semibold">
+              Manage Bricks
+            </h2>
           </div>
         </template>
         <p class="text-gray-600 dark:text-gray-400 mb-4">
           Add your work experiences, education, projects, and skills as reusable bricks.
         </p>
-        <UButton to="/bricks" variant="soft" block>
+        <UButton
+          to="/bricks"
+          variant="soft"
+          block
+        >
           Go to Bricks
         </UButton>
       </UCard>
@@ -76,14 +91,23 @@ const stats = computed(() => {
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-file-text" class="w-5 h-5 text-primary" />
-            <h2 class="font-semibold">Build CV</h2>
+            <UIcon
+              name="i-lucide-file-text"
+              class="w-5 h-5 text-primary"
+            />
+            <h2 class="font-semibold">
+              Build CV
+            </h2>
           </div>
         </template>
         <p class="text-gray-600 dark:text-gray-400 mb-4">
           Select bricks and use AI to create a customized CV for your target job.
         </p>
-        <UButton to="/builder" variant="soft" block>
+        <UButton
+          to="/builder"
+          variant="soft"
+          block
+        >
           Start Building
         </UButton>
       </UCard>
@@ -91,26 +115,42 @@ const stats = computed(() => {
       <UCard>
         <template #header>
           <div class="flex items-center gap-2">
-            <UIcon name="i-lucide-settings" class="w-5 h-5 text-primary" />
-            <h2 class="font-semibold">Personal Info</h2>
+            <UIcon
+              name="i-lucide-settings"
+              class="w-5 h-5 text-primary"
+            />
+            <h2 class="font-semibold">
+              Personal Info
+            </h2>
           </div>
         </template>
         <p class="text-gray-600 dark:text-gray-400 mb-4">
           Set up your contact information, summary, and social links.
         </p>
-        <UButton to="/settings" variant="soft" block>
+        <UButton
+          to="/settings"
+          variant="soft"
+          block
+        >
           Edit Settings
         </UButton>
       </UCard>
     </div>
 
     <!-- Recent Bricks -->
-    <div v-if="bricks.length > 0" class="mt-8">
+    <div
+      v-if="bricks.length > 0"
+      class="mt-8"
+    >
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
           Recent Bricks
         </h2>
-        <UButton to="/bricks" variant="link" trailing-icon="i-lucide-arrow-right">
+        <UButton
+          to="/bricks"
+          variant="link"
+          trailing-icon="i-lucide-arrow-right"
+        >
           View all
         </UButton>
       </div>
@@ -125,15 +165,24 @@ const stats = computed(() => {
     </div>
 
     <!-- Empty State -->
-    <UCard v-else class="mt-8 text-center py-12">
-      <UIcon name="i-lucide-inbox" class="w-16 h-16 mx-auto mb-4 text-gray-400" />
+    <UCard
+      v-else
+      class="mt-8 text-center py-12"
+    >
+      <UIcon
+        name="i-lucide-inbox"
+        class="w-16 h-16 mx-auto mb-4 text-gray-400"
+      />
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
         No bricks yet
       </h3>
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         Start by adding your work experience, education, and projects.
       </p>
-      <UButton to="/bricks" icon="i-lucide-plus">
+      <UButton
+        to="/bricks"
+        icon="i-lucide-plus"
+      >
         Add Your First Brick
       </UButton>
     </UCard>

@@ -12,7 +12,7 @@ const emit = defineEmits<{
 
 const data = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 
 // Related projects input
@@ -52,7 +52,10 @@ const proficiencyOptions = PROFICIENCY_LEVELS.map(p => ({
 <template>
   <div class="space-y-6">
     <!-- Skill Name -->
-    <UFormField label="Skill Name" required>
+    <UFormField
+      label="Skill Name"
+      required
+    >
       <UInput
         v-model="data.name"
         placeholder="e.g., TypeScript, Project Management, Spanish"
@@ -62,14 +65,20 @@ const proficiencyOptions = PROFICIENCY_LEVELS.map(p => ({
 
     <!-- Category & Proficiency -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <UFormField label="Category" required>
+      <UFormField
+        label="Category"
+        required
+      >
         <URadioGroup
           v-model="data.category"
           :items="categoryOptions"
         />
       </UFormField>
 
-      <UFormField label="Proficiency Level" required>
+      <UFormField
+        label="Proficiency Level"
+        required
+      >
         <URadioGroup
           v-model="data.proficiency"
           :items="proficiencyOptions"
@@ -94,7 +103,10 @@ const proficiencyOptions = PROFICIENCY_LEVELS.map(p => ({
     </UFormField>
 
     <!-- Context -->
-    <UFormField label="Context" hint="Briefly describe where/how you've used this skill">
+    <UFormField
+      label="Context"
+      hint="Briefly describe where/how you've used this skill"
+    >
       <UTextarea
         v-model="data.context"
         :rows="3"
@@ -103,7 +115,10 @@ const proficiencyOptions = PROFICIENCY_LEVELS.map(p => ({
     </UFormField>
 
     <!-- Related Projects -->
-    <UFormField label="Related Projects" hint="Projects where you applied this skill">
+    <UFormField
+      label="Related Projects"
+      hint="Projects where you applied this skill"
+    >
       <div class="space-y-2">
         <div class="flex gap-2">
           <UInput
@@ -112,11 +127,17 @@ const proficiencyOptions = PROFICIENCY_LEVELS.map(p => ({
             class="flex-1"
             @keydown.enter.prevent="addProject"
           />
-          <UButton variant="soft" @click="addProject">
+          <UButton
+            variant="soft"
+            @click="addProject"
+          >
             Add
           </UButton>
         </div>
-        <div v-if="data.relatedProjects.length" class="flex flex-wrap gap-1">
+        <div
+          v-if="data.relatedProjects.length"
+          class="flex flex-wrap gap-1"
+        >
           <UBadge
             v-for="project in data.relatedProjects"
             :key="project"
@@ -127,7 +148,10 @@ const proficiencyOptions = PROFICIENCY_LEVELS.map(p => ({
             @click="removeProject(project)"
           >
             <template #trailing>
-              <UIcon name="i-lucide-x" class="w-3 h-3" />
+              <UIcon
+                name="i-lucide-x"
+                class="w-3 h-3"
+              />
             </template>
           </UBadge>
         </div>

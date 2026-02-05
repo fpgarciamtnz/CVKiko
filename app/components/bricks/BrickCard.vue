@@ -42,15 +42,24 @@ const contentPreview = computed(() => {
     @click="selectable && emit('select', brick)"
   >
     <div class="flex items-start gap-3">
-      <div v-if="selectable" class="pt-0.5">
-        <UCheckbox :model-value="selected" @click.stop />
+      <div
+        v-if="selectable"
+        class="pt-0.5"
+      >
+        <UCheckbox
+          :model-value="selected"
+          @click.stop
+        />
       </div>
 
       <div
         class="flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
         :class="`bg-${config.color}-100 dark:bg-${config.color}-900/30 text-${config.color}-600 dark:text-${config.color}-400`"
       >
-        <UIcon :name="config.icon" class="w-5 h-5" />
+        <UIcon
+          :name="config.icon"
+          class="w-5 h-5"
+        />
       </div>
 
       <div class="flex-1 min-w-0">
@@ -59,11 +68,17 @@ const contentPreview = computed(() => {
             <h3 class="font-semibold text-gray-900 dark:text-white truncate">
               {{ brick.title }}
             </h3>
-            <p v-if="brick.frontmatter?.subtitle" class="text-sm text-gray-600 dark:text-gray-400">
+            <p
+              v-if="brick.frontmatter?.subtitle"
+              class="text-sm text-gray-600 dark:text-gray-400"
+            >
               {{ brick.frontmatter.subtitle }}
             </p>
           </div>
-          <div v-if="!selectable" class="flex items-center gap-1">
+          <div
+            v-if="!selectable"
+            class="flex items-center gap-1"
+          >
             <UButton
               icon="i-lucide-pencil"
               variant="ghost"
@@ -81,7 +96,10 @@ const contentPreview = computed(() => {
           </div>
         </div>
 
-        <p v-if="dateRange" class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+        <p
+          v-if="dateRange"
+          class="text-xs text-gray-500 dark:text-gray-500 mt-1"
+        >
           {{ dateRange }}
           <span v-if="brick.frontmatter?.location"> · {{ brick.frontmatter.location }}</span>
         </p>
@@ -93,7 +111,10 @@ const contentPreview = computed(() => {
           {{ contentPreview }}
         </p>
 
-        <div v-if="brick.tags?.length" class="flex flex-wrap gap-1 mt-2">
+        <div
+          v-if="brick.tags?.length"
+          class="flex flex-wrap gap-1 mt-2"
+        >
           <UBadge
             v-for="tag in brick.tags.slice(0, 5)"
             :key="tag"

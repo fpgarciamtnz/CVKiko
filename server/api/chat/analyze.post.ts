@@ -1,6 +1,9 @@
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
-  const { jobDescription, bricks } = await readBody(event)
+  const { jobDescription, bricks } = await readBody<{
+    jobDescription: string
+    bricks: Array<{ id: string, type: string, title: string, frontmatter?: { subtitle?: string }, content?: string, tags?: string[] }>
+  }>(event)
 
   if (!jobDescription) {
     throw createError({
@@ -9,7 +12,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const bricksContext = bricks.map((b: any) => ({
+  const bricksContext = bricks.map(b => ({
     id: b.id,
     type: b.type,
     title: b.title,
@@ -54,11 +57,12 @@ Format response clearly with:
     }
 
     return { response }
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const err = error as Error
     console.error('AI API error:', error)
     throw createError({
       statusCode: 500,
-      message: error.message || 'AI analysis failed'
+      message: err.message || 'AI analysis failed'
     })
   }
 })

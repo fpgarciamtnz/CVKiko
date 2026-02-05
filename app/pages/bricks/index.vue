@@ -81,7 +81,10 @@ async function handleDelete() {
           Manage your experiences, education, projects, and skills
         </p>
       </div>
-      <UButton icon="i-lucide-plus" @click="openCreateForm">
+      <UButton
+        icon="i-lucide-plus"
+        @click="openCreateForm"
+      >
         Add Brick
       </UButton>
     </div>
@@ -94,15 +97,26 @@ async function handleDelete() {
     >
       <template #item="{ item }">
         <div class="flex items-center gap-2">
-          <UIcon v-if="item.icon" :name="item.icon" class="w-4 h-4" />
+          <UIcon
+            v-if="item.icon"
+            :name="item.icon"
+            class="w-4 h-4"
+          />
           <span>{{ item.label }}</span>
-          <UBadge :label="String(item.count)" variant="subtle" size="xs" />
+          <UBadge
+            :label="String(item.count)"
+            variant="subtle"
+            size="xs"
+          />
         </div>
       </template>
     </UTabs>
 
     <!-- Brick List -->
-    <div v-if="filteredBricks.length > 0" class="grid md:grid-cols-2 gap-4">
+    <div
+      v-if="filteredBricks.length > 0"
+      class="grid md:grid-cols-2 gap-4"
+    >
       <BricksBrickCard
         v-for="brick in filteredBricks"
         :key="brick.id"
@@ -112,15 +126,24 @@ async function handleDelete() {
       />
     </div>
 
-    <UCard v-else class="text-center py-12">
-      <UIcon name="i-lucide-inbox" class="w-16 h-16 mx-auto mb-4 text-gray-400" />
+    <UCard
+      v-else
+      class="text-center py-12"
+    >
+      <UIcon
+        name="i-lucide-inbox"
+        class="w-16 h-16 mx-auto mb-4 text-gray-400"
+      />
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
         No {{ activeTab === 'all' ? 'bricks' : BRICK_TYPE_CONFIG[activeTab as BrickType].pluralLabel.toLowerCase() }} yet
       </h3>
       <p class="text-gray-600 dark:text-gray-400 mb-4">
         Add your first {{ activeTab === 'all' ? 'brick' : BRICK_TYPE_CONFIG[activeTab as BrickType].label.toLowerCase() }} to get started.
       </p>
-      <UButton icon="i-lucide-plus" @click="openCreateForm">
+      <UButton
+        icon="i-lucide-plus"
+        @click="openCreateForm"
+      >
         Add {{ activeTab === 'all' ? 'Brick' : BRICK_TYPE_CONFIG[activeTab as BrickType].label }}
       </UButton>
     </UCard>
@@ -156,7 +179,9 @@ async function handleDelete() {
       <template #content>
         <UCard>
           <template #header>
-            <h2 class="text-lg font-semibold text-red-600">Delete Brick</h2>
+            <h2 class="text-lg font-semibold text-red-600">
+              Delete Brick
+            </h2>
           </template>
           <p class="text-gray-600 dark:text-gray-400">
             Are you sure you want to delete "<strong>{{ deleteConfirmBrick?.title }}</strong>"?
@@ -171,7 +196,10 @@ async function handleDelete() {
               >
                 Cancel
               </UButton>
-              <UButton color="error" @click="handleDelete">
+              <UButton
+                color="error"
+                @click="handleDelete"
+              >
                 Delete
               </UButton>
             </div>

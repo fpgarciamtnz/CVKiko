@@ -17,8 +17,9 @@ export function useChat() {
       })
 
       analysisResult.value = response.response
-    } catch (e: any) {
-      error.value = e.data?.message || e.message || 'Analysis failed'
+    } catch (e: unknown) {
+      const err = e as { data?: { message?: string }, message?: string }
+      error.value = err.data?.message || err.message || 'Analysis failed'
       console.error('Chat analysis error:', e)
     } finally {
       analyzing.value = false

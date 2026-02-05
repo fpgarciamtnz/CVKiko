@@ -45,16 +45,34 @@ function renderMarkdown(content: string): string {
         {{ settings?.name || 'Your Name' }}
       </h1>
       <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-600">
-        <span v-if="settings?.email" class="flex items-center gap-1">
-          <UIcon name="i-lucide-mail" class="w-4 h-4" />
+        <span
+          v-if="settings?.email"
+          class="flex items-center gap-1"
+        >
+          <UIcon
+            name="i-lucide-mail"
+            class="w-4 h-4"
+          />
           {{ settings.email }}
         </span>
-        <span v-if="settings?.phone" class="flex items-center gap-1">
-          <UIcon name="i-lucide-phone" class="w-4 h-4" />
+        <span
+          v-if="settings?.phone"
+          class="flex items-center gap-1"
+        >
+          <UIcon
+            name="i-lucide-phone"
+            class="w-4 h-4"
+          />
           {{ settings.phone }}
         </span>
-        <span v-if="settings?.location" class="flex items-center gap-1">
-          <UIcon name="i-lucide-map-pin" class="w-4 h-4" />
+        <span
+          v-if="settings?.location"
+          class="flex items-center gap-1"
+        >
+          <UIcon
+            name="i-lucide-map-pin"
+            class="w-4 h-4"
+          />
           {{ settings.location }}
         </span>
         <a
@@ -63,7 +81,10 @@ function renderMarkdown(content: string): string {
           target="_blank"
           class="flex items-center gap-1 text-blue-600 hover:underline"
         >
-          <UIcon name="i-simple-icons-linkedin" class="w-4 h-4" />
+          <UIcon
+            name="i-simple-icons-linkedin"
+            class="w-4 h-4"
+          />
           LinkedIn
         </a>
         <a
@@ -72,7 +93,10 @@ function renderMarkdown(content: string): string {
           target="_blank"
           class="flex items-center gap-1 text-gray-700 hover:underline"
         >
-          <UIcon name="i-simple-icons-github" class="w-4 h-4" />
+          <UIcon
+            name="i-simple-icons-github"
+            class="w-4 h-4"
+          />
           GitHub
         </a>
         <a
@@ -81,14 +105,20 @@ function renderMarkdown(content: string): string {
           target="_blank"
           class="flex items-center gap-1 text-blue-600 hover:underline"
         >
-          <UIcon name="i-lucide-globe" class="w-4 h-4" />
+          <UIcon
+            name="i-lucide-globe"
+            class="w-4 h-4"
+          />
           Website
         </a>
       </div>
     </header>
 
     <!-- Summary -->
-    <section v-if="settings?.summary" class="mb-6">
+    <section
+      v-if="settings?.summary"
+      class="mb-6"
+    >
       <p class="text-gray-700 leading-relaxed">
         {{ settings.summary }}
       </p>
@@ -99,8 +129,13 @@ function renderMarkdown(content: string): string {
       v-if="visibleSections.length === 0"
       class="flex flex-col items-center justify-center py-20 text-gray-400"
     >
-      <UIcon name="i-lucide-file-text" class="w-16 h-16 mb-4" />
-      <p class="text-lg">Select bricks to build your CV</p>
+      <UIcon
+        name="i-lucide-file-text"
+        class="w-16 h-16 mb-4"
+      />
+      <p class="text-lg">
+        Select bricks to build your CV
+      </p>
     </div>
 
     <!-- Sections -->
@@ -138,9 +173,15 @@ function renderMarkdown(content: string): string {
               <h3 class="font-semibold text-gray-900">
                 {{ brick.title }}
               </h3>
-              <p v-if="brick.frontmatter?.subtitle" class="text-gray-600 italic">
+              <p
+                v-if="brick.frontmatter?.subtitle"
+                class="text-gray-600 italic"
+              >
                 {{ brick.frontmatter.subtitle }}
-                <span v-if="brick.frontmatter?.location" class="text-gray-500">
+                <span
+                  v-if="brick.frontmatter?.location"
+                  class="text-gray-500"
+                >
                   | {{ brick.frontmatter.location }}
                 </span>
               </p>
@@ -160,7 +201,10 @@ function renderMarkdown(content: string): string {
             v-html="renderMarkdown(brick.content)"
           />
 
-          <div v-if="brick.tags?.length" class="mt-2 flex flex-wrap gap-1">
+          <div
+            v-if="brick.tags?.length"
+            class="mt-2 flex flex-wrap gap-1"
+          >
             <span
               v-for="tag in brick.tags"
               :key="tag"

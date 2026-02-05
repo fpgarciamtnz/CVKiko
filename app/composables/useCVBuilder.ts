@@ -1,5 +1,4 @@
 import type { Brick } from './useBricks'
-import type { Settings } from './useSettings'
 import type { BrickType } from '~/utils/brick-types'
 
 export interface CVConfig {
@@ -45,7 +44,7 @@ export function useCVBuilder() {
   }
 
   function selectBricks(brickIds: string[]) {
-    brickIds.forEach(id => {
+    brickIds.forEach((id) => {
       if (!selectedBrickIds.value.has(id)) {
         selectedBrickIds.value.add(id)
         brickOrder.value.push(id)

@@ -51,12 +51,20 @@ async function handleSubmit() {
     </div>
 
     <UCard>
-      <form @submit.prevent="handleSubmit" class="space-y-6">
+      <form
+        class="space-y-6"
+        @submit.prevent="handleSubmit"
+      >
         <!-- Personal Info -->
         <div>
-          <h3 class="text-lg font-semibold mb-4">Personal Information</h3>
+          <h3 class="text-lg font-semibold mb-4">
+            Personal Information
+          </h3>
           <div class="space-y-4">
-            <UFormField label="Full Name" required>
+            <UFormField
+              label="Full Name"
+              required
+            >
               <UInput
                 v-model="form.name"
                 placeholder="John Doe"
@@ -92,7 +100,9 @@ async function handleSubmit() {
 
         <!-- Summary -->
         <div>
-          <h3 class="text-lg font-semibold mb-4">Professional Summary</h3>
+          <h3 class="text-lg font-semibold mb-4">
+            Professional Summary
+          </h3>
           <UFormField label="Summary">
             <UTextarea
               v-model="form.summary"
@@ -104,7 +114,9 @@ async function handleSubmit() {
 
         <!-- Social Links -->
         <div>
-          <h3 class="text-lg font-semibold mb-4">Social Links</h3>
+          <h3 class="text-lg font-semibold mb-4">
+            Social Links
+          </h3>
           <div class="space-y-4">
             <UFormField label="LinkedIn">
               <UInput
@@ -113,7 +125,10 @@ async function handleSubmit() {
                 placeholder="https://linkedin.com/in/johndoe"
               >
                 <template #leading>
-                  <UIcon name="i-simple-icons-linkedin" class="w-4 h-4" />
+                  <UIcon
+                    name="i-simple-icons-linkedin"
+                    class="w-4 h-4"
+                  />
                 </template>
               </UInput>
             </UFormField>
@@ -125,7 +140,10 @@ async function handleSubmit() {
                 placeholder="https://github.com/johndoe"
               >
                 <template #leading>
-                  <UIcon name="i-simple-icons-github" class="w-4 h-4" />
+                  <UIcon
+                    name="i-simple-icons-github"
+                    class="w-4 h-4"
+                  />
                 </template>
               </UInput>
             </UFormField>
@@ -137,7 +155,10 @@ async function handleSubmit() {
                 placeholder="https://johndoe.com"
               >
                 <template #leading>
-                  <UIcon name="i-lucide-globe" class="w-4 h-4" />
+                  <UIcon
+                    name="i-lucide-globe"
+                    class="w-4 h-4"
+                  />
                 </template>
               </UInput>
             </UFormField>
@@ -145,7 +166,10 @@ async function handleSubmit() {
         </div>
 
         <div class="flex justify-end pt-4">
-          <UButton type="submit" :loading="loading">
+          <UButton
+            type="submit"
+            :loading="loading"
+          >
             Save Settings
           </UButton>
         </div>

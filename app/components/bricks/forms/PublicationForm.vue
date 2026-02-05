@@ -12,7 +12,7 @@ const emit = defineEmits<{
 
 const data = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 
 // Authors management
@@ -66,7 +66,10 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
 <template>
   <div class="space-y-6">
     <!-- Title -->
-    <UFormField label="Title" required>
+    <UFormField
+      label="Title"
+      required
+    >
       <UInput
         v-model="data.title"
         placeholder="e.g., Deep Learning Approaches to Natural Language Processing"
@@ -75,7 +78,10 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
     </UFormField>
 
     <!-- Authors -->
-    <UFormField label="Authors" hint="List all authors in order (highlight your name with asterisk *)">
+    <UFormField
+      label="Authors"
+      hint="List all authors in order (highlight your name with asterisk *)"
+    >
       <div class="space-y-2">
         <div
           v-for="(author, index) in data.authors"
@@ -111,7 +117,10 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
 
     <!-- Publication Type & Venue -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <UFormField label="Publication Type" required>
+      <UFormField
+        label="Publication Type"
+        required
+      >
         <USelectMenu
           v-model="data.publicationType"
           :items="publicationTypeOptions"
@@ -119,7 +128,10 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
         />
       </UFormField>
 
-      <UFormField label="Publication Venue" hint="Journal, Conference, Publisher name">
+      <UFormField
+        label="Publication Venue"
+        hint="Journal, Conference, Publisher name"
+      >
         <UInput
           v-model="data.publicationName"
           placeholder="e.g., Nature, IEEE Conference on AI"
@@ -131,10 +143,16 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
     <!-- Date & Citations -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <UFormField label="Publication Date">
-        <UInput v-model="data.date" type="month" />
+        <UInput
+          v-model="data.date"
+          type="month"
+        />
       </UFormField>
 
-      <UFormField label="Citations" hint="Optional">
+      <UFormField
+        label="Citations"
+        hint="Optional"
+      >
         <UInputNumber
           v-model="data.citations"
           :min="0"
@@ -142,7 +160,10 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
         />
       </UFormField>
 
-      <UFormField label="DOI" hint="Digital Object Identifier">
+      <UFormField
+        label="DOI"
+        hint="Digital Object Identifier"
+      >
         <UInput
           v-model="data.doi"
           placeholder="e.g., 10.1000/xyz123"
@@ -151,7 +172,10 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
     </div>
 
     <!-- URL -->
-    <UFormField label="Link" hint="URL to the publication">
+    <UFormField
+      label="Link"
+      hint="URL to the publication"
+    >
       <UInput
         v-model="data.url"
         type="url"
@@ -161,7 +185,10 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
     </UFormField>
 
     <!-- Abstract -->
-    <UFormField label="Abstract" hint="Brief summary of the publication">
+    <UFormField
+      label="Abstract"
+      hint="Brief summary of the publication"
+    >
       <UTextarea
         v-model="data.abstract"
         :rows="4"
@@ -170,7 +197,10 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
     </UFormField>
 
     <!-- Your Contributions -->
-    <UFormField label="Your Contributions" hint="What was your specific role?">
+    <UFormField
+      label="Your Contributions"
+      hint="What was your specific role?"
+    >
       <div class="space-y-2">
         <div
           v-for="(contribution, index) in data.contributions"

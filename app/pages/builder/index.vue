@@ -62,7 +62,9 @@ function handleDownloadPdf() {
       <div class="p-4 border-b bg-gray-50 dark:bg-gray-900">
         <div class="flex items-center justify-between mb-4">
           <div>
-            <h2 class="text-lg font-semibold">Select Bricks</h2>
+            <h2 class="text-lg font-semibold">
+              Select Bricks
+            </h2>
             <p class="text-sm text-gray-500">
               {{ selectedBricks.length }} selected
             </p>
@@ -95,7 +97,11 @@ function handleDownloadPdf() {
         >
           <template #item="{ item }">
             <div class="flex items-center gap-1">
-              <UIcon v-if="item.icon" :name="item.icon" class="w-3 h-3" />
+              <UIcon
+                v-if="item.icon"
+                :name="item.icon"
+                class="w-3 h-3"
+              />
               <span class="text-xs">{{ item.label }}</span>
             </div>
           </template>
@@ -104,15 +110,28 @@ function handleDownloadPdf() {
 
       <!-- Brick List -->
       <div class="flex-1 overflow-y-auto p-3">
-        <div v-if="filteredBricks.length === 0" class="text-center py-12 text-gray-500">
-          <UIcon name="i-lucide-inbox" class="w-12 h-12 mx-auto mb-2 opacity-50" />
+        <div
+          v-if="filteredBricks.length === 0"
+          class="text-center py-12 text-gray-500"
+        >
+          <UIcon
+            name="i-lucide-inbox"
+            class="w-12 h-12 mx-auto mb-2 opacity-50"
+          />
           <p>No bricks in this category</p>
-          <UButton to="/bricks" variant="link" class="mt-2">
+          <UButton
+            to="/bricks"
+            variant="link"
+            class="mt-2"
+          >
             Add bricks
           </UButton>
         </div>
 
-        <div v-else class="space-y-2">
+        <div
+          v-else
+          class="space-y-2"
+        >
           <BricksBrickCard
             v-for="brick in filteredBricks"
             :key="brick.id"
@@ -135,7 +154,9 @@ function handleDownloadPdf() {
       <!-- Preview Controls -->
       <div class="p-4 border-b bg-white dark:bg-gray-900 print:hidden">
         <div class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold">CV Preview</h2>
+          <h2 class="text-lg font-semibold">
+            CV Preview
+          </h2>
           <div class="flex gap-2">
             <UButton
               :icon="showChat ? 'i-lucide-panel-right-close' : 'i-lucide-panel-right-open'"

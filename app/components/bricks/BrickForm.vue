@@ -204,9 +204,15 @@ function handleSubmit() {
 </script>
 
 <template>
-  <form class="space-y-6" @submit.prevent="handleSubmit">
+  <form
+    class="space-y-6"
+    @submit.prevent="handleSubmit"
+  >
     <!-- Type Selector (only for new bricks) -->
-    <div v-if="!isEditing" class="space-y-3">
+    <div
+      v-if="!isEditing"
+      class="space-y-3"
+    >
       <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
         What type of brick do you want to create?
       </label>
@@ -223,7 +229,10 @@ function handleSubmit() {
           ]"
           @click="selectedType = option.value"
         >
-          <UIcon :name="option.icon" class="w-6 h-6" />
+          <UIcon
+            :name="option.icon"
+            class="w-6 h-6"
+          />
           <span class="font-medium">{{ option.label }}</span>
           <span class="text-xs text-neutral-500 text-center">{{ option.description }}</span>
         </button>
@@ -231,8 +240,14 @@ function handleSubmit() {
     </div>
 
     <!-- Type indicator for editing -->
-    <div v-else class="flex items-center gap-2 text-sm text-neutral-500">
-      <UIcon :name="currentConfig.icon" class="w-4 h-4" />
+    <div
+      v-else
+      class="flex items-center gap-2 text-sm text-neutral-500"
+    >
+      <UIcon
+        :name="currentConfig.icon"
+        class="w-4 h-4"
+      />
       <span>Editing {{ currentConfig.label }}</span>
     </div>
 
@@ -240,18 +255,39 @@ function handleSubmit() {
 
     <!-- Type-specific form -->
     <div class="min-h-[300px]">
-      <BricksFormsExperienceForm v-if="selectedType === 'experience'" v-model="experienceData" />
-      <BricksFormsEducationForm v-else-if="selectedType === 'education'" v-model="educationData" />
-      <BricksFormsProjectForm v-else-if="selectedType === 'project'" v-model="projectData" />
-      <BricksFormsSkillForm v-else-if="selectedType === 'skill'" v-model="skillData" />
-      <BricksFormsPublicationForm v-else-if="selectedType === 'publication'" v-model="publicationData" />
-      <BricksFormsCustomForm v-else-if="selectedType === 'custom'" v-model="customData" />
+      <BricksFormsExperienceForm
+        v-if="selectedType === 'experience'"
+        v-model="experienceData"
+      />
+      <BricksFormsEducationForm
+        v-else-if="selectedType === 'education'"
+        v-model="educationData"
+      />
+      <BricksFormsProjectForm
+        v-else-if="selectedType === 'project'"
+        v-model="projectData"
+      />
+      <BricksFormsSkillForm
+        v-else-if="selectedType === 'skill'"
+        v-model="skillData"
+      />
+      <BricksFormsPublicationForm
+        v-else-if="selectedType === 'publication'"
+        v-model="publicationData"
+      />
+      <BricksFormsCustomForm
+        v-else-if="selectedType === 'custom'"
+        v-model="customData"
+      />
     </div>
 
     <USeparator />
 
     <!-- Title (can be auto-generated or overridden) -->
-    <UFormField label="Display Title" hint="Auto-generated, but you can customize">
+    <UFormField
+      label="Display Title"
+      hint="Auto-generated, but you can customize"
+    >
       <UInput
         v-model="title"
         placeholder="Will be generated from your input"
@@ -260,7 +296,10 @@ function handleSubmit() {
     </UFormField>
 
     <!-- Tags -->
-    <UFormField label="Tags" hint="For filtering and organizing your bricks">
+    <UFormField
+      label="Tags"
+      hint="For filtering and organizing your bricks"
+    >
       <div class="space-y-2">
         <div class="flex gap-2">
           <UInput
@@ -269,11 +308,18 @@ function handleSubmit() {
             class="flex-1"
             @keydown.enter.prevent="addTag"
           />
-          <UButton type="button" variant="soft" @click="addTag">
+          <UButton
+            type="button"
+            variant="soft"
+            @click="addTag"
+          >
             Add
           </UButton>
         </div>
-        <div v-if="tags.length" class="flex flex-wrap gap-1">
+        <div
+          v-if="tags.length"
+          class="flex flex-wrap gap-1"
+        >
           <UBadge
             v-for="tag in tags"
             :key="tag"
@@ -283,7 +329,10 @@ function handleSubmit() {
             @click="removeTag(tag)"
           >
             <template #trailing>
-              <UIcon name="i-lucide-x" class="w-3 h-3" />
+              <UIcon
+                name="i-lucide-x"
+                class="w-3 h-3"
+              />
             </template>
           </UBadge>
         </div>
@@ -292,11 +341,19 @@ function handleSubmit() {
 
     <!-- Actions -->
     <div class="flex justify-end gap-2 pt-4 border-t border-neutral-200 dark:border-neutral-700">
-      <UButton type="button" variant="ghost" color="neutral" @click="emit('cancel')">
+      <UButton
+        type="button"
+        variant="ghost"
+        color="neutral"
+        @click="emit('cancel')"
+      >
         Cancel
       </UButton>
       <UButton type="submit">
-        <UIcon :name="isEditing ? 'i-lucide-save' : 'i-lucide-plus'" class="w-4 h-4" />
+        <UIcon
+          :name="isEditing ? 'i-lucide-save' : 'i-lucide-plus'"
+          class="w-4 h-4"
+        />
         {{ isEditing ? 'Update' : 'Create' }} Brick
       </UButton>
     </div>

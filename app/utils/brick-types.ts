@@ -38,7 +38,7 @@ export interface ProjectData {
   features: string[] // Key features
   technologies: string[]
   outcome: string // Results/impact
-  links: { label: string; url: string }[] // GitHub, Demo, etc.
+  links: { label: string, url: string }[] // GitHub, Demo, etc.
   isPersonal: boolean // Personal vs Professional
   date: string // When built
 }
@@ -70,13 +70,13 @@ export interface CustomData {
 }
 
 // Union type for all brick data
-export type BrickData =
-  | { type: 'experience'; data: ExperienceData }
-  | { type: 'education'; data: EducationData }
-  | { type: 'project'; data: ProjectData }
-  | { type: 'skill'; data: SkillData }
-  | { type: 'publication'; data: PublicationData }
-  | { type: 'custom'; data: CustomData }
+export type BrickData
+  = | { type: 'experience', data: ExperienceData }
+    | { type: 'education', data: EducationData }
+    | { type: 'project', data: ProjectData }
+    | { type: 'skill', data: SkillData }
+    | { type: 'publication', data: PublicationData }
+    | { type: 'custom', data: CustomData }
 
 // ============================================
 // BRICK FRONTMATTER (for backwards compatibility)
@@ -294,14 +294,14 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       let md = ''
       if (exp.responsibilities.filter(r => r.trim()).length > 0) {
         md += '## Responsibilities\n\n'
-        exp.responsibilities.filter(r => r.trim()).forEach(r => {
+        exp.responsibilities.filter(r => r.trim()).forEach((r) => {
           md += `- ${r}\n`
         })
         md += '\n'
       }
       if (exp.achievements.filter(a => a.trim()).length > 0) {
         md += '## Achievements\n\n'
-        exp.achievements.filter(a => a.trim()).forEach(a => {
+        exp.achievements.filter(a => a.trim()).forEach((a) => {
           md += `- ${a}\n`
         })
         md += '\n'
@@ -316,7 +316,7 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       let md = ''
       if (edu.coursework.length > 0) {
         md += '## Relevant Coursework\n\n'
-        edu.coursework.forEach(c => {
+        edu.coursework.forEach((c) => {
           md += `- ${c}\n`
         })
         md += '\n'
@@ -326,7 +326,7 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       }
       if (edu.activities.length > 0) {
         md += '## Activities\n\n'
-        edu.activities.forEach(a => {
+        edu.activities.forEach((a) => {
           md += `- ${a}\n`
         })
       }
@@ -346,7 +346,7 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       }
       if (proj.features.filter(f => f.trim()).length > 0) {
         md += '## Key Features\n\n'
-        proj.features.filter(f => f.trim()).forEach(f => {
+        proj.features.filter(f => f.trim()).forEach((f) => {
           md += `- ${f}\n`
         })
         md += '\n'
@@ -381,7 +381,7 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       }
       if (pub.contributions.filter(c => c.trim()).length > 0) {
         md += '## Key Contributions\n\n'
-        pub.contributions.filter(c => c.trim()).forEach(c => {
+        pub.contributions.filter(c => c.trim()).forEach((c) => {
           md += `- ${c}\n`
         })
       }

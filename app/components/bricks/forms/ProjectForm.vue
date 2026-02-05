@@ -11,7 +11,7 @@ const emit = defineEmits<{
 
 const data = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 
 // Features management
@@ -86,7 +86,10 @@ const projectTypeOptions = [
   <div class="space-y-6">
     <!-- Basic Info -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <UFormField label="Project Name" required>
+      <UFormField
+        label="Project Name"
+        required
+      >
         <UInput
           v-model="data.name"
           placeholder="e.g., E-commerce Platform"
@@ -112,13 +115,23 @@ const projectTypeOptions = [
         />
       </UFormField>
 
-      <UFormField label="Date" hint="When was this built?">
-        <UInput v-model="data.date" type="month" />
+      <UFormField
+        label="Date"
+        hint="When was this built?"
+      >
+        <UInput
+          v-model="data.date"
+          type="month"
+        />
       </UFormField>
     </div>
 
     <!-- Description -->
-    <UFormField label="Short Description" required hint="1-2 sentences explaining what the project does">
+    <UFormField
+      label="Short Description"
+      required
+      hint="1-2 sentences explaining what the project does"
+    >
       <UTextarea
         v-model="data.description"
         :rows="2"
@@ -127,7 +140,10 @@ const projectTypeOptions = [
     </UFormField>
 
     <!-- Problem Solved -->
-    <UFormField label="Problem Solved" hint="What problem does this project solve?">
+    <UFormField
+      label="Problem Solved"
+      hint="What problem does this project solve?"
+    >
       <UTextarea
         v-model="data.problem"
         :rows="2"
@@ -136,7 +152,10 @@ const projectTypeOptions = [
     </UFormField>
 
     <!-- Key Features -->
-    <UFormField label="Key Features" hint="2-4 main features of your project">
+    <UFormField
+      label="Key Features"
+      hint="2-4 main features of your project"
+    >
       <div class="space-y-2">
         <div
           v-for="(feature, index) in data.features"
@@ -171,7 +190,10 @@ const projectTypeOptions = [
     </UFormField>
 
     <!-- Technologies -->
-    <UFormField label="Tech Stack" hint="Technologies, languages, frameworks used">
+    <UFormField
+      label="Tech Stack"
+      hint="Technologies, languages, frameworks used"
+    >
       <div class="space-y-2">
         <div class="flex gap-2">
           <UInput
@@ -180,11 +202,17 @@ const projectTypeOptions = [
             class="flex-1"
             @keydown.enter.prevent="addTech"
           />
-          <UButton variant="soft" @click="addTech">
+          <UButton
+            variant="soft"
+            @click="addTech"
+          >
             Add
           </UButton>
         </div>
-        <div v-if="data.technologies.length" class="flex flex-wrap gap-1">
+        <div
+          v-if="data.technologies.length"
+          class="flex flex-wrap gap-1"
+        >
           <UBadge
             v-for="tech in data.technologies"
             :key="tech"
@@ -195,7 +223,10 @@ const projectTypeOptions = [
             @click="removeTech(tech)"
           >
             <template #trailing>
-              <UIcon name="i-lucide-x" class="w-3 h-3" />
+              <UIcon
+                name="i-lucide-x"
+                class="w-3 h-3"
+              />
             </template>
           </UBadge>
         </div>
@@ -203,7 +234,10 @@ const projectTypeOptions = [
     </UFormField>
 
     <!-- Outcome -->
-    <UFormField label="Outcome / Results" hint="Impact, metrics, or results">
+    <UFormField
+      label="Outcome / Results"
+      hint="Impact, metrics, or results"
+    >
       <UTextarea
         v-model="data.outcome"
         :rows="2"
@@ -212,7 +246,10 @@ const projectTypeOptions = [
     </UFormField>
 
     <!-- Links -->
-    <UFormField label="Links" hint="GitHub, Demo, Documentation, etc.">
+    <UFormField
+      label="Links"
+      hint="GitHub, Demo, Documentation, etc."
+    >
       <div class="space-y-2">
         <div
           v-for="(link, index) in data.links"

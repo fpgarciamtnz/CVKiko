@@ -1,6 +1,7 @@
 import { db, bricks, type NewBrick } from '../../database'
 import { eq } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
+import type { BrickType } from '~/utils/brick-types'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody<{
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
 
   const newBrick: NewBrick = {
     id: uuidv4(),
-    type: body.type as any,
+    type: body.type as BrickType,
     title: body.title,
     content: body.content ?? '',
     tags: body.tags ?? [],
