@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { ExperienceData } from '~/utils/brick-types'
-import { LOCATION_TYPES } from '~/utils/brick-types'
 
 const props = defineProps<{
   modelValue: ExperienceData
@@ -13,6 +12,15 @@ const emit = defineEmits<{
 const data = computed({
   get: () => props.modelValue,
   set: val => emit('update:modelValue', val)
+})
+
+// Current position toggle
+const isCurrentPosition = ref(!props.modelValue.endDate)
+
+watch(isCurrentPosition, (isCurrent) => {
+  if (isCurrent) {
+    data.value = { ...data.value, endDate: '' }
+  }
 })
 
 // Dynamic list management
@@ -75,11 +83,6 @@ function removeTech(tech: string) {
     technologies: data.value.technologies.filter(t => t !== tech)
   }
 }
-
-const locationTypeOptions = LOCATION_TYPES.map(lt => ({
-  label: lt.label,
-  value: lt.value
-}))
 </script>
 
 <template>
@@ -110,23 +113,13 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
       </UFormField>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <UFormField label="Location">
-        <UInput
-          v-model="data.location"
-          placeholder="e.g., San Francisco, CA"
-          icon="i-lucide-map-pin"
-        />
-      </UFormField>
-
-      <UFormField label="Work Type">
-        <USelectMenu
-          v-model="data.locationType"
-          :items="locationTypeOptions"
-          value-key="value"
-        />
-      </UFormField>
-    </div>
+    <UFormField label="Location">
+      <UInput
+        v-model="data.location"
+        placeholder="e.g., San Francisco, CA"
+        icon="i-lucide-map-pin"
+      />
+    </UFormField>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <UFormField
@@ -135,19 +128,24 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
       >
         <UInput
           v-model="data.startDate"
-          type="month"
+          placeholder="e.g., Jan 2020 or 2020-01"
+          icon="i-lucide-calendar"
         />
       </UFormField>
-      <UFormField
-        label="End Date"
-        hint="Leave empty if current position"
-      >
+      <UFormField label="End Date">
         <UInput
           v-model="data.endDate"
-          type="month"
+          placeholder="e.g., Dec 2023 or 2023-12"
+          icon="i-lucide-calendar"
+          :disabled="isCurrentPosition"
         />
       </UFormField>
     </div>
+
+    <UCheckbox
+      v-model="isCurrentPosition"
+      label="I currently work here"
+    />
 
     <!-- Responsibilities -->
     <UFormField
