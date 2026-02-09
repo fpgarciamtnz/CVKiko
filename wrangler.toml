@@ -1,0 +1,13 @@
+name = "cvkiko"
+compatibility_date = "2025-01-15"
+pages_build_output_dir = ".output/public"
+
+# Uncomment and set these for D1 database (if needed)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "cvkiko-db"
+# database_id = "your-database-id"
+
+# Environment variables (set via Cloudflare dashboard or wrangler secret)
+# [vars]
+# AI_PROVIDER = "cloudflare"

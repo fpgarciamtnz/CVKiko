@@ -67,9 +67,16 @@ const customData = ref<CustomData>(
     : (BRICK_TYPE_CONFIG.custom.defaultData() as CustomData)
 )
 
+// Clear title when switching brick type (only for new bricks)
+watch(selectedType, () => {
+  if (!isEditing.value) {
+    title.value = ''
+  }
+})
+
 // Auto-generate title based on structured data
-watch([selectedType, experienceData, educationData, projectData, skillData, publicationData], () => {
-  if (!isEditing.value || !title.value) {
+watch([experienceData, educationData, projectData, skillData, publicationData], () => {
+  if (!isEditing.value) {
     switch (selectedType.value) {
       case 'experience':
         if (experienceData.value.jobTitle && experienceData.value.company) {

@@ -133,23 +133,12 @@ const degreeOptions = DEGREE_OPTIONS.map(d => ({ label: d, value: d }))
     </div>
 
     <!-- Graduation & GPA -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <UFormField label="Graduation Date">
         <UInput
           v-model="data.graduationDate"
-          type="month"
-        />
-      </UFormField>
-
-      <UFormField>
-        <template #label>
-          <span class="flex items-center gap-2">
-            Expected Graduation?
-          </span>
-        </template>
-        <USwitch
-          v-model="data.isExpected"
-          label="Still in progress"
+          placeholder="e.g., May 2024 or 2024-05"
+          icon="i-lucide-calendar"
         />
       </UFormField>
 
@@ -164,6 +153,11 @@ const degreeOptions = DEGREE_OPTIONS.map(d => ({ label: d, value: d }))
         />
       </UFormField>
     </div>
+
+    <UCheckbox
+      v-model="data.isExpected"
+      label="Expected graduation (still in progress)"
+    />
 
     <!-- Honors -->
     <UFormField
