@@ -9,10 +9,6 @@ export default defineNuxtConfig({
     enabled: true
   },
 
-  nitro: {
-    preset: 'cloudflare-pages'
-  },
-
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
@@ -28,6 +24,10 @@ export default defineNuxtConfig({
   },
 
   compatibilityDate: '2025-01-15',
+
+  nitro: {
+    preset: 'cloudflare-pages'
+  },
 
   eslint: {
     config: {
