@@ -1,9 +1,10 @@
-import { db, bricks, type NewBrick } from '../../database'
+import { useDb, bricks, type NewBrick } from '../../database'
 import { eq } from 'drizzle-orm'
 import { v4 as uuidv4 } from 'uuid'
 import type { BrickType } from '~/utils/brick-types'
 
 export default defineEventHandler(async (event) => {
+  const db = useDb(event)
   const body = await readBody<{
     type: string
     title: string
@@ -36,5 +37,6 @@ export default defineEventHandler(async (event) => {
 
   await db.insert(bricks).values(newBrick)
 
-  return await db.select().from(bricks).where(eq(bricks.id, newBrick.id)).get()
+  const [result] = await db.select().from(bricks).where(eq(bricks.id, newBrick.id))
+  return result
 })

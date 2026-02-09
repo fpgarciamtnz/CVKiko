@@ -1,7 +1,8 @@
-import { db, bricks } from '../../database'
+import { useDb, bricks } from '../../database'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
+  const db = useDb(event)
   const id = getRouterParam(event, 'id')
 
   if (!id) {
@@ -11,7 +12,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const brick = await db.select().from(bricks).where(eq(bricks.id, id)).get()
+  const [brick] = await db.select().from(bricks).where(eq(bricks.id, id))
 
   if (!brick) {
     throw createError({

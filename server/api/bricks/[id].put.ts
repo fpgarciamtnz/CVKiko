@@ -1,7 +1,8 @@
-import { db, bricks, type Brick } from '../../database'
+import { useDb, bricks, type Brick } from '../../database'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
+  const db = useDb(event)
   const id = getRouterParam(event, 'id')
   const body = await readBody<Partial<Brick>>(event)
 
@@ -12,7 +13,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const existing = await db.select().from(bricks).where(eq(bricks.id, id)).get()
+  const [existing] = await db.select().from(bricks).where(eq(bricks.id, id))
 
   if (!existing) {
     throw createError({
@@ -26,5 +27,6 @@ export default defineEventHandler(async (event) => {
     updatedAt: new Date()
   }).where(eq(bricks.id, id))
 
-  return await db.select().from(bricks).where(eq(bricks.id, id)).get()
+  const [result] = await db.select().from(bricks).where(eq(bricks.id, id))
+  return result
 })

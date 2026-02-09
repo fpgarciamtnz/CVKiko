@@ -87,19 +87,18 @@ const proficiencyOptions = PROFICIENCY_LEVELS.map(p => ({
     </div>
 
     <!-- Years of Experience -->
-    <UFormField label="Years of Experience">
-      <div class="flex items-center gap-4">
-        <USlider
-          v-model="data.yearsOfExperience"
-          :min="0"
-          :max="20"
-          :step="1"
-          class="flex-1"
-        />
-        <span class="text-sm font-medium w-20 text-right">
-          {{ data.yearsOfExperience }} {{ data.yearsOfExperience === 1 ? 'year' : 'years' }}
-        </span>
-      </div>
+    <UFormField
+      label="Years of Experience"
+      hint="How many years have you used this skill?"
+    >
+      <UInput
+        v-model.number="data.yearsOfExperience"
+        type="number"
+        :min="0"
+        :max="50"
+        placeholder="e.g., 5"
+        icon="i-lucide-clock"
+      />
     </UFormField>
 
     <!-- Context -->

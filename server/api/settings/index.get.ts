@@ -1,8 +1,9 @@
-import { db, settings } from '../../database'
+import { useDb, settings } from '../../database'
 import { eq } from 'drizzle-orm'
 
-export default defineEventHandler(async () => {
-  let result = await db.select().from(settings).where(eq(settings.id, 'default')).get()
+export default defineEventHandler(async (event) => {
+  const db = useDb(event)
+  let [result] = await db.select().from(settings).where(eq(settings.id, 'default'))
 
   // Create default settings if none exist
   if (!result) {
@@ -17,7 +18,7 @@ export default defineEventHandler(async () => {
       github: '',
       website: ''
     })
-    result = await db.select().from(settings).where(eq(settings.id, 'default')).get()
+    ;[result] = await db.select().from(settings).where(eq(settings.id, 'default'))
   }
 
   return result

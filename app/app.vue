@@ -22,10 +22,10 @@ useSeoMeta({
 })
 
 const navigation = [
-  { label: 'Dashboard', to: '/', icon: 'i-lucide-home' },
-  { label: 'Bricks', to: '/bricks', icon: 'i-lucide-layers' },
-  { label: 'Builder', to: '/builder', icon: 'i-lucide-file-text' },
-  { label: 'Settings', to: '/settings', icon: 'i-lucide-settings' }
+  { label: 'Dashboard', to: '/' },
+  { label: 'Bricks', to: '/bricks' },
+  { label: 'Builder', to: '/builder' },
+  { label: 'Settings', to: '/settings' }
 ]
 </script>
 

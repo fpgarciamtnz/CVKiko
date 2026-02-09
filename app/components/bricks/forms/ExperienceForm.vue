@@ -110,7 +110,7 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
       </UFormField>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <UFormField label="Location">
         <UInput
           v-model="data.location"
@@ -126,27 +126,27 @@ const locationTypeOptions = LOCATION_TYPES.map(lt => ({
           value-key="value"
         />
       </UFormField>
+    </div>
 
-      <div class="grid grid-cols-2 gap-2">
-        <UFormField
-          label="Start Date"
-          required
-        >
-          <UInput
-            v-model="data.startDate"
-            type="month"
-          />
-        </UFormField>
-        <UFormField
-          label="End Date"
-          hint="Empty = current"
-        >
-          <UInput
-            v-model="data.endDate"
-            type="month"
-          />
-        </UFormField>
-      </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <UFormField
+        label="Start Date"
+        required
+      >
+        <UInput
+          v-model="data.startDate"
+          type="month"
+        />
+      </UFormField>
+      <UFormField
+        label="End Date"
+        hint="Leave empty if current position"
+      >
+        <UInput
+          v-model="data.endDate"
+          type="month"
+        />
+      </UFormField>
     </div>
 
     <!-- Responsibilities -->

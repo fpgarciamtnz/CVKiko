@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * BRICKS PAGE - Combined Approach
+ * - Drawer for quick create/edit
+ * - Links to dedicated pages for full editing
+ * - Clean, organized UI
+ */
 import { BRICK_TYPE_CONFIG, BRICK_TYPES, type BrickType } from '~/utils/brick-types'
 import type { Brick } from '~/composables/useBricks'
 
@@ -8,9 +14,10 @@ const toast = useToast()
 await fetchBricks()
 
 const activeTab = ref<BrickType | 'all'>('all')
-const showForm = ref(false)
+const drawerOpen = ref(false)
 const editingBrick = ref<Brick | null>(null)
 const deleteConfirmBrick = ref<Brick | null>(null)
+const isSubmitting = ref(false)
 
 const tabs = computed(() => [
   { label: 'All', value: 'all' as const, icon: undefined as string | undefined, count: bricks.value.length },
@@ -27,14 +34,14 @@ const filteredBricks = computed(() => {
   return bricksByType.value[activeTab.value] || []
 })
 
-function openCreateForm() {
+function openCreateDrawer() {
   editingBrick.value = null
-  showForm.value = true
+  drawerOpen.value = true
 }
 
-function openEditForm(brick: Brick) {
+function openEditDrawer(brick: Brick) {
   editingBrick.value = brick
-  showForm.value = true
+  drawerOpen.value = true
 }
 
 function confirmDelete(brick: Brick) {
@@ -42,18 +49,21 @@ function confirmDelete(brick: Brick) {
 }
 
 async function handleSubmit(data: Partial<Brick>) {
+  isSubmitting.value = true
   try {
     if (editingBrick.value) {
       await updateBrick(editingBrick.value.id, data)
-      toast.add({ title: 'Brick updated', color: 'success' })
+      toast.add({ title: 'Brick updated successfully', color: 'success', icon: 'i-lucide-check-circle' })
     } else {
       await createBrick(data)
-      toast.add({ title: 'Brick created', color: 'success' })
+      toast.add({ title: 'Brick created successfully', color: 'success', icon: 'i-lucide-check-circle' })
     }
-    showForm.value = false
+    drawerOpen.value = false
     editingBrick.value = null
   } catch {
-    toast.add({ title: 'Failed to save brick', color: 'error' })
+    toast.add({ title: 'Failed to save brick', color: 'error', icon: 'i-lucide-alert-circle' })
+  } finally {
+    isSubmitting.value = false
   }
 }
 
@@ -62,135 +72,279 @@ async function handleDelete() {
 
   try {
     await deleteBrick(deleteConfirmBrick.value.id)
-    toast.add({ title: 'Brick deleted', color: 'success' })
+    toast.add({ title: 'Brick deleted', color: 'success', icon: 'i-lucide-check-circle' })
     deleteConfirmBrick.value = null
   } catch {
-    toast.add({ title: 'Failed to delete brick', color: 'error' })
+    toast.add({ title: 'Failed to delete brick', color: 'error', icon: 'i-lucide-alert-circle' })
+  }
+}
+
+// Form ref for external submit
+const formRef = ref<{ submit: () => void } | null>(null)
+
+function submitForm() {
+  const form = document.getElementById('brick-form') as HTMLFormElement
+  if (form) {
+    form.requestSubmit()
   }
 }
 </script>
 
 <template>
   <UContainer class="py-8">
-    <div class="flex items-center justify-between mb-6">
+    <!-- Page Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
           Bricks
         </h1>
-        <p class="text-gray-600 dark:text-gray-400">
+        <p class="mt-1 text-gray-600 dark:text-gray-400">
           Manage your experiences, education, projects, and skills
         </p>
       </div>
       <UButton
         icon="i-lucide-plus"
-        @click="openCreateForm"
+        size="lg"
+        @click="openCreateDrawer"
       >
         Add Brick
       </UButton>
     </div>
 
-    <!-- Tabs -->
-    <UTabs
-      v-model="activeTab"
-      :items="tabs"
-      class="mb-6"
-    >
-      <template #default="{ item }">
-        <div class="flex items-center gap-2">
-          <UIcon
-            v-if="item.icon"
-            :name="item.icon"
-            class="w-4 h-4"
-          />
-          <span>{{ item.label }}</span>
-          <UBadge
-            :label="String(item.count)"
-            variant="subtle"
-            size="xs"
-          />
-        </div>
-      </template>
-    </UTabs>
-
-    <!-- Brick List -->
-    <div
-      v-if="filteredBricks.length > 0"
-      class="grid md:grid-cols-2 gap-4"
-    >
-      <BricksBrickCard
-        v-for="brick in filteredBricks"
-        :key="brick.id"
-        :brick="brick"
-        @edit="openEditForm"
-        @delete="confirmDelete"
-      />
+    <!-- Filter Tabs -->
+    <div class="mb-6 overflow-x-auto">
+      <UTabs
+        v-model="activeTab"
+        :items="tabs"
+        variant="pill"
+      >
+        <template #default="{ item }">
+          <div class="flex items-center gap-2">
+            <UIcon
+              v-if="item.icon"
+              :name="item.icon"
+              class="w-4 h-4"
+            />
+            <span>{{ item.label }}</span>
+            <UBadge
+              :label="String(item.count)"
+              variant="subtle"
+              size="xs"
+            />
+          </div>
+        </template>
+      </UTabs>
     </div>
 
+    <!-- Brick Grid -->
+    <div
+      v-if="filteredBricks.length > 0"
+      class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"
+    >
+      <UCard
+        v-for="brick in filteredBricks"
+        :key="brick.id"
+        class="hover:shadow-md transition-shadow group"
+      >
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-start gap-3 flex-1 min-w-0">
+            <!-- Type Icon -->
+            <div
+              class="p-2.5 rounded-xl flex-shrink-0 transition-transform group-hover:scale-105"
+              :style="{
+                backgroundColor: BRICK_TYPE_CONFIG[brick.type].color.includes('blue') ? 'rgb(219 234 254)'
+                  : BRICK_TYPE_CONFIG[brick.type].color.includes('green') ? 'rgb(220 252 231)'
+                    : BRICK_TYPE_CONFIG[brick.type].color.includes('purple') ? 'rgb(243 232 255)'
+                      : BRICK_TYPE_CONFIG[brick.type].color.includes('orange') ? 'rgb(255 237 213)'
+                        : BRICK_TYPE_CONFIG[brick.type].color.includes('pink') ? 'rgb(252 231 243)'
+                          : 'rgb(243 244 246)'
+              }"
+            >
+              <UIcon
+                :name="BRICK_TYPE_CONFIG[brick.type].icon"
+                class="w-5 h-5"
+                :class="BRICK_TYPE_CONFIG[brick.type].color"
+              />
+            </div>
+
+            <!-- Content -->
+            <div class="min-w-0 flex-1">
+              <h3 class="font-semibold text-gray-900 dark:text-white truncate">
+                {{ brick.title }}
+              </h3>
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                {{ BRICK_TYPE_CONFIG[brick.type].label }}
+              </p>
+
+              <!-- Tags -->
+              <div
+                v-if="brick.tags?.length"
+                class="flex flex-wrap gap-1 mt-2"
+              >
+                <UBadge
+                  v-for="tag in brick.tags.slice(0, 3)"
+                  :key="tag"
+                  :label="tag"
+                  variant="subtle"
+                  size="xs"
+                />
+                <UBadge
+                  v-if="brick.tags.length > 3"
+                  :label="`+${brick.tags.length - 3}`"
+                  variant="subtle"
+                  size="xs"
+                  color="neutral"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions Dropdown -->
+          <UDropdownMenu
+            :items="[
+              [{
+                label: 'Edit',
+                icon: 'i-lucide-pencil',
+                onSelect: () => openEditDrawer(brick)
+              }],
+              [{
+                label: 'Delete',
+                icon: 'i-lucide-trash-2',
+                color: 'error' as const,
+                onSelect: () => confirmDelete(brick)
+              }]
+            ]"
+          >
+            <UButton
+              icon="i-lucide-more-vertical"
+              variant="ghost"
+              color="neutral"
+              size="sm"
+              class="opacity-0 group-hover:opacity-100 transition-opacity"
+            />
+          </UDropdownMenu>
+        </div>
+      </UCard>
+    </div>
+
+    <!-- Empty State -->
     <UCard
       v-else
-      class="text-center py-12"
+      class="text-center py-16"
     >
       <UIcon
         name="i-lucide-inbox"
-        class="w-16 h-16 mx-auto mb-4 text-gray-400"
+        class="w-20 h-20 mx-auto mb-4 text-gray-300 dark:text-gray-600"
       />
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
         No {{ activeTab === 'all' ? 'bricks' : BRICK_TYPE_CONFIG[activeTab as BrickType].pluralLabel.toLowerCase() }} yet
       </h3>
-      <p class="text-gray-600 dark:text-gray-400 mb-4">
-        Add your first {{ activeTab === 'all' ? 'brick' : BRICK_TYPE_CONFIG[activeTab as BrickType].label.toLowerCase() }} to get started.
+      <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+        Add your first {{ activeTab === 'all' ? 'brick' : BRICK_TYPE_CONFIG[activeTab as BrickType].label.toLowerCase() }} to start building your CV.
       </p>
       <UButton
         icon="i-lucide-plus"
-        @click="openCreateForm"
+        size="lg"
+        @click="openCreateDrawer"
       >
         Add {{ activeTab === 'all' ? 'Brick' : BRICK_TYPE_CONFIG[activeTab as BrickType].label }}
       </UButton>
     </UCard>
 
-    <!-- Create/Edit Modal -->
-    <UModal v-model:open="showForm">
+    <!-- MODAL FOR CREATE/EDIT -->
+    <UModal
+      v-model:open="drawerOpen"
+      :ui="{
+        content: 'max-w-3xl w-full max-h-[90vh] flex flex-col'
+      }"
+    >
       <template #content>
-        <UCard>
-          <template #header>
+        <div class="flex flex-col h-full max-h-[90vh]">
+          <!-- Fixed Header -->
+          <div class="flex-shrink-0 px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center justify-between">
-              <h2 class="text-lg font-semibold">
-                {{ editingBrick ? 'Edit' : 'Create' }} Brick
-              </h2>
+              <div>
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                  {{ editingBrick ? 'Edit Brick' : 'Create New Brick' }}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {{ editingBrick ? 'Update your brick information' : 'Fill in the details for your new brick' }}
+                </p>
+              </div>
               <UButton
                 icon="i-lucide-x"
                 variant="ghost"
                 color="neutral"
-                @click="showForm = false"
+                @click="drawerOpen = false"
               />
             </div>
-          </template>
-          <BricksBrickForm
-            :brick="editingBrick || undefined"
-            @submit="handleSubmit"
-            @cancel="showForm = false"
-          />
-        </UCard>
+          </div>
+
+          <!-- Scrollable Content -->
+          <div class="flex-1 overflow-y-auto px-6 py-6">
+            <BricksBrickForm
+              ref="formRef"
+              :brick="editingBrick || undefined"
+              hide-actions
+              @submit="handleSubmit"
+              @cancel="drawerOpen = false"
+            />
+          </div>
+
+          <!-- Fixed Footer with Save Button -->
+          <div class="flex-shrink-0 px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-b-lg">
+            <div class="flex justify-end gap-3">
+              <UButton
+                variant="outline"
+                color="neutral"
+                @click="drawerOpen = false"
+              >
+                Cancel
+              </UButton>
+              <UButton
+                :loading="isSubmitting"
+                @click="submitForm"
+              >
+                <UIcon
+                  :name="editingBrick ? 'i-lucide-save' : 'i-lucide-plus'"
+                  class="w-4 h-4 mr-2"
+                />
+                {{ editingBrick ? 'Save Changes' : 'Create Brick' }}
+              </UButton>
+            </div>
+          </div>
+        </div>
       </template>
     </UModal>
 
     <!-- Delete Confirmation Modal -->
-    <UModal :open="!!deleteConfirmBrick" @update:open="val => { if (!val) deleteConfirmBrick = null }">
+    <UModal
+      :open="!!deleteConfirmBrick"
+      @update:open="val => { if (!val) deleteConfirmBrick = null }"
+    >
       <template #content>
         <UCard>
           <template #header>
-            <h2 class="text-lg font-semibold text-red-600">
-              Delete Brick
-            </h2>
+            <div class="flex items-center gap-3">
+              <div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
+                <UIcon
+                  name="i-lucide-trash-2"
+                  class="w-5 h-5 text-red-600 dark:text-red-400"
+                />
+              </div>
+              <h2 class="text-lg font-semibold">
+                Delete Brick
+              </h2>
+            </div>
           </template>
           <p class="text-gray-600 dark:text-gray-400">
-            Are you sure you want to delete "<strong>{{ deleteConfirmBrick?.title }}</strong>"?
+            Are you sure you want to delete "<strong class="text-gray-900 dark:text-white">{{ deleteConfirmBrick?.title }}</strong>"?
             This action cannot be undone.
           </p>
           <template #footer>
-            <div class="flex justify-end gap-2">
+            <div class="flex justify-end gap-3">
               <UButton
-                variant="ghost"
+                variant="outline"
                 color="neutral"
                 @click="deleteConfirmBrick = null"
               >
@@ -200,6 +354,10 @@ async function handleDelete() {
                 color="error"
                 @click="handleDelete"
               >
+                <UIcon
+                  name="i-lucide-trash-2"
+                  class="w-4 h-4 mr-2"
+                />
                 Delete
               </UButton>
             </div>

@@ -1,11 +1,12 @@
-import { db, settings, type Settings } from '../../database'
+import { useDb, settings, type Settings } from '../../database'
 import { eq } from 'drizzle-orm'
 
 export default defineEventHandler(async (event) => {
+  const db = useDb(event)
   const body = await readBody<Partial<Settings>>(event)
 
   // Ensure default settings exist
-  const existing = await db.select().from(settings).where(eq(settings.id, 'default')).get()
+  const [existing] = await db.select().from(settings).where(eq(settings.id, 'default'))
 
   if (!existing) {
     await db.insert(settings).values({
@@ -26,5 +27,6 @@ export default defineEventHandler(async (event) => {
     }).where(eq(settings.id, 'default'))
   }
 
-  return await db.select().from(settings).where(eq(settings.id, 'default')).get()
+  const [result] = await db.select().from(settings).where(eq(settings.id, 'default'))
+  return result
 })

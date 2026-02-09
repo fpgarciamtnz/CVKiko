@@ -129,26 +129,26 @@ const projectTypeOptions = [
 
     <!-- Description -->
     <UFormField
-      label="Short Description"
+      label="Project Description"
       required
-      hint="1-2 sentences explaining what the project does"
+      hint="Describe what the project does and its purpose"
     >
       <UTextarea
         v-model="data.description"
-        :rows="2"
-        placeholder="e.g., A full-stack e-commerce platform that enables small businesses to sell products online with integrated payment processing."
+        :rows="4"
+        placeholder="e.g., A full-stack e-commerce platform that enables small businesses to sell products online with integrated payment processing. Features include inventory management, order tracking, and analytics dashboard."
       />
     </UFormField>
 
     <!-- Problem Solved -->
     <UFormField
       label="Problem Solved"
-      hint="What problem does this project solve?"
+      hint="What problem does this project solve? Why did you build it?"
     >
       <UTextarea
         v-model="data.problem"
-        :rows="2"
-        placeholder="e.g., Small businesses struggled with expensive e-commerce solutions. This platform provides an affordable, easy-to-use alternative."
+        :rows="4"
+        placeholder="e.g., Small businesses struggled with expensive e-commerce solutions that required technical knowledge. This platform provides an affordable, easy-to-use alternative that anyone can set up in minutes."
       />
     </UFormField>
 
@@ -237,12 +237,12 @@ const projectTypeOptions = [
     <!-- Outcome -->
     <UFormField
       label="Outcome / Results"
-      hint="Impact, metrics, or results"
+      hint="Impact, metrics, or results achieved"
     >
       <UTextarea
         v-model="data.outcome"
-        :rows="2"
-        placeholder="e.g., Used by 50+ small businesses, processing $100K+ in transactions monthly"
+        :rows="3"
+        placeholder="e.g., Used by 50+ small businesses, processing $100K+ in transactions monthly. Reduced setup time from days to 15 minutes."
       />
     </UFormField>
 

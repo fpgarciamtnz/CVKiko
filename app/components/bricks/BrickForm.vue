@@ -11,9 +11,12 @@ import type {
 } from '~/utils/brick-types'
 import { BRICK_TYPE_CONFIG, BRICK_TYPES } from '~/utils/brick-types'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   brick?: Brick
-}>()
+  hideActions?: boolean
+}>(), {
+  hideActions: false
+})
 
 const emit = defineEmits<{
   submit: [data: Partial<Brick>]
@@ -205,6 +208,7 @@ function handleSubmit() {
 
 <template>
   <form
+    id="brick-form"
     class="space-y-6"
     @submit.prevent="handleSubmit"
   >
@@ -339,8 +343,11 @@ function handleSubmit() {
       </div>
     </UFormField>
 
-    <!-- Actions -->
-    <div class="flex justify-end gap-2 pt-4 border-t border-neutral-200 dark:border-neutral-700">
+    <!-- Actions (shown only when not using external buttons) -->
+    <div
+      v-if="!hideActions"
+      class="flex justify-end gap-2 pt-4 border-t border-neutral-200 dark:border-neutral-700"
+    >
       <UButton
         type="button"
         variant="ghost"

@@ -9,17 +9,21 @@ export default defineNuxtConfig({
     enabled: true
   },
 
+  nitro: {
+    preset: 'cloudflare-pages'
+  },
+
   css: ['~/assets/css/main.css'],
 
   runtimeConfig: {
     // AI Provider config (choose one)
     // For Groq (free): GROQ_API_KEY
-    // For Cloudflare Workers AI: CF_ACCOUNT_ID + CF_API_TOKEN
+    // For Cloudflare Workers AI: CLOUDFLARE_ACCOUNT_ID + CLOUDFLARE_API_TOKEN
     // For Anthropic: ANTHROPIC_API_KEY
     aiProvider: process.env.AI_PROVIDER || 'cloudflare', // 'cloudflare' | 'groq' | 'anthropic'
     groqApiKey: process.env.GROQ_API_KEY || '',
-    cfAccountId: process.env.CF_ACCOUNT_ID || '',
-    cfApiToken: process.env.CF_API_TOKEN || '',
+    cfAccountId: process.env.CLOUDFLARE_ACCOUNT_ID || '',
+    cfApiToken: process.env.CLOUDFLARE_API_TOKEN || '',
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || ''
   },
 

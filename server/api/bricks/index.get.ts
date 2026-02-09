@@ -1,8 +1,9 @@
-import { db, bricks } from '../../database'
+import { useDb, bricks } from '../../database'
 import { eq } from 'drizzle-orm'
 import type { BrickType } from '~/utils/brick-types'
 
 export default defineEventHandler(async (event) => {
+  const db = useDb(event)
   const query = getQuery(event)
   const type = query.type as string | undefined
 
