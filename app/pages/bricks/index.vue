@@ -60,8 +60,9 @@ async function handleSubmit(data: Partial<Brick>) {
     }
     drawerOpen.value = false
     editingBrick.value = null
-  } catch {
-    toast.add({ title: 'Failed to save brick', color: 'error', icon: 'i-lucide-alert-circle' })
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : (e as { data?: { message?: string } })?.data?.message || 'Unknown error'
+    toast.add({ title: 'Failed to save brick', description: message, color: 'error', icon: 'i-lucide-alert-circle' })
   } finally {
     isSubmitting.value = false
   }
@@ -83,10 +84,7 @@ async function handleDelete() {
 const formRef = ref<{ submit: () => void } | null>(null)
 
 function submitForm() {
-  const form = document.getElementById('brick-form') as HTMLFormElement
-  if (form) {
-    form.requestSubmit()
-  }
+  formRef.value?.submit()
 }
 </script>
 

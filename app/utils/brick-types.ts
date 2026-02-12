@@ -9,6 +9,7 @@ export interface ExperienceData {
   company: string
   location: string
   locationType: 'onsite' | 'remote' | 'hybrid' | ''
+  isInternship: boolean
   startDate: string
   endDate: string // Empty = current
   responsibilities: string[] // Action-verb bullet points
@@ -121,6 +122,7 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
       company: '',
       location: '',
       locationType: '',
+      isInternship: false,
       startDate: '',
       endDate: '',
       responsibilities: [''],
@@ -292,6 +294,9 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
     case 'experience': {
       const exp = data as ExperienceData
       let md = ''
+      if (exp.isInternship) {
+        md += '**Internship**\n\n'
+      }
       if (exp.responsibilities.filter(r => r.trim()).length > 0) {
         md += '## Responsibilities\n\n'
         exp.responsibilities.filter(r => r.trim()).forEach((r) => {

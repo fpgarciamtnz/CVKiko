@@ -9,7 +9,7 @@ import type {
   PublicationData,
   CustomData
 } from '~/utils/brick-types'
-import { BRICK_TYPE_CONFIG, BRICK_TYPES } from '~/utils/brick-types'
+import { BRICK_TYPE_CONFIG, BRICK_TYPES, structuredDataToMarkdown } from '~/utils/brick-types'
 
 const props = withDefaults(defineProps<{
   brick?: Brick
@@ -75,7 +75,7 @@ watch(selectedType, () => {
 })
 
 // Auto-generate title based on structured data
-watch([experienceData, educationData, projectData, skillData, publicationData], () => {
+watch([experienceData, educationData, projectData, skillData, publicationData, customData], () => {
   if (!isEditing.value) {
     switch (selectedType.value) {
       case 'experience':
@@ -101,6 +101,14 @@ watch([experienceData, educationData, projectData, skillData, publicationData], 
       case 'publication':
         if (publicationData.value.title) {
           title.value = publicationData.value.title
+        }
+        break
+      case 'custom':
+        if (customData.value.content) {
+          const firstLine = customData.value.content.split('\n')[0].replace(/^#+\s*/, '').trim()
+          if (firstLine) {
+            title.value = firstLine.slice(0, 60)
+          }
         }
         break
     }
@@ -162,7 +170,8 @@ function buildFrontmatter() {
         startDate: exp.startDate,
         endDate: exp.endDate,
         company: exp.company,
-        role: exp.jobTitle
+        role: exp.jobTitle,
+        isInternship: exp.isInternship
       }
     }
     case 'education': {
@@ -201,16 +210,42 @@ function buildFrontmatter() {
   }
 }
 
+// Validation
+const validationError = ref('')
+
+function generateFallbackTitle(): string {
+  const typeLabel = BRICK_TYPE_CONFIG[selectedType.value].label
+  const now = new Date()
+  const dateStr = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  return `${typeLabel} - ${dateStr}`
+}
+
 function handleSubmit() {
+  validationError.value = ''
+
+  // Title fallback: generate one if empty
+  if (!title.value.trim()) {
+    title.value = generateFallbackTitle()
+  }
+
+  const structuredData = getCurrentStructuredData()
+  const content = structuredDataToMarkdown(selectedType.value, structuredData)
+
   emit('submit', {
     type: selectedType.value,
-    title: title.value,
+    title: title.value.trim(),
     tags: tags.value,
     frontmatter: buildFrontmatter(),
-    structuredData: getCurrentStructuredData(),
-    content: '' // Content generated from structuredData when needed
+    structuredData,
+    content: content || `# ${title.value.trim()}\n`
   })
 }
+
+function submit() {
+  handleSubmit()
+}
+
+defineExpose({ submit })
 </script>
 
 <template>
@@ -218,6 +253,7 @@ function handleSubmit() {
     id="brick-form"
     class="space-y-6"
     @submit.prevent="handleSubmit"
+    @keydown.enter.prevent
   >
     <!-- Type Selector (only for new bricks) -->
     <div
@@ -312,12 +348,14 @@ function handleSubmit() {
       hint="For filtering and organizing your bricks"
     >
       <div class="space-y-2">
-        <div class="flex gap-2">
+        <div
+          class="flex gap-2"
+          @keydown.enter.prevent="addTag"
+        >
           <UInput
             v-model="tagInput"
             placeholder="Add a tag and press Enter"
             class="flex-1"
-            @keydown.enter.prevent="addTag"
           />
           <UButton
             type="button"

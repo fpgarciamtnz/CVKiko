@@ -21,6 +21,8 @@ await Promise.all([
 
 const activeTab = ref<BrickType | 'all'>('all')
 const showChat = ref(true)
+const showPreview = ref(false)
+const showShare = ref(false)
 
 const tabs = computed(() => [
   { label: 'All', value: 'all' as const, icon: undefined as string | undefined, count: bricks.value.length },
@@ -182,6 +184,24 @@ function handleDownloadPdf() {
             >
               Print
             </UButton>
+            <UButton
+              icon="i-lucide-car"
+              variant="soft"
+              color="amber"
+              size="sm"
+              :disabled="selectedBricks.length === 0"
+              @click="showPreview = true"
+            >
+              Interactive Preview
+            </UButton>
+            <UButton
+              icon="i-lucide-share-2"
+              size="sm"
+              :disabled="selectedBricks.length === 0"
+              @click="showShare = true"
+            >
+              Save & Share
+            </UButton>
           </div>
         </div>
       </div>
@@ -207,6 +227,19 @@ function handleDownloadPdf() {
         @select-bricks="handleSelectBricks"
       />
     </div>
+
+    <!-- Preview Modal -->
+    <BuilderPreviewModal
+      v-model="showPreview"
+      :bricks="selectedBricks"
+      :settings="settings"
+    />
+
+    <!-- Share Modal -->
+    <BuilderShareModal
+      v-model="showShare"
+      :brick-ids="[...selectedBrickIds]"
+    />
   </div>
 </template>
 

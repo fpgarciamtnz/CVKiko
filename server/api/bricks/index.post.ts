@@ -1,6 +1,5 @@
 import { useDb, bricks, type NewBrick } from '../../database'
 import { eq } from 'drizzle-orm'
-import { v4 as uuidv4 } from 'uuid'
 import type { BrickType } from '~/utils/brick-types'
 
 export default defineEventHandler(async (event) => {
@@ -16,17 +15,20 @@ export default defineEventHandler(async (event) => {
     isActive?: boolean
   }>(event)
 
-  if (!body.type || !body.title) {
+  if (!body.type) {
     throw createError({
       statusCode: 400,
-      message: 'Type and title are required'
+      message: 'Brick type is required'
     })
   }
 
+  // Fallback title if empty
+  const title = body.title?.trim() || `Untitled ${body.type.charAt(0).toUpperCase() + body.type.slice(1)}`
+
   const newBrick: NewBrick = {
-    id: uuidv4(),
+    id: crypto.randomUUID(),
     type: body.type as BrickType,
-    title: body.title,
+    title,
     content: body.content ?? '',
     tags: body.tags ?? [],
     frontmatter: body.frontmatter ?? {},
@@ -35,7 +37,15 @@ export default defineEventHandler(async (event) => {
     isActive: body.isActive ?? true
   }
 
-  await db.insert(bricks).values(newBrick)
+  try {
+    await db.insert(bricks).values(newBrick)
+  } catch (err) {
+    const message = err instanceof Error ? err.message : 'Unknown database error'
+    throw createError({
+      statusCode: 500,
+      message: `Failed to insert brick: ${message}`
+    })
+  }
 
   const [result] = await db.select().from(bricks).where(eq(bricks.id, newBrick.id))
   return result

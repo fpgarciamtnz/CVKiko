@@ -64,6 +64,32 @@ function updateAchievement(index: number, value: string) {
   data.value = { ...data.value, achievements: updated }
 }
 
+// Refs for auto-focus on Enter
+const responsibilityRefs = ref<HTMLElement[]>([])
+const achievementRefs = ref<HTMLElement[]>([])
+
+function handleResponsibilityEnter(index: number) {
+  if (data.value.responsibilities[index]?.trim()) {
+    addResponsibility()
+    nextTick(() => {
+      const inputs = responsibilityRefs.value
+      const last = inputs[inputs.length - 1]
+      last?.querySelector('input')?.focus()
+    })
+  }
+}
+
+function handleAchievementEnter(index: number) {
+  if (data.value.achievements[index]?.trim()) {
+    addAchievement()
+    nextTick(() => {
+      const inputs = achievementRefs.value
+      const last = inputs[inputs.length - 1]
+      last?.querySelector('input')?.focus()
+    })
+  }
+}
+
 // Tech tags
 const techInput = ref('')
 function addTech() {
@@ -142,10 +168,16 @@ function removeTech(tech: string) {
       </UFormField>
     </div>
 
-    <UCheckbox
-      v-model="isCurrentPosition"
-      label="I currently work here"
-    />
+    <div class="flex flex-wrap gap-6">
+      <UCheckbox
+        v-model="isCurrentPosition"
+        label="I currently work here"
+      />
+      <UCheckbox
+        v-model="data.isInternship"
+        label="This is an internship"
+      />
+    </div>
 
     <!-- Responsibilities -->
     <UFormField
@@ -156,7 +188,9 @@ function removeTech(tech: string) {
         <div
           v-for="(resp, index) in data.responsibilities"
           :key="index"
+          :ref="(el) => { if (el) responsibilityRefs[index] = el as HTMLElement }"
           class="flex gap-2"
+          @keydown.enter.prevent="handleResponsibilityEnter(index)"
         >
           <UInput
             :model-value="resp"
@@ -194,7 +228,9 @@ function removeTech(tech: string) {
         <div
           v-for="(ach, index) in data.achievements"
           :key="index"
+          :ref="(el) => { if (el) achievementRefs[index] = el as HTMLElement }"
           class="flex gap-2"
+          @keydown.enter.prevent="handleAchievementEnter(index)"
         >
           <UInput
             :model-value="ach"
@@ -229,12 +265,14 @@ function removeTech(tech: string) {
       hint="Tools, languages, and frameworks you used"
     >
       <div class="space-y-2">
-        <div class="flex gap-2">
+        <div
+          class="flex gap-2"
+          @keydown.enter.prevent="addTech"
+        >
           <UInput
             v-model="techInput"
             placeholder="Type a technology and press Enter"
             class="flex-1"
-            @keydown.enter.prevent="addTech"
           />
           <UButton
             variant="soft"

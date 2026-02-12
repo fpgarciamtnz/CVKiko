@@ -35,6 +35,20 @@ function updateFeature(index: number, value: string) {
   data.value = { ...data.value, features: updated }
 }
 
+// Ref for auto-focus on Enter
+const featureRefs = ref<HTMLElement[]>([])
+
+function handleFeatureEnter(index: number) {
+  if (data.value.features[index]?.trim()) {
+    addFeature()
+    nextTick(() => {
+      const inputs = featureRefs.value
+      const last = inputs[inputs.length - 1]
+      last?.querySelector('input')?.focus()
+    })
+  }
+}
+
 // Tech tags
 const techInput = ref('')
 function addTech() {
@@ -161,7 +175,9 @@ const projectTypeOptions = [
         <div
           v-for="(feature, index) in data.features"
           :key="index"
+          :ref="(el) => { if (el) featureRefs[index] = el as HTMLElement }"
           class="flex gap-2"
+          @keydown.enter.prevent="handleFeatureEnter(index)"
         >
           <UInput
             :model-value="feature"
@@ -196,12 +212,14 @@ const projectTypeOptions = [
       hint="Technologies, languages, frameworks used"
     >
       <div class="space-y-2">
-        <div class="flex gap-2">
+        <div
+          class="flex gap-2"
+          @keydown.enter.prevent="addTech"
+        >
           <UInput
             v-model="techInput"
             placeholder="Type a technology and press Enter"
             class="flex-1"
-            @keydown.enter.prevent="addTech"
           />
           <UButton
             variant="soft"

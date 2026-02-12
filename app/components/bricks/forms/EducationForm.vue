@@ -165,12 +165,14 @@ const degreeOptions = DEGREE_OPTIONS.map(d => ({ label: d, value: d }))
       hint="Dean's List, Cum Laude, Scholarships, etc."
     >
       <div class="space-y-2">
-        <div class="flex gap-2">
+        <div
+          class="flex gap-2"
+          @keydown.enter.prevent="addHonor"
+        >
           <UInput
             v-model="honorsInput"
             placeholder="Type an honor and press Enter"
             class="flex-1"
-            @keydown.enter.prevent="addHonor"
           />
           <UButton
             variant="soft"
@@ -209,12 +211,14 @@ const degreeOptions = DEGREE_OPTIONS.map(d => ({ label: d, value: d }))
       hint="Classes relevant to your target job"
     >
       <div class="space-y-2">
-        <div class="flex gap-2">
+        <div
+          class="flex gap-2"
+          @keydown.enter.prevent="addCoursework"
+        >
           <UInput
             v-model="courseworkInput"
             placeholder="e.g., Data Structures, Machine Learning"
             class="flex-1"
-            @keydown.enter.prevent="addCoursework"
           />
           <UButton
             variant="soft"
@@ -253,12 +257,14 @@ const degreeOptions = DEGREE_OPTIONS.map(d => ({ label: d, value: d }))
       hint="Clubs, teams, leadership roles"
     >
       <div class="space-y-2">
-        <div class="flex gap-2">
+        <div
+          class="flex gap-2"
+          @keydown.enter.prevent="addActivity"
+        >
           <UInput
             v-model="activityInput"
             placeholder="e.g., President of Computer Science Club"
             class="flex-1"
-            @keydown.enter.prevent="addActivity"
           />
           <UButton
             variant="soft"

@@ -3,10 +3,12 @@ import { BRICK_TYPE_CONFIG, BRICK_TYPES } from '~/utils/brick-types'
 
 const { bricks, fetchBricks } = useBricks()
 const { settings, fetchSettings } = useSettings()
+const { savedCVs, fetchCVs } = useSavedCVs()
 
 await Promise.all([
   fetchBricks(),
-  fetchSettings()
+  fetchSettings(),
+  fetchCVs()
 ])
 
 const stats = computed(() => {
@@ -164,9 +166,53 @@ const stats = computed(() => {
       </div>
     </div>
 
+    <!-- Shared CVs -->
+    <div
+      v-if="savedCVs.length > 0"
+      class="mt-8"
+    >
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+          Shared CVs
+        </h2>
+        <UButton
+          to="/builder"
+          variant="link"
+          trailing-icon="i-lucide-plus"
+        >
+          Create new
+        </UButton>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <UCard
+          v-for="cv in savedCVs"
+          :key="cv.id"
+        >
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="font-semibold text-gray-900 dark:text-white">
+                {{ cv.name }}
+              </h3>
+              <p class="text-xs text-gray-500 mt-1">
+                /cv/{{ cv.slug }}
+              </p>
+            </div>
+            <UButton
+              icon="i-lucide-external-link"
+              variant="ghost"
+              color="neutral"
+              size="xs"
+              :to="`/cv/${cv.slug}`"
+              target="_blank"
+            />
+          </div>
+        </UCard>
+      </div>
+    </div>
+
     <!-- Empty State -->
     <UCard
-      v-else
+      v-if="bricks.length === 0 && savedCVs.length === 0"
       class="mt-8 text-center py-12"
     >
       <UIcon

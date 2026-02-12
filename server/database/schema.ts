@@ -47,6 +47,8 @@ export const bricks = sqliteTable('bricks', {
 export const cvs = sqliteTable('cvs', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
+  slug: text('slug').unique(),
+  isPublished: integer('is_published', { mode: 'boolean' }).default(true),
   targetRole: text('target_role'),
   targetCompany: text('target_company'),
   jobDescription: text('job_description'),

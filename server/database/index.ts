@@ -29,7 +29,4 @@ export function useDb(event?: H3Event) {
   return getLocalDb()
 }
 
-// Legacy export for backwards compatibility (local dev only)
-export const db = getLocalDb()
-
 export * from './schema'

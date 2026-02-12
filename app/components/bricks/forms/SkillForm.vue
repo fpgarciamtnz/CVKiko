@@ -119,12 +119,14 @@ const proficiencyOptions = PROFICIENCY_LEVELS.map(p => ({
       hint="Projects where you applied this skill"
     >
       <div class="space-y-2">
-        <div class="flex gap-2">
+        <div
+          class="flex gap-2"
+          @keydown.enter.prevent="addProject"
+        >
           <UInput
             v-model="projectInput"
             placeholder="Project name"
             class="flex-1"
-            @keydown.enter.prevent="addProject"
           />
           <UButton
             variant="soft"

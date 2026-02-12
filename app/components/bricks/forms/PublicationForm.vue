@@ -57,6 +57,32 @@ function updateContribution(index: number, value: string) {
   data.value = { ...data.value, contributions: updated }
 }
 
+// Refs for auto-focus on Enter
+const authorRefs = ref<HTMLElement[]>([])
+const contributionRefs = ref<HTMLElement[]>([])
+
+function handleAuthorEnter(index: number) {
+  if (data.value.authors[index]?.trim()) {
+    addAuthor()
+    nextTick(() => {
+      const inputs = authorRefs.value
+      const last = inputs[inputs.length - 1]
+      last?.querySelector('input')?.focus()
+    })
+  }
+}
+
+function handleContributionEnter(index: number) {
+  if (data.value.contributions[index]?.trim()) {
+    addContribution()
+    nextTick(() => {
+      const inputs = contributionRefs.value
+      const last = inputs[inputs.length - 1]
+      last?.querySelector('input')?.focus()
+    })
+  }
+}
+
 const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
   label: pt.label,
   value: pt.value
@@ -86,7 +112,9 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
         <div
           v-for="(author, index) in data.authors"
           :key="index"
+          :ref="(el) => { if (el) authorRefs[index] = el as HTMLElement }"
           class="flex gap-2"
+          @keydown.enter.prevent="handleAuthorEnter(index)"
         >
           <UInput
             :model-value="author"
@@ -205,7 +233,9 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
         <div
           v-for="(contribution, index) in data.contributions"
           :key="index"
+          :ref="(el) => { if (el) contributionRefs[index] = el as HTMLElement }"
           class="flex gap-2"
+          @keydown.enter.prevent="handleContributionEnter(index)"
         >
           <UInput
             :model-value="contribution"

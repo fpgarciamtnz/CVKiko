@@ -33,6 +33,15 @@ export function useBricks() {
     }
   }
 
+  function extractErrorMessage(e: unknown, fallback: string): string {
+    if (e && typeof e === 'object' && 'data' in e) {
+      const data = (e as { data?: { message?: string } }).data
+      if (data?.message) return data.message
+    }
+    if (e instanceof Error) return e.message
+    return fallback
+  }
+
   const createBrick = async (brick: Partial<Brick>) => {
     loading.value = true
     error.value = null
@@ -44,7 +53,7 @@ export function useBricks() {
       bricks.value.push(created)
       return created
     } catch (e) {
-      error.value = 'Failed to create brick'
+      error.value = extractErrorMessage(e, 'Failed to create brick')
       console.error(e)
       throw e
     } finally {
@@ -64,7 +73,7 @@ export function useBricks() {
       if (index !== -1) bricks.value[index] = updated
       return updated
     } catch (e) {
-      error.value = 'Failed to update brick'
+      error.value = extractErrorMessage(e, 'Failed to update brick')
       console.error(e)
       throw e
     } finally {
@@ -79,7 +88,7 @@ export function useBricks() {
       await $fetch(`/api/bricks/${id}`, { method: 'DELETE' })
       bricks.value = bricks.value.filter(b => b.id !== id)
     } catch (e) {
-      error.value = 'Failed to delete brick'
+      error.value = extractErrorMessage(e, 'Failed to delete brick')
       console.error(e)
       throw e
     } finally {

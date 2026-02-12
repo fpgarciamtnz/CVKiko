@@ -42,10 +42,11 @@ async function handleSubmit(data: Partial<Brick>) {
       icon: 'i-lucide-check-circle'
     })
     router.push('/bricks')
-  } catch {
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : (e as { data?: { message?: string } })?.data?.message || 'Unknown error'
     toast.add({
       title: 'Failed to update brick',
-      description: 'Please try again.',
+      description: message,
       color: 'error',
       icon: 'i-lucide-alert-circle'
     })
@@ -58,11 +59,10 @@ function handleCancel() {
   router.push('/bricks')
 }
 
+const formRef = ref<{ submit: () => void } | null>(null)
+
 function submitForm() {
-  const form = document.getElementById('brick-form') as HTMLFormElement
-  if (form) {
-    form.requestSubmit()
-  }
+  formRef.value?.submit()
 }
 </script>
 
@@ -139,6 +139,7 @@ function submitForm() {
       <div class="max-w-4xl mx-auto">
         <UCard>
           <BricksBrickForm
+            ref="formRef"
             :brick="brick"
             hide-actions
             @submit="handleSubmit"
