@@ -9,7 +9,7 @@ interface SceneSection {
   x: number
 }
 
-const props = defineProps<{
+const _props = defineProps<{
   sections: SceneSection[]
   activeSectionId: string | null
   carX: number

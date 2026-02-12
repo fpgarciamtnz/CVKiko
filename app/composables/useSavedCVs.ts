@@ -39,7 +39,7 @@ export function useSavedCVs() {
     }
   }
 
-  const saveCV = async (data: { name: string; slug?: string; brickIds: string[] }) => {
+  const saveCV = async (data: { name: string, slug?: string, brickIds: string[] }) => {
     loading.value = true
     error.value = null
     try {
@@ -58,7 +58,7 @@ export function useSavedCVs() {
     }
   }
 
-  const updateCV = async (id: string, updates: Partial<{ name: string; slug: string; brickIds: string[]; isPublished: boolean }>) => {
+  const updateCV = async (id: string, updates: Partial<{ name: string, slug: string, brickIds: string[], isPublished: boolean }>) => {
     loading.value = true
     error.value = null
     try {

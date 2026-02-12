@@ -45,7 +45,9 @@ async function handleSave() {
 function handleCopy() {
   navigator.clipboard.writeText(shareUrl.value)
   copied.value = true
-  setTimeout(() => { copied.value = false }, 2000)
+  setTimeout(() => {
+    copied.value = false
+  }, 2000)
 }
 
 function handleClose() {
