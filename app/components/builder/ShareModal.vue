@@ -66,7 +66,7 @@ function handleClose() {
   <UModal
     v-model:open="model"
     title="Save & Share CV"
-    :ui="{ width: 'sm:max-w-lg' }"
+    :ui="{ content: 'sm:max-w-lg' }"
   >
     <template #body>
       <!-- Step 1: Form -->

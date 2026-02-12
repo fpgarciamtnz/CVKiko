@@ -112,7 +112,7 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
         <div
           v-for="(author, index) in data.authors"
           :key="index"
-          :ref="(el) => { if (el) authorRefs[index] = el as HTMLElement }"
+          :ref="(el: Element | ComponentPublicInstance | null) => { if (el) authorRefs[index] = el as HTMLElement }"
           class="flex gap-2"
           @keydown.enter.prevent="handleAuthorEnter(index)"
         >
@@ -233,7 +233,7 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
         <div
           v-for="(contribution, index) in data.contributions"
           :key="index"
-          :ref="(el) => { if (el) contributionRefs[index] = el as HTMLElement }"
+          :ref="(el: Element | ComponentPublicInstance | null) => { if (el) contributionRefs[index] = el as HTMLElement }"
           class="flex gap-2"
           @keydown.enter.prevent="handleContributionEnter(index)"
         >

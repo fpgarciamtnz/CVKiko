@@ -69,7 +69,7 @@ const sections = computed<SceneSection[]>(() => {
 
 const worldWidth = computed(() => {
   if (sections.value.length === 0) return 3000
-  return sections.value[sections.value.length - 1].x + 600
+  return sections.value[sections.value.length - 1]!.x + 600
 })
 
 // --- Composables ---

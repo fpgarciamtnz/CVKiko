@@ -188,7 +188,7 @@ function removeTech(tech: string) {
         <div
           v-for="(resp, index) in data.responsibilities"
           :key="index"
-          :ref="(el) => { if (el) responsibilityRefs[index] = el as HTMLElement }"
+          :ref="(el: Element | ComponentPublicInstance | null) => { if (el) responsibilityRefs[index] = el as HTMLElement }"
           class="flex gap-2"
           @keydown.enter.prevent="handleResponsibilityEnter(index)"
         >
@@ -228,7 +228,7 @@ function removeTech(tech: string) {
         <div
           v-for="(ach, index) in data.achievements"
           :key="index"
-          :ref="(el) => { if (el) achievementRefs[index] = el as HTMLElement }"
+          :ref="(el: Element | ComponentPublicInstance | null) => { if (el) achievementRefs[index] = el as HTMLElement }"
           class="flex gap-2"
           @keydown.enter.prevent="handleAchievementEnter(index)"
         >

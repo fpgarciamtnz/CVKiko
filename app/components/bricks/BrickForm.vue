@@ -105,7 +105,7 @@ watch([experienceData, educationData, projectData, skillData, publicationData, c
         break
       case 'custom':
         if (customData.value.content) {
-          const firstLine = customData.value.content.split('\n')[0].replace(/^#+\s*/, '').trim()
+          const firstLine = customData.value.content?.split('\n')[0]?.replace(/^#+\s*/, '').trim()
           if (firstLine) {
             title.value = firstLine.slice(0, 60)
           }

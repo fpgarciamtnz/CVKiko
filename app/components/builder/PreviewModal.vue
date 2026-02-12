@@ -14,7 +14,7 @@ const model = defineModel<boolean>()
   <UModal
     v-model:open="model"
     fullscreen
-    :ui="{ padding: '' }"
+    :ui="{ body: 'p-0' }"
   >
     <template #body>
       <div class="h-screen w-screen relative">

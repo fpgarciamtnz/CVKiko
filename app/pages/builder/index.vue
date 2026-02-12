@@ -187,7 +187,7 @@ function handleDownloadPdf() {
             <UButton
               icon="i-lucide-car"
               variant="soft"
-              color="amber"
+              color="warning"
               size="sm"
               :disabled="selectedBricks.length === 0"
               @click="showPreview = true"

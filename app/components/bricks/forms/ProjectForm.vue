@@ -175,7 +175,7 @@ const projectTypeOptions = [
         <div
           v-for="(feature, index) in data.features"
           :key="index"
-          :ref="(el) => { if (el) featureRefs[index] = el as HTMLElement }"
+          :ref="(el: Element | ComponentPublicInstance | null) => { if (el) featureRefs[index] = el as HTMLElement }"
           class="flex gap-2"
           @keydown.enter.prevent="handleFeatureEnter(index)"
         >
