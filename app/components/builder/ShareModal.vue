@@ -27,18 +27,25 @@ watch(name, (val) => {
 })
 
 const copied = ref(false)
+const saveError = ref('')
 
 async function handleSave() {
   if (!name.value.trim()) return
-  const cv = await saveCV({
-    name: name.value.trim(),
-    slug: slug.value,
-    brickIds: props.brickIds
-  })
-  if (cv) {
-    const origin = window.location.origin
-    shareUrl.value = `${origin}/cv/${cv.slug}`
-    step.value = 'done'
+  saveError.value = ''
+  try {
+    const cv = await saveCV({
+      name: name.value.trim(),
+      slug: slug.value,
+      brickIds: props.brickIds
+    })
+    if (cv) {
+      const origin = window.location.origin
+      shareUrl.value = `${origin}/cv/${cv.slug}`
+      step.value = 'done'
+    }
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : (e as { data?: { message?: string } })?.data?.message
+    saveError.value = msg || 'Failed to save CV. Please try again.'
   }
 }
 
@@ -58,6 +65,7 @@ function handleClose() {
     name.value = ''
     slug.value = ''
     shareUrl.value = ''
+    saveError.value = ''
   }, 300)
 }
 </script>
@@ -96,6 +104,12 @@ function handleClose() {
             {{ brickIds.length }} bricks will be included
           </p>
         </div>
+        <p
+          v-if="saveError"
+          class="text-sm text-red-500"
+        >
+          {{ saveError }}
+        </p>
         <div class="flex justify-end gap-2 pt-2">
           <UButton
             variant="ghost"

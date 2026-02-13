@@ -14,10 +14,11 @@ const model = defineModel<boolean>()
   <UModal
     v-model:open="model"
     fullscreen
-    :ui="{ body: 'p-0' }"
+    :close="false"
+    :ui="{ content: 'p-0' }"
   >
-    <template #body>
-      <div class="h-screen w-screen relative">
+    <template #content>
+      <div class="h-[100dvh] w-[100dvw] relative">
         <ClientOnly>
           <InteractiveInteractiveScene
             :bricks="bricks"
