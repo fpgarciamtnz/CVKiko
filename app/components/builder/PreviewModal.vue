@@ -18,14 +18,15 @@ const model = defineModel<boolean>()
     :ui="{ content: 'p-0' }"
   >
     <template #content>
-      <div class="h-[100dvh] w-[100dvw] relative">
+      <div class="fixed inset-0">
         <ClientOnly>
           <InteractiveInteractiveScene
+            class="!h-screen !w-screen"
             :bricks="bricks"
             :settings="settings"
           />
           <template #fallback>
-            <div class="flex items-center justify-center h-full text-slate-500">
+            <div class="flex items-center justify-center h-screen text-slate-500">
               <div class="text-center">
                 <UIcon
                   name="i-lucide-car"
