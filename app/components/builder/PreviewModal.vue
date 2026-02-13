@@ -18,15 +18,14 @@ const model = defineModel<boolean>()
     :ui="{ content: 'p-0' }"
   >
     <template #content>
-      <div class="fixed inset-0">
+      <div style="height: 100dvh; width: 100dvw; position: relative; overflow: hidden;">
         <ClientOnly>
           <InteractiveInteractiveScene
-            class="!h-screen !w-screen"
             :bricks="bricks"
             :settings="settings"
           />
           <template #fallback>
-            <div class="flex items-center justify-center h-screen text-slate-500">
+            <div class="flex items-center justify-center h-full text-slate-500">
               <div class="text-center">
                 <UIcon
                   name="i-lucide-car"
@@ -38,8 +37,7 @@ const model = defineModel<boolean>()
           </template>
         </ClientOnly>
 
-        <!-- Close button -->
-        <div class="fixed top-4 right-4 z-50">
+        <div class="absolute top-4 right-4 z-50">
           <UButton
             icon="i-lucide-x"
             color="neutral"
