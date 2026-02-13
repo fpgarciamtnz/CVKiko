@@ -1,13 +1,14 @@
-import { jsPDF } from 'jspdf'
+import type { jsPDF } from 'jspdf'
 import type { Brick } from './useBricks'
 import type { Settings } from './useSettings'
 import { BRICK_TYPE_CONFIG, formatDateRange, type BrickType } from '~/utils/brick-types'
 
 export function usePdfExport() {
-  function generateCV(
+  async function generateCV(
     settings: Settings | null,
     bricksByType: Record<BrickType, Brick[]>
-  ): jsPDF {
+  ): Promise<jsPDF> {
+    const { jsPDF } = await import('jspdf')
     const doc = new jsPDF({
       unit: 'mm',
       format: 'a4'
@@ -173,21 +174,21 @@ export function usePdfExport() {
     return doc
   }
 
-  function exportToPdf(
+  async function exportToPdf(
     settings: Settings | null,
     bricksByType: Record<BrickType, Brick[]>,
     filename?: string
   ) {
-    const doc = generateCV(settings, bricksByType)
+    const doc = await generateCV(settings, bricksByType)
     const name = filename || `cv-${new Date().toISOString().split('T')[0]}.pdf`
     doc.save(name)
   }
 
-  function getPreviewUrl(
+  async function getPreviewUrl(
     settings: Settings | null,
     bricksByType: Record<BrickType, Brick[]>
-  ): string {
-    const doc = generateCV(settings, bricksByType)
+  ): Promise<string> {
+    const doc = await generateCV(settings, bricksByType)
     return doc.output('datauristring')
   }
 

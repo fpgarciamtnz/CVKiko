@@ -52,8 +52,8 @@ function handlePrint() {
   window.print()
 }
 
-function handleDownloadPdf() {
-  exportToPdf(settings.value, selectedBricksByType.value)
+async function handleDownloadPdf() {
+  await exportToPdf(settings.value, selectedBricksByType.value)
 }
 </script>
 
