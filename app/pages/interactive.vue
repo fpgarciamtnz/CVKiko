@@ -24,8 +24,7 @@ onMounted(() => {
         pin: viewport.value,
         scrub: 1,
         end: () => `+=${totalScroll}`,
-        invalidateOnRefresh: true,
-        markers: true
+        invalidateOnRefresh: true
       }
     })
   })
