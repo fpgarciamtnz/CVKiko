@@ -5,18 +5,18 @@ const scrollContainer = ref<HTMLElement | null>(null)
 const viewport = ref<HTMLElement | null>(null)
 const scene = ref<HTMLElement | null>(null)
 
-let ctx: any
+let ctx: gsap.Context | null = null
 
 onMounted(() => {
   if (!scrollContainer.value || !viewport.value || !scene.value) return
 
-  const gsap = $gsap as any
-  const ScrollTrigger = $ScrollTrigger as any
+  // Register ScrollTrigger before creating the animation
+  void $ScrollTrigger
 
-  ctx = gsap.context(() => {
+  ctx = ($gsap as typeof import('gsap').gsap).context(() => {
     const totalScroll = scene.value!.scrollWidth - window.innerWidth
 
-    gsap.to(scene.value, {
+    ;($gsap as typeof import('gsap').gsap).to(scene.value!, {
       x: -totalScroll,
       ease: 'none',
       scrollTrigger: {
@@ -25,7 +25,7 @@ onMounted(() => {
         scrub: 1,
         end: () => `+=${totalScroll}`,
         invalidateOnRefresh: true,
-        markers: true,
+        markers: true
       }
     })
   })
@@ -38,14 +38,48 @@ onBeforeUnmount(() => {
 
 <template>
   <ClientOnly>
-    <div class="scroll-container" ref="scrollContainer">
-      <div class="viewport" ref="viewport">
-        <div class="scene" ref="scene">
-          <div class="panel" style="background: #264653;">ABOUT</div>
-          <div class="panel" style="background: #2a9d8f;">EXPERIENCE</div>
-          <div class="panel" style="background: #e9c46a;">SKILLS</div>
-          <div class="panel" style="background: #f4a261;">EDUCATION</div>
-          <div class="panel" style="background: #e76f51;">CONTACT</div>
+    <div
+      ref="scrollContainer"
+      class="scroll-container"
+    >
+      <div
+        ref="viewport"
+        class="viewport"
+      >
+        <div
+          ref="scene"
+          class="scene"
+        >
+          <div
+            class="panel"
+            style="background: #264653;"
+          >
+            ABOUT
+          </div>
+          <div
+            class="panel"
+            style="background: #2a9d8f;"
+          >
+            EXPERIENCE
+          </div>
+          <div
+            class="panel"
+            style="background: #e9c46a;"
+          >
+            SKILLS
+          </div>
+          <div
+            class="panel"
+            style="background: #f4a261;"
+          >
+            EDUCATION
+          </div>
+          <div
+            class="panel"
+            style="background: #e76f51;"
+          >
+            CONTACT
+          </div>
         </div>
       </div>
     </div>
