@@ -1,4 +1,6 @@
 <script setup lang="ts">
+definePageMeta({ layout: 'blank' })
+
 const { $gsap, $ScrollTrigger } = useNuxtApp()
 
 const scrollContainer = ref<HTMLElement | null>(null)
@@ -37,6 +39,7 @@ onBeforeUnmount(() => {
 
 <template>
   <ClientOnly>
+    <CarSprite class="fixed bottom-[25vh] left-1/2 z-10 -translate-x-1/2" />
     <div
       ref="scrollContainer"
       class="scroll-container"
