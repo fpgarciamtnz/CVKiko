@@ -68,7 +68,7 @@ export function useCalendarAttributes() {
 
   const ownerPartialDayDates = computed(() =>
     ownerDates.value
-      .filter(s => {
+      .filter((s) => {
         const slots = parseSlots(s.slots)
         return slots.length > 0 && slots.length < 3
       })

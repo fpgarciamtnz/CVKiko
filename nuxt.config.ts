@@ -11,10 +11,6 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
-  build: {
-    transpile: ['gsap']
-  },
-
   runtimeConfig: {
     // AI Provider config (choose one)
     // For Groq (free): GROQ_API_KEY
@@ -25,6 +21,10 @@ export default defineNuxtConfig({
     cfAccountId: process.env.CLOUDFLARE_ACCOUNT_ID || '',
     cfApiToken: process.env.CLOUDFLARE_API_TOKEN || '',
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || ''
+  },
+
+  build: {
+    transpile: ['gsap']
   },
 
   compatibilityDate: '2025-01-15',

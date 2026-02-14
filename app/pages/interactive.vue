@@ -13,7 +13,7 @@ const sections = [
   { label: 'EXPERIENCE', color: '#2a9d8f' },
   { label: 'SKILLS', color: '#e9c46a' },
   { label: 'EDUCATION', color: '#f4a261' },
-  { label: 'CONTACT', color: '#e76f51' },
+  { label: 'CONTACT', color: '#e76f51' }
 ]
 
 onMounted(() => {
@@ -33,7 +33,7 @@ function initScrollAnimation() {
     console.error('[GSAP] Refs not ready:', {
       scrollContainer: !!scrollContainer.value,
       viewport: !!viewport.value,
-      scene: !!scene.value,
+      scene: !!scene.value
     })
     return
   }
@@ -43,7 +43,7 @@ function initScrollAnimation() {
   if (!$gsap || !$ScrollTrigger) {
     console.error('[GSAP] Plugin not providing gsap or ScrollTrigger:', {
       gsap: !!$gsap,
-      ScrollTrigger: !!$ScrollTrigger,
+      ScrollTrigger: !!$ScrollTrigger
     })
     return
   }
@@ -67,8 +67,8 @@ function initScrollAnimation() {
         scrub: 1,
         end: () => `+=${scene.value.scrollWidth - window.innerWidth}`,
         invalidateOnRefresh: true,
-        markers: true,
-      },
+        markers: true
+      }
     })
   }, scrollContainer.value)
 
@@ -85,9 +85,18 @@ onBeforeUnmount(() => {
 
 <template>
   <ClientOnly>
-    <div ref="scrollContainer" class="scroll-container">
-      <div ref="viewport" class="viewport">
-        <div ref="scene" class="scene">
+    <div
+      ref="scrollContainer"
+      class="scroll-container"
+    >
+      <div
+        ref="viewport"
+        class="viewport"
+      >
+        <div
+          ref="scene"
+          class="scene"
+        >
           <div
             v-for="(section, i) in sections"
             :key="i"
@@ -100,7 +109,9 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <template #fallback>
-      <div class="loading">Loading...</div>
+      <div class="loading">
+        Loading...
+      </div>
     </template>
   </ClientOnly>
 </template>

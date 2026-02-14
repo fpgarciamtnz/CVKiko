@@ -111,7 +111,10 @@ const submit = async () => {
         </template>
 
         <div class="space-y-4">
-          <UFormField label="Your Name" required>
+          <UFormField
+            label="Your Name"
+            required
+          >
             <UInput
               v-model="form.name"
               placeholder="Enter your name"
@@ -134,7 +137,10 @@ const submit = async () => {
             />
           </UFormField>
 
-          <UFormField label="Dates" required>
+          <UFormField
+            label="Dates"
+            required
+          >
             <div class="flex gap-2">
               <UInput
                 v-model="dateInput"

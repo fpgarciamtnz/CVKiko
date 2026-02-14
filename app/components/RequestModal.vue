@@ -12,7 +12,7 @@ const emit = defineEmits<{
 
 const isOpen = computed({
   get: () => props.modelValue,
-  set: (val) => emit('update:modelValue', val)
+  set: val => emit('update:modelValue', val)
 })
 
 const schedule = useSchedule()
@@ -125,7 +125,10 @@ const resetForm = () => {
     <template #body>
       <div class="space-y-4">
         <!-- Name -->
-        <UFormField label="Your Name" required>
+        <UFormField
+          label="Your Name"
+          required
+        >
           <UInput
             v-model="form.name"
             placeholder="Enter your name"
@@ -151,7 +154,10 @@ const resetForm = () => {
         </UFormField>
 
         <!-- Date Selection -->
-        <UFormField label="Dates" required>
+        <UFormField
+          label="Dates"
+          required
+        >
           <div class="flex gap-2">
             <UInput
               v-model="dateInput"
