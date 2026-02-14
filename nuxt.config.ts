@@ -11,6 +11,10 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  build: {
+    transpile: ['gsap']
+  },
+
   runtimeConfig: {
     // AI Provider config (choose one)
     // For Groq (free): GROQ_API_KEY
