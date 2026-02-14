@@ -68,6 +68,30 @@ export const cvBricks = sqliteTable('cv_bricks', {
   isHighlighted: integer('is_highlighted', { mode: 'boolean' }).default(false)
 })
 
+// ============ SCHEDULES (Owner date/slot blocking) ============
+export const schedules = sqliteTable('schedules', {
+  id: text('id').primaryKey(),
+  date: text('date').notNull().unique(),
+  ownerStatus: text('owner_status', { enum: ['blocked', 'tentative'] }).notNull().default('blocked'),
+  slots: text('slots').notNull().default('morning,midday,evening'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
+// ============ REQUESTS (Ticket rental requests) ============
+export const requests = sqliteTable('requests', {
+  id: text('id').primaryKey(),
+  dates: text('dates', { mode: 'json' }).$type<string[]>().notNull(),
+  status: text('status', { enum: ['pending', 'approved', 'rejected'] }).notNull().default('pending'),
+  name: text('name').notNull(),
+  email: text('email').default(''),
+  reason: text('reason').default(''),
+  duration: text('duration', { enum: ['4h', '8h', '12h', '24h'] }).notNull().default('8h'),
+  slots: text('slots'),
+  createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
+})
+
 // ============ RELATIONS ============
 export const bricksRelations = relations(bricks, ({ many }) => ({
   cvBricks: many(cvBricks)
@@ -95,3 +119,9 @@ export type NewCV = typeof cvs.$inferInsert
 
 export type CVBrick = typeof cvBricks.$inferSelect
 export type NewCVBrick = typeof cvBricks.$inferInsert
+
+export type Schedule = typeof schedules.$inferSelect
+export type NewSchedule = typeof schedules.$inferInsert
+
+export type TicketRequest = typeof requests.$inferSelect
+export type NewTicketRequest = typeof requests.$inferInsert

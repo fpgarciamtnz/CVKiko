@@ -4,12 +4,17 @@ import { BRICK_TYPE_CONFIG, BRICK_TYPES } from '~/utils/brick-types'
 const { bricks, fetchBricks } = useBricks()
 const { settings, fetchSettings } = useSettings()
 const { savedCVs, fetchCVs } = useSavedCVs()
+const schedule = useSchedule()
 
 await Promise.all([
   fetchBricks(),
   fetchSettings(),
-  fetchCVs()
+  fetchCVs(),
+  schedule.fetchSchedule(),
+  schedule.fetchRequests()
 ])
+
+const showRequestModal = ref(false)
 
 const stats = computed(() => {
   const counts = BRICK_TYPES.reduce((acc, type) => {
@@ -138,6 +143,75 @@ const stats = computed(() => {
         </UButton>
       </UCard>
     </div>
+
+    <!-- Ticket Scheduling -->
+    <div class="mt-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+          Ticket Availability
+        </h2>
+        <div class="flex gap-2">
+          <UButton
+            to="/request"
+            variant="soft"
+            icon="i-lucide-calendar-plus"
+          >
+            Request Ticket
+          </UButton>
+          <UButton
+            to="/admin"
+            variant="ghost"
+            icon="i-lucide-shield"
+            color="neutral"
+          >
+            Admin
+          </UButton>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <CalendarView />
+
+        <UCard>
+          <template #header>
+            <h3 class="font-semibold text-sm">
+              Legend
+            </h3>
+          </template>
+          <div class="space-y-3 text-sm">
+            <div class="flex items-center gap-3">
+              <span class="w-4 h-4 rounded-full bg-red-500 shrink-0" />
+              <span>Owner using (full day — all 3 slots blocked)</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-4 h-4 rounded-full bg-red-200 dark:bg-red-900/40 shrink-0" />
+              <span>Owner using (partial day — some slots available)</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-4 h-4 rounded-full ring-2 ring-yellow-400 bg-transparent shrink-0" />
+              <span>Pending request</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-4 h-4 rounded-full ring-2 ring-blue-400 bg-transparent shrink-0" />
+              <span>Approved request</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="w-4 h-4 rounded-full ring-2 ring-green-400 bg-transparent shrink-0" />
+              <span>Today</span>
+            </div>
+            <UDivider />
+            <p class="text-gray-500 dark:text-gray-400 text-xs">
+              Click a date on the calendar to see morning, midday, and evening availability.
+            </p>
+          </div>
+        </UCard>
+      </div>
+    </div>
+
+    <RequestModal
+      v-model="showRequestModal"
+      @submitted="schedule.fetchRequests()"
+    />
 
     <!-- Recent Bricks -->
     <div
