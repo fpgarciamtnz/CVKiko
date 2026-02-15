@@ -102,3 +102,84 @@ export function createStreetLight(PIXI: typeof import('pixi.js')): Container {
 
   return container
 }
+
+/**
+ * Creates a district sign — a signpost with a hanging board.
+ */
+export function createDistrictSign(PIXI: typeof import('pixi.js'), label: string, color: number): Container {
+  const container = new PIXI.Container()
+
+  // Pole
+  const pole = new PIXI.Graphics()
+  pole.rect(-2, -30, 4, 30)
+  pole.fill({ color: 0x8B4513 })
+  container.addChild(pole)
+
+  // Sign board
+  const board = new PIXI.Graphics()
+  const boardW = Math.max(80, label.length * 8 + 20)
+  board.roundRect(-boardW / 2, -38, boardW, 22, 4)
+  board.fill({ color })
+  board.stroke({ color: 0x000000, width: 1, alpha: 0.3 })
+  container.addChild(board)
+
+  // Sign text
+  const text = new PIXI.Text({
+    text: label,
+    style: {
+      fontFamily: 'system-ui, sans-serif',
+      fontSize: 11,
+      fontWeight: 'bold',
+      fill: 0xffffff,
+      align: 'center'
+    }
+  })
+  text.anchor.set(0.5)
+  text.y = -27
+  container.addChild(text)
+
+  return container
+}
+
+/**
+ * Creates a compact building for skill booths (80×60).
+ */
+export function createSmallBuilding(PIXI: typeof import('pixi.js'), color: number): Container {
+  const container = new PIXI.Container()
+  const w = 80
+  const h = 60
+
+  // Shadow
+  const shadow = new PIXI.Graphics()
+  shadow.roundRect(-w / 2 + 3, -h / 2 + 3, w, h, 5)
+  shadow.fill({ color: 0x000000, alpha: 0.2 })
+  container.addChild(shadow)
+
+  // Body
+  const body = new PIXI.Graphics()
+  body.roundRect(-w / 2, -h / 2, w, h, 5)
+  body.fill({ color })
+  body.stroke({ color: darkenColor(color, 0.3), width: 1.5 })
+  container.addChild(body)
+
+  // Single window
+  const win = new PIXI.Graphics()
+  win.roundRect(-8, -12, 16, 12, 2)
+  win.fill({ color: 0xadd8e6, alpha: 0.7 })
+  container.addChild(win)
+
+  // Door
+  const door = new PIXI.Graphics()
+  door.roundRect(-5, h / 2 - 14, 10, 12, 2)
+  door.fill({ color: darkenColor(color, 0.4) })
+  container.addChild(door)
+
+  return container
+}
+
+function darkenColor(color: number, amount: number): number {
+  const r = Math.max(0, ((color >> 16) & 0xff) * (1 - amount)) | 0
+  const g = Math.max(0, ((color >> 8) & 0xff) * (1 - amount)) | 0
+  const b = Math.max(0, (color & 0xff) * (1 - amount)) | 0
+  return (r << 16) | (g << 8) | b
+}

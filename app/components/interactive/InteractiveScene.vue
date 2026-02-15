@@ -2,7 +2,7 @@
 import type { Brick } from '~/composables/useBricks'
 import type { Settings } from '~/composables/useSettings'
 import type { MapZone } from '~/utils/map-data'
-import { createCarGraphics, createTree, createStreetLight } from '~/utils/pixi-sprites'
+import { createCarGraphics, createTree, createStreetLight, createDistrictSign, createSmallBuilding } from '~/utils/pixi-sprites'
 
 const props = defineProps<{
   bricks: Brick[]
@@ -123,12 +123,26 @@ function buildScene() {
     drawRoad(road)
   }
 
-  // Draw zone buildings
+  // Draw zones by kind
   for (const zone of map.zones) {
-    drawZoneBuilding(zone)
+    switch (zone.kind) {
+      case 'district-sign':
+        drawDistrictSign(zone)
+        break
+      case 'building':
+        if (zone.type === 'skill') {
+          drawSkillBooth(zone)
+        } else {
+          drawBuilding(zone)
+        }
+        break
+      case 'settings-zone':
+        drawSettingsBuilding(zone)
+        break
+    }
   }
 
-  // Add decorations (trees along roads)
+  // Add decorations (scale tree count with world size)
   addDecorations(map)
 
   // Car sprite (on top)
@@ -199,7 +213,7 @@ function drawRoad(road: { x1: number, y1: number, x2: number, y2: number, width:
   worldContainer!.addChild(roadGfx)
 }
 
-function drawZoneBuilding(zone: MapZone) {
+function drawBuilding(zone: MapZone) {
   if (!PIXI || !worldContainer) return
 
   const zoneContainer = new PIXI.Container()
@@ -247,6 +261,144 @@ function drawZoneBuilding(zone: MapZone) {
   door.fill({ color: darkenColor(zone.color, 0.4) })
   zoneContainer.addChild(door)
 
+  // Title label (above building)
+  const label = new PIXI.Text({
+    text: truncateText(zone.label, 22),
+    style: {
+      fontFamily: 'system-ui, sans-serif',
+      fontSize: 13,
+      fontWeight: 'bold',
+      fill: 0xffffff,
+      align: 'center',
+      dropShadow: {
+        color: 0x000000,
+        blur: 3,
+        distance: 1,
+        alpha: 0.5
+      }
+    }
+  })
+  label.anchor.set(0.5)
+  label.y = -zone.height / 2 - 16
+  zoneContainer.addChild(label)
+
+  // Subtitle label (below title)
+  if (zone.subtitle) {
+    const subtitle = new PIXI.Text({
+      text: truncateText(zone.subtitle, 26),
+      style: {
+        fontFamily: 'system-ui, sans-serif',
+        fontSize: 10,
+        fill: 0xdddddd,
+        align: 'center',
+        dropShadow: {
+          color: 0x000000,
+          blur: 2,
+          distance: 1,
+          alpha: 0.4
+        }
+      }
+    })
+    subtitle.anchor.set(0.5)
+    subtitle.y = -zone.height / 2 - 4
+    zoneContainer.addChild(subtitle)
+  }
+
+  worldContainer!.addChild(zoneContainer)
+}
+
+function drawSkillBooth(zone: MapZone) {
+  if (!PIXI || !worldContainer) return
+
+  const zoneContainer = new PIXI.Container()
+  zoneContainer.x = zone.cx
+  zoneContainer.y = zone.cy
+
+  // Use the small building sprite
+  const building = createSmallBuilding(PIXI, zone.color)
+  zoneContainer.addChild(building)
+
+  // Label above
+  const label = new PIXI.Text({
+    text: truncateText(zone.label, 12),
+    style: {
+      fontFamily: 'system-ui, sans-serif',
+      fontSize: 10,
+      fontWeight: 'bold',
+      fill: 0xffffff,
+      align: 'center',
+      dropShadow: {
+        color: 0x000000,
+        blur: 2,
+        distance: 1,
+        alpha: 0.5
+      }
+    }
+  })
+  label.anchor.set(0.5)
+  label.y = -zone.height / 2 - 12
+  zoneContainer.addChild(label)
+
+  worldContainer!.addChild(zoneContainer)
+}
+
+function drawDistrictSign(zone: MapZone) {
+  if (!PIXI || !worldContainer) return
+
+  const sign = createDistrictSign(PIXI, zone.label, zone.color)
+  sign.x = zone.cx
+  sign.y = zone.cy
+  worldContainer.addChild(sign)
+}
+
+function drawSettingsBuilding(zone: MapZone) {
+  if (!PIXI || !worldContainer) return
+
+  const zoneContainer = new PIXI.Container()
+  zoneContainer.x = zone.cx
+  zoneContainer.y = zone.cy
+
+  // Building shadow
+  const shadow = new PIXI.Graphics()
+  shadow.roundRect(-zone.width / 2 + 4, -zone.height / 2 + 4, zone.width, zone.height, 8)
+  shadow.fill({ color: 0x000000, alpha: 0.2 })
+  zoneContainer.addChild(shadow)
+
+  // Building body
+  const building = new PIXI.Graphics()
+  building.roundRect(-zone.width / 2, -zone.height / 2, zone.width, zone.height, 8)
+  building.fill({ color: zone.color })
+  building.stroke({ color: darkenColor(zone.color, 0.3), width: 2 })
+  zoneContainer.addChild(building)
+
+  // Roof accent
+  const roof = new PIXI.Graphics()
+  roof.roundRect(-zone.width / 2 + 8, -zone.height / 2 + 4, zone.width - 16, 10, 3)
+  roof.fill({ color: darkenColor(zone.color, 0.15) })
+  zoneContainer.addChild(roof)
+
+  // Windows (grid pattern)
+  const winCols = 3
+  const winRows = 2
+  const winW = 16
+  const winH = 12
+  const wxStart = -((winCols - 1) * (winW + 8)) / 2
+  const wyStart = -zone.height / 2 + 28
+  for (let r = 0; r < winRows; r++) {
+    for (let c = 0; c < winCols; c++) {
+      const win = new PIXI.Graphics()
+      win.roundRect(wxStart + c * (winW + 8), wyStart + r * (winH + 8), winW, winH, 2)
+      win.fill({ color: 0xadd8e6, alpha: 0.7 })
+      zoneContainer.addChild(win)
+    }
+  }
+
+  // Door
+  const door = new PIXI.Graphics()
+  door.roundRect(-8, zone.height / 2 - 22, 16, 18, 3)
+  door.fill({ color: darkenColor(zone.color, 0.4) })
+  zoneContainer.addChild(door)
+
   // Label (text above building)
   const label = new PIXI.Text({
     text: zone.label,
@@ -274,9 +426,12 @@ function drawZoneBuilding(zone: MapZone) {
 function addDecorations(map: typeof townMap.value) {
   if (!PIXI || !worldContainer) return
 
-  // Add trees scattered around
-  const rng = seedRandom(42) // deterministic placement
-  for (let i = 0; i < 60; i++) {
+  // Scale tree count with world size
+  const worldArea = map.worldWidth * map.worldHeight
+  const treeCount = Math.min(120, Math.floor(worldArea / 40000))
+
+  const rng = seedRandom(42)
+  for (let i = 0; i < treeCount; i++) {
     const x = rng() * map.worldWidth
     const y = rng() * map.worldHeight
 
@@ -358,6 +513,9 @@ function updateActiveZone() {
   let found: MapZone | null = null
 
   for (const zone of townMap.value.zones) {
+    // Skip district signs — they're decorative, not interactive
+    if (zone.kind === 'district-sign') continue
+
     const halfW = zone.width / 2 + TRIGGER_MARGIN
     const halfH = zone.height / 2 + TRIGGER_MARGIN
     if (
@@ -396,6 +554,10 @@ function darkenColor(color: number, amount: number): number {
   const g = Math.max(0, ((color >> 8) & 0xff) * (1 - amount)) | 0
   const b = Math.max(0, (color & 0xff) * (1 - amount)) | 0
   return (r << 16) | (g << 8) | b
+}
+
+function truncateText(text: string, maxLen: number): string {
+  return text.length > maxLen ? text.slice(0, maxLen - 1) + '\u2026' : text
 }
 
 function seedRandom(seed: number) {
@@ -473,6 +635,7 @@ function pointNearRoad(px: number, py: number, road: { x1: number, y1: number, x
     <!-- HUD -->
     <GameHud
       :zones="townMap.zones"
+      :districts="townMap.districts"
       :active-zone-id="activeZone?.id ?? null"
       :car-x="carPosition.x"
       :car-y="carPosition.y"

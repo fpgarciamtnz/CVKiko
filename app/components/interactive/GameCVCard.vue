@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { Settings } from '~/composables/useSettings'
 import type { MapZone } from '~/utils/map-data'
-import { formatDateRange } from '~/utils/brick-types'
+import { BRICK_TYPE_CONFIG, formatDateRange, PROFICIENCY_LEVELS, SKILL_CATEGORIES } from '~/utils/brick-types'
+import type { SkillData } from '~/utils/brick-types'
 import { renderMarkdown } from '~/utils/render-markdown'
 
 const props = defineProps<{
@@ -10,6 +11,26 @@ const props = defineProps<{
 }>()
 
 const isVisible = computed(() => props.zone !== null)
+
+const districtLabel = computed(() => {
+  if (!props.zone?.districtType) return null
+  return BRICK_TYPE_CONFIG[props.zone.districtType]?.pluralLabel ?? null
+})
+
+const skillData = computed<SkillData | null>(() => {
+  if (props.zone?.type !== 'skill' || !props.zone.brick) return null
+  return (props.zone.brick.structuredData ?? null) as SkillData | null
+})
+
+const proficiencyLabel = computed(() => {
+  if (!skillData.value) return null
+  return PROFICIENCY_LEVELS.find(p => p.value === skillData.value!.proficiency)?.label ?? skillData.value.proficiency
+})
+
+const categoryLabel = computed(() => {
+  if (!skillData.value) return null
+  return SKILL_CATEGORIES.find(c => c.value === skillData.value!.category)?.label ?? skillData.value.category
+})
 </script>
 
 <template>
@@ -32,9 +53,17 @@ const isVisible = computed(() => props.zone !== null)
             :name="zone.icon"
             class="w-6 h-6 text-slate-700 dark:text-slate-300"
           />
-          <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
-            {{ zone.label }}
-          </h2>
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
+              {{ zone.label }}
+            </h2>
+            <p
+              v-if="districtLabel"
+              class="text-xs text-slate-500 dark:text-slate-400"
+            >
+              {{ districtLabel }}
+            </p>
+          </div>
         </div>
 
         <!-- Hero content -->
@@ -124,75 +153,115 @@ const isVisible = computed(() => props.zone !== null)
           </div>
         </template>
 
-        <!-- Skill bricks (tag layout) -->
-        <template v-else-if="zone.type === 'skill'">
-          <div class="flex flex-wrap gap-2">
-            <UBadge
-              v-for="brick in zone.bricks"
-              :key="brick.id"
-              variant="subtle"
-              color="neutral"
-              size="lg"
-            >
-              {{ brick.title }}
-            </UBadge>
-          </div>
-        </template>
-
-        <!-- Standard brick content -->
-        <template v-else>
-          <div class="space-y-5">
-            <div
-              v-for="brick in zone.bricks"
-              :key="brick.id"
-              class="pb-4 last:pb-0 border-b border-slate-100 dark:border-slate-700 last:border-0"
-            >
-              <div class="flex justify-between items-start gap-4">
-                <div>
-                  <h3 class="font-semibold text-slate-900 dark:text-slate-100">
-                    {{ brick.title }}
-                  </h3>
-                  <p
-                    v-if="brick.frontmatter?.subtitle"
-                    class="text-sm text-slate-600 dark:text-slate-400 italic"
-                  >
-                    {{ brick.frontmatter.subtitle }}
-                    <span
-                      v-if="brick.frontmatter?.location"
-                      class="text-slate-500"
-                    >
-                      | {{ brick.frontmatter.location }}
-                    </span>
-                  </p>
-                </div>
-                <span
-                  v-if="brick.frontmatter?.startDate"
-                  class="text-xs text-slate-500 whitespace-nowrap"
-                >
-                  {{ formatDateRange(brick.frontmatter.startDate as string, brick.frontmatter.endDate as string) }}
-                </span>
-              </div>
-
-              <div
-                v-if="brick.content"
-                class="mt-2 text-sm text-slate-700 dark:text-slate-300 leading-relaxed panel-content"
-                v-html="renderMarkdown(brick.content)"
-              />
-
-              <div
-                v-if="brick.tags?.length"
-                class="mt-2 flex flex-wrap gap-1"
+        <!-- Skill detail view -->
+        <template v-else-if="zone.type === 'skill' && zone.brick">
+          <div class="space-y-4">
+            <div class="flex flex-wrap gap-2">
+              <UBadge
+                v-if="categoryLabel"
+                variant="subtle"
+                color="neutral"
+                size="lg"
               >
+                {{ categoryLabel }}
+              </UBadge>
+              <UBadge
+                v-if="proficiencyLabel"
+                variant="subtle"
+                color="primary"
+                size="lg"
+              >
+                {{ proficiencyLabel }}
+              </UBadge>
+            </div>
+            <div
+              v-if="skillData?.yearsOfExperience"
+              class="text-sm text-slate-600 dark:text-slate-400"
+            >
+              {{ skillData.yearsOfExperience }} year{{ skillData.yearsOfExperience > 1 ? 's' : '' }} of experience
+            </div>
+            <p
+              v-if="skillData?.context"
+              class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed"
+            >
+              {{ skillData.context }}
+            </p>
+            <div
+              v-if="skillData?.relatedProjects?.length"
+              class="mt-2"
+            >
+              <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase mb-1">
+                Related Projects
+              </p>
+              <div class="flex flex-wrap gap-1">
                 <UBadge
-                  v-for="tag in brick.tags"
-                  :key="tag"
+                  v-for="proj in skillData.relatedProjects"
+                  :key="proj"
                   variant="subtle"
                   color="neutral"
                   size="xs"
                 >
-                  {{ tag }}
+                  {{ proj }}
                 </UBadge>
               </div>
+            </div>
+            <!-- Fallback to markdown content -->
+            <div
+              v-if="zone.brick.content"
+              class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed panel-content"
+              v-html="renderMarkdown(zone.brick.content)"
+            />
+          </div>
+        </template>
+
+        <!-- Single brick content (experience, education, project, etc.) -->
+        <template v-else-if="zone.brick">
+          <div>
+            <div class="flex justify-between items-start gap-4">
+              <div>
+                <h3 class="font-semibold text-slate-900 dark:text-slate-100">
+                  {{ zone.brick.title }}
+                </h3>
+                <p
+                  v-if="zone.brick.frontmatter?.subtitle"
+                  class="text-sm text-slate-600 dark:text-slate-400 italic"
+                >
+                  {{ zone.brick.frontmatter.subtitle }}
+                  <span
+                    v-if="zone.brick.frontmatter?.location"
+                    class="text-slate-500"
+                  >
+                    | {{ zone.brick.frontmatter.location }}
+                  </span>
+                </p>
+              </div>
+              <span
+                v-if="zone.brick.frontmatter?.startDate"
+                class="text-xs text-slate-500 whitespace-nowrap"
+              >
+                {{ formatDateRange(zone.brick.frontmatter.startDate as string, zone.brick.frontmatter.endDate as string) }}
+              </span>
+            </div>
+
+            <div
+              v-if="zone.brick.content"
+              class="mt-2 text-sm text-slate-700 dark:text-slate-300 leading-relaxed panel-content"
+              v-html="renderMarkdown(zone.brick.content)"
+            />
+
+            <div
+              v-if="zone.brick.tags?.length"
+              class="mt-2 flex flex-wrap gap-1"
+            >
+              <UBadge
+                v-for="tag in zone.brick.tags"
+                :key="tag"
+                variant="subtle"
+                color="neutral"
+                size="xs"
+              >
+                {{ tag }}
+              </UBadge>
             </div>
           </div>
         </template>
