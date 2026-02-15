@@ -3,7 +3,6 @@ const navigation = [
   { label: 'Dashboard', to: '/' },
   { label: 'Bricks', to: '/bricks' },
   { label: 'Builder', to: '/builder' },
-  { label: 'Interactive', to: '/interactive' },
   { label: 'Settings', to: '/settings' }
 ]
 </script>
