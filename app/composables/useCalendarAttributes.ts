@@ -1,5 +1,3 @@
-import type { Schedule, TicketRequest } from '~/composables/useSchedule'
-
 export interface CalendarDateInfo {
   isOwnerFullDay: boolean
   isOwnerPartialDay: boolean

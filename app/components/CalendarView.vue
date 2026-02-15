@@ -1,28 +1,9 @@
 <script setup lang="ts">
-const { ownerDates, ticketRequests } = useSchedule()
-const { getDateClasses } = useCalendarAttributes()
-
 const selectedDate = ref<string | null>(null)
 
 const handleDayClick = (dateStr: string) => {
   selectedDate.value = selectedDate.value === dateStr ? null : dateStr
 }
-
-// Build a map of date -> CSS classes for the calendar
-const dateClassMap = computed(() => {
-  const map: Record<string, string> = {}
-  for (const s of ownerDates.value) {
-    map[s.date] = getDateClasses(s.date)
-  }
-  for (const r of ticketRequests.value) {
-    for (const d of r.dates) {
-      if (!map[d]) {
-        map[d] = getDateClasses(d)
-      }
-    }
-  }
-  return map
-})
 
 // Format a Date object to YYYY-MM-DD
 function formatDate(d: Date): string {
