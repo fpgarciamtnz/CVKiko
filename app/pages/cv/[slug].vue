@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Brick } from '~/composables/useBricks'
+
 definePageMeta({
   layout: 'blank'
 })
@@ -16,7 +18,7 @@ if (error.value) {
 }
 
 const cvName = computed(() => data.value?.cv?.name || 'CV')
-const cvBricks = computed(() => data.value?.bricks || [])
+const cvBricks = computed(() => (data.value?.bricks || []) as Brick[])
 const cvSettings = computed(() => data.value?.settings || null)
 
 useSeoMeta({

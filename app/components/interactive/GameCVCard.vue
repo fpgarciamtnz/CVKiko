@@ -19,7 +19,7 @@ const districtLabel = computed(() => {
 
 const skillData = computed<SkillData | null>(() => {
   if (props.zone?.type !== 'skill' || !props.zone.brick) return null
-  return (props.zone.brick.structuredData ?? null) as SkillData | null
+  return (props.zone.brick.structuredData ?? null) as unknown as SkillData | null
 })
 
 const proficiencyLabel = computed(() => {
