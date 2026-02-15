@@ -37,29 +37,6 @@ CREATE TABLE `cvs` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `cvs_slug_unique` ON `cvs` (`slug`);--> statement-breakpoint
-CREATE TABLE `requests` (
-	`id` text PRIMARY KEY NOT NULL,
-	`dates` text NOT NULL,
-	`status` text DEFAULT 'pending' NOT NULL,
-	`name` text NOT NULL,
-	`email` text DEFAULT '',
-	`reason` text DEFAULT '',
-	`duration` text DEFAULT '8h' NOT NULL,
-	`slots` text,
-	`created_at` integer,
-	`updated_at` integer
-);
---> statement-breakpoint
-CREATE TABLE `schedules` (
-	`id` text PRIMARY KEY NOT NULL,
-	`date` text NOT NULL,
-	`owner_status` text DEFAULT 'blocked' NOT NULL,
-	`slots` text DEFAULT 'morning,midday,evening' NOT NULL,
-	`created_at` integer,
-	`updated_at` integer
-);
---> statement-breakpoint
-CREATE UNIQUE INDEX `schedules_date_unique` ON `schedules` (`date`);--> statement-breakpoint
 CREATE TABLE `settings` (
 	`id` text PRIMARY KEY DEFAULT 'default' NOT NULL,
 	`name` text DEFAULT '' NOT NULL,
