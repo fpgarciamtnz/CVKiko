@@ -113,26 +113,24 @@ onBeforeUnmount(() => {
         class="flex items-center justify-center flex-col gap-6"
         style="height: 100vh; background-color: #264653;"
       >
-        <UIcon
-          name="i-lucide-loader-2"
-          class="w-10 h-10 animate-spin text-white/80"
-        />
+        <svg class="w-10 h-10 animate-spin text-white/80" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
         <p class="text-white/70 text-base">
           Loading interactive CV...
         </p>
         <div class="flex gap-2 flex-wrap justify-center px-4">
-          <span
-            v-for="section in sections"
-            :key="section.label"
-            class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider animate-pulse"
-            :style="{
-              backgroundColor: section.color,
-              color: section.color === '#e9c46a' || section.color === '#f4a261' ? '#264653' : 'white',
-              border: section.color === '#264653' ? '1px solid rgba(255,255,255,0.3)' : 'none',
-            }"
-          >
-            {{ section.label }}
-          </span>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider animate-pulse"
+                style="background-color: #264653; color: white; border: 1px solid rgba(255,255,255,0.3);">About</span>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider animate-pulse"
+                style="background-color: #2a9d8f; color: white; animation-delay: 0.15s;">Experience</span>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider animate-pulse"
+                style="background-color: #e9c46a; color: #264653; animation-delay: 0.3s;">Skills</span>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider animate-pulse"
+                style="background-color: #f4a261; color: #264653; animation-delay: 0.45s;">Education</span>
+          <span class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider animate-pulse"
+                style="background-color: #e76f51; color: white; animation-delay: 0.6s;">Contact</span>
         </div>
       </div>
     </template>
