@@ -109,8 +109,31 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <template #fallback>
-      <div class="loading">
-        Loading...
+      <div
+        class="flex items-center justify-center flex-col gap-6"
+        style="height: 100vh; background-color: #264653;"
+      >
+        <UIcon
+          name="i-lucide-loader-2"
+          class="w-10 h-10 animate-spin text-white/80"
+        />
+        <p class="text-white/70 text-base">
+          Loading interactive CV...
+        </p>
+        <div class="flex gap-2 flex-wrap justify-center px-4">
+          <span
+            v-for="section in sections"
+            :key="section.label"
+            class="px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider animate-pulse"
+            :style="{
+              backgroundColor: section.color,
+              color: section.color === '#e9c46a' || section.color === '#f4a261' ? '#264653' : 'white',
+              border: section.color === '#264653' ? '1px solid rgba(255,255,255,0.3)' : 'none',
+            }"
+          >
+            {{ section.label }}
+          </span>
+        </div>
       </div>
     </template>
   </ClientOnly>
@@ -159,11 +182,4 @@ onBeforeUnmount(() => {
   margin: 0;
 }
 
-.loading {
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-}
 </style>
