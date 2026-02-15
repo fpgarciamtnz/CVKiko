@@ -1,54 +1,44 @@
 <script setup lang="ts">
-import type { Brick } from '~/composables/useBricks'
 import type { Settings } from '~/composables/useSettings'
-import type { BrickType } from '~/utils/brick-types'
+import type { MapZone } from '~/utils/map-data'
 import { formatDateRange } from '~/utils/brick-types'
 import { renderMarkdown } from '~/utils/render-markdown'
 
-interface SceneSection {
-  id: string
-  label: string
-  icon: string
-  type: 'hero' | 'contact' | BrickType
-  x: number
-  bricks: Brick[]
-}
-
 const props = defineProps<{
-  section: SceneSection | null
+  zone: MapZone | null
   settings: Settings | null
 }>()
 
-const isVisible = computed(() => props.section !== null)
+const isVisible = computed(() => props.zone !== null)
 </script>
 
 <template>
   <Transition
-    enter-active-class="transition-transform duration-300 ease-out"
-    leave-active-class="transition-transform duration-200 ease-in"
-    enter-from-class="translate-y-full"
-    enter-to-class="translate-y-0"
-    leave-from-class="translate-y-0"
-    leave-to-class="translate-y-full"
+    enter-active-class="transition-all duration-300 ease-out"
+    leave-active-class="transition-all duration-200 ease-in"
+    enter-from-class="translate-x-full opacity-0"
+    enter-to-class="translate-x-0 opacity-100"
+    leave-from-class="translate-x-0 opacity-100"
+    leave-to-class="translate-x-full opacity-0"
   >
     <div
-      v-if="isVisible && section"
-      class="absolute bottom-0 left-0 right-0 max-h-[45vh] bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-t border-slate-300 dark:border-slate-600 overflow-y-auto z-30"
+      v-if="isVisible && zone"
+      class="absolute top-0 right-0 bottom-0 w-full sm:w-96 max-w-full bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-l border-slate-300 dark:border-slate-600 overflow-y-auto z-30 shadow-2xl"
     >
-      <div class="max-w-3xl mx-auto px-6 py-5">
+      <div class="px-5 py-5">
         <!-- Section header -->
         <div class="flex items-center gap-3 mb-4 pb-3 border-b border-slate-200 dark:border-slate-700">
           <UIcon
-            :name="section.icon"
+            :name="zone.icon"
             class="w-6 h-6 text-slate-700 dark:text-slate-300"
           />
           <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
-            {{ section.label }}
+            {{ zone.label }}
           </h2>
         </div>
 
         <!-- Hero content -->
-        <template v-if="section.type === 'hero'">
+        <template v-if="zone.type === 'hero'">
           <div class="space-y-3">
             <h3 class="text-2xl font-bold text-slate-900 dark:text-white">
               {{ settings?.name || 'Your Name' }}
@@ -61,7 +51,7 @@ const isVisible = computed(() => props.section !== null)
             </p>
             <p
               v-if="settings?.location"
-              class="text-sm text-slate-500 dark:text-slate-500 flex items-center gap-1"
+              class="text-sm text-slate-500 flex items-center gap-1"
             >
               <UIcon
                 name="i-lucide-map-pin"
@@ -73,8 +63,8 @@ const isVisible = computed(() => props.section !== null)
         </template>
 
         <!-- Contact content -->
-        <template v-else-if="section.type === 'contact'">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <template v-else-if="zone.type === 'contact'">
+          <div class="space-y-3">
             <div
               v-if="settings?.email"
               class="flex items-center gap-2 text-slate-700 dark:text-slate-300"
@@ -135,10 +125,10 @@ const isVisible = computed(() => props.section !== null)
         </template>
 
         <!-- Skill bricks (tag layout) -->
-        <template v-else-if="section.type === 'skill'">
+        <template v-else-if="zone.type === 'skill'">
           <div class="flex flex-wrap gap-2">
             <UBadge
-              v-for="brick in section.bricks"
+              v-for="brick in zone.bricks"
               :key="brick.id"
               variant="subtle"
               color="neutral"
@@ -153,7 +143,7 @@ const isVisible = computed(() => props.section !== null)
         <template v-else>
           <div class="space-y-5">
             <div
-              v-for="brick in section.bricks"
+              v-for="brick in zone.bricks"
               :key="brick.id"
               class="pb-4 last:pb-0 border-b border-slate-100 dark:border-slate-700 last:border-0"
             >
@@ -179,7 +169,7 @@ const isVisible = computed(() => props.section !== null)
                   v-if="brick.frontmatter?.startDate"
                   class="text-xs text-slate-500 whitespace-nowrap"
                 >
-                  {{ formatDateRange(brick.frontmatter.startDate, brick.frontmatter.endDate) }}
+                  {{ formatDateRange(brick.frontmatter.startDate as string, brick.frontmatter.endDate as string) }}
                 </span>
               </div>
 

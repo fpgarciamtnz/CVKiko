@@ -23,10 +23,6 @@ export default defineNuxtConfig({
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || ''
   },
 
-  build: {
-    transpile: ['gsap']
-  },
-
   compatibilityDate: '2025-01-15',
 
   nitro: {
