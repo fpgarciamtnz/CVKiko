@@ -15,7 +15,7 @@ const emit = defineEmits<{
   teleport: [zoneId: string]
 }>()
 
-const isTouchDevice = ref(false)
+const { joystickMode, toggleControlMode } = useControlMode()
 const minimapCanvas = ref<HTMLCanvasElement | null>(null)
 
 const MINIMAP_W = 160
@@ -25,13 +25,6 @@ const MINIMAP_H = 120
 const teleportZones = computed(() =>
   props.zones.filter(z => z.kind !== 'district-sign')
 )
-
-onMounted(() => {
-  isTouchDevice.value
-    = window.matchMedia('(pointer: coarse)').matches
-      || navigator.maxTouchPoints > 0
-      || 'ontouchstart' in window
-})
 
 // Draw minimap
 watch(
@@ -120,15 +113,17 @@ function drawMinimap() {
       />
     </div>
 
-    <!-- Controls hint -->
-    <div class="bg-black/40 backdrop-blur-sm rounded-lg px-3 py-2 text-xs text-white/70">
-      <template v-if="isTouchDevice">
-        Use joystick to drive
-      </template>
-      <template v-else>
-        WASD / Arrows to drive
-      </template>
-    </div>
+    <!-- Controls mode toggle -->
+    <button
+      class="bg-black/40 backdrop-blur-sm rounded-lg px-3 py-2 text-xs text-white/70 flex items-center gap-2 hover:bg-black/60 transition-colors"
+      @click="toggleControlMode()"
+    >
+      <UIcon
+        :name="joystickMode ? 'i-lucide-gamepad-2' : 'i-lucide-keyboard'"
+        class="w-4 h-4"
+      />
+      {{ joystickMode ? 'Joystick' : 'Keyboard' }}
+    </button>
 
     <!-- Zone labels (teleport) grouped by district -->
     <div class="bg-black/40 backdrop-blur-sm rounded-lg px-3 py-2 space-y-2 max-h-80 overflow-y-auto">

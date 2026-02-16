@@ -3,7 +3,7 @@ const emit = defineEmits<{
   input: [{ up: boolean, down: boolean, left: boolean, right: boolean }]
 }>()
 
-const isTouchDevice = ref(false)
+const { joystickMode } = useControlMode()
 
 const BASE_RADIUS = 60
 const THUMB_RADIUS = 20
@@ -69,18 +69,11 @@ function updateThumb(touch: Touch) {
     right: angle < 45 || angle > 315
   })
 }
-
-onMounted(() => {
-  isTouchDevice.value
-    = window.matchMedia('(pointer: coarse)').matches
-      || navigator.maxTouchPoints > 0
-      || 'ontouchstart' in window
-})
 </script>
 
 <template>
   <div
-    v-if="isTouchDevice"
+    v-if="joystickMode"
     class="fixed bottom-8 left-8 z-50"
     style="touch-action: none"
     @touchstart="handleTouchStart"

@@ -15,14 +15,7 @@ const activeZone = ref<MapZone | null>(null)
 const carPosition = reactive({ x: 0, y: 0 })
 const showTutorial = ref(true)
 const hasInteracted = ref(false)
-const isTouchDevice = ref(false)
-
-onMounted(() => {
-  isTouchDevice.value
-    = window.matchMedia('(pointer: coarse)').matches
-      || navigator.maxTouchPoints > 0
-      || 'ontouchstart' in window
-})
+const { joystickMode } = useControlMode()
 
 // --- Map data ---
 const bricksRef = computed(() => props.bricks)
@@ -620,7 +613,7 @@ function pointNearRoad(px: number, py: number, road: { x1: number, y1: number, x
             Explore this CV
           </h3>
           <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
-            <template v-if="isTouchDevice">
+            <template v-if="joystickMode">
               Use the joystick to drive between sections
             </template>
             <template v-else>
@@ -630,7 +623,7 @@ function pointNearRoad(px: number, py: number, road: { x1: number, y1: number, x
             </template>
           </p>
           <p class="text-xs text-slate-400">
-            {{ isTouchDevice ? 'Tap anywhere to start' : 'Click anywhere to start' }}
+            {{ joystickMode ? 'Tap anywhere to start' : 'Click anywhere to start' }}
           </p>
         </div>
       </div>
