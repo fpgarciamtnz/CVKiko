@@ -12,6 +12,9 @@ const thumbX = ref(0)
 const thumbY = ref(0)
 const dragging = ref(false)
 
+const rootEl = ref<HTMLDivElement | null>(null)
+const joystickBase = ref<HTMLDivElement | null>(null)
+
 function handleTouchStart(e: TouchEvent) {
   e.preventDefault()
   dragging.value = true
@@ -33,7 +36,7 @@ function handleTouchEnd(e: TouchEvent) {
 }
 
 function updateThumb(touch: Touch) {
-  const el = document.getElementById('joystick-base')
+  const el = joystickBase.value
   if (!el) return
 
   const rect = el.getBoundingClientRect()
@@ -69,20 +72,41 @@ function updateThumb(touch: Touch) {
     right: angle < 45 || angle > 315
   })
 }
+
+function attachListeners(el: HTMLElement) {
+  el.addEventListener('touchstart', handleTouchStart, { passive: false })
+  el.addEventListener('touchmove', handleTouchMove, { passive: false })
+  el.addEventListener('touchend', handleTouchEnd, { passive: false })
+  el.addEventListener('touchcancel', handleTouchEnd, { passive: false })
+}
+
+function detachListeners(el: HTMLElement) {
+  el.removeEventListener('touchstart', handleTouchStart)
+  el.removeEventListener('touchmove', handleTouchMove)
+  el.removeEventListener('touchend', handleTouchEnd)
+  el.removeEventListener('touchcancel', handleTouchEnd)
+}
+
+watch(rootEl, (newEl, oldEl) => {
+  if (oldEl) detachListeners(oldEl)
+  if (newEl) attachListeners(newEl)
+})
+
+onBeforeUnmount(() => {
+  if (rootEl.value) detachListeners(rootEl.value)
+})
 </script>
 
 <template>
   <div
     v-if="joystickMode"
+    ref="rootEl"
     class="fixed bottom-8 left-8 z-50"
     style="touch-action: none"
-    @touchstart="handleTouchStart"
-    @touchmove="handleTouchMove"
-    @touchend="handleTouchEnd"
   >
     <!-- Base ring -->
     <div
-      id="joystick-base"
+      ref="joystickBase"
       class="rounded-full border-2 border-white/40 bg-white/10"
       :style="{ width: `${BASE_RADIUS * 2}px`, height: `${BASE_RADIUS * 2}px` }"
     >
