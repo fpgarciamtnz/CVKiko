@@ -27,7 +27,10 @@ const teleportZones = computed(() =>
 )
 
 onMounted(() => {
-  isTouchDevice.value = window.matchMedia('(pointer: coarse)').matches
+  isTouchDevice.value
+    = window.matchMedia('(pointer: coarse)').matches
+      || navigator.maxTouchPoints > 0
+      || 'ontouchstart' in window
 })
 
 // Draw minimap

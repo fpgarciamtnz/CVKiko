@@ -15,6 +15,14 @@ const activeZone = ref<MapZone | null>(null)
 const carPosition = reactive({ x: 0, y: 0 })
 const showTutorial = ref(true)
 const hasInteracted = ref(false)
+const isTouchDevice = ref(false)
+
+onMounted(() => {
+  isTouchDevice.value
+    = window.matchMedia('(pointer: coarse)').matches
+      || navigator.maxTouchPoints > 0
+      || 'ontouchstart' in window
+})
 
 // --- Map data ---
 const bricksRef = computed(() => props.bricks)
@@ -612,12 +620,17 @@ function pointNearRoad(px: number, py: number, road: { x1: number, y1: number, x
             Explore this CV
           </h3>
           <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
-            Use <kbd class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs font-mono">WASD</kbd> or
-            <kbd class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs font-mono">Arrow keys</kbd>
-            to drive between sections
+            <template v-if="isTouchDevice">
+              Use the joystick to drive between sections
+            </template>
+            <template v-else>
+              Use <kbd class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs font-mono">WASD</kbd> or
+              <kbd class="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 rounded text-xs font-mono">Arrow keys</kbd>
+              to drive between sections
+            </template>
           </p>
           <p class="text-xs text-slate-400">
-            Click anywhere to start
+            {{ isTouchDevice ? 'Tap anywhere to start' : 'Click anywhere to start' }}
           </p>
         </div>
       </div>

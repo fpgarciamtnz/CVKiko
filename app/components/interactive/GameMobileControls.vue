@@ -71,14 +71,17 @@ function updateThumb(touch: Touch) {
 }
 
 onMounted(() => {
-  isTouchDevice.value = window.matchMedia('(pointer: coarse)').matches
+  isTouchDevice.value
+    = window.matchMedia('(pointer: coarse)').matches
+      || navigator.maxTouchPoints > 0
+      || 'ontouchstart' in window
 })
 </script>
 
 <template>
   <div
     v-if="isTouchDevice"
-    class="fixed bottom-8 left-8 z-20"
+    class="fixed bottom-8 left-8 z-50"
     style="touch-action: none"
     @touchstart="handleTouchStart"
     @touchmove="handleTouchMove"
