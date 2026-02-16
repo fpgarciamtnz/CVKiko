@@ -18,8 +18,7 @@ onMounted(async () => {
 
   const manager = nipplejs.create({
     zone: el,
-    mode: 'static',
-    position: { left: '80px', bottom: '80px' },
+    mode: 'dynamic',
     color: 'rgba(255,255,255,0.5)',
     size: 120
   })
@@ -62,6 +61,6 @@ onMounted(async () => {
   <div
     v-if="isTouchDevice"
     ref="joystickContainer"
-    class="absolute bottom-0 left-0 w-48 h-48 z-20"
+    class="absolute bottom-0 left-0 w-1/2 h-full z-20"
   />
 </template>
