@@ -28,7 +28,6 @@
     "ai": "^6.0.69",
     "drizzle-orm": "^0.45.1",
     "jspdf": "^4.1.0",
-    "nipplejs": "^0.10.2",
     "nuxt": "^4.3.0",
     "pixi.js": "^8.16.0",
     "tailwindcss": "^4.1.18",
