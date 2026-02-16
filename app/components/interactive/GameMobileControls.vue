@@ -11,6 +11,8 @@ onMounted(async () => {
 
   if (!isTouchDevice.value) return
 
+  await nextTick()
+
   const el = joystickContainer.value
   if (!el) return
 
@@ -19,6 +21,7 @@ onMounted(async () => {
   const manager = nipplejs.create({
     zone: el,
     mode: 'dynamic',
+    dynamicPage: true,
     color: 'rgba(255,255,255,0.5)',
     size: 120
   })
@@ -62,5 +65,6 @@ onMounted(async () => {
     v-if="isTouchDevice"
     ref="joystickContainer"
     class="absolute bottom-0 left-0 w-1/2 h-full z-20"
+    style="touch-action: none"
   />
 </template>
