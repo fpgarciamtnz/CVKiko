@@ -15,7 +15,7 @@ export interface RoadmapPhase {
   tasks: RoadmapTask[]
 }
 
-export const DIFFICULTY_CONFIG: Record<Difficulty, { label: string; color: string }> = {
+export const DIFFICULTY_CONFIG: Record<Difficulty, { label: string, color: string }> = {
   easy: { label: 'Easy', color: 'green' },
   medium: { label: 'Medium', color: 'yellow' },
   hard: { label: 'Hard', color: 'red' }

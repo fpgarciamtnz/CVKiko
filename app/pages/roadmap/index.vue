@@ -4,8 +4,7 @@ import {
   DIFFICULTY_CONFIG,
   getTotalTasks,
   getPhaseTaskIds,
-  type RoadmapPhase,
-  type RoadmapTask
+  type RoadmapPhase
 } from '~/utils/roadmap-data'
 
 const STORAGE_KEY = 'cvkiko-roadmap-completed'
@@ -18,8 +17,7 @@ onMounted(() => {
   if (stored) {
     try {
       completedTasks.value = new Set(JSON.parse(stored))
-    }
-    catch {
+    } catch {
       // ignore malformed data
     }
   }
@@ -33,8 +31,7 @@ function toggleTask(taskId: string) {
   const next = new Set(completedTasks.value)
   if (next.has(taskId)) {
     next.delete(taskId)
-  }
-  else {
+  } else {
     next.add(taskId)
   }
   completedTasks.value = next
@@ -45,8 +42,7 @@ function togglePhase(phaseId: string) {
   const next = new Set(expandedPhases.value)
   if (next.has(phaseId)) {
     next.delete(phaseId)
-  }
-  else {
+  } else {
     next.add(phaseId)
   }
   expandedPhases.value = next
@@ -158,8 +154,7 @@ async function downloadPdf() {
     }
 
     doc.save(`cvkiko-roadmap-${new Date().toISOString().split('T')[0]}.pdf`)
-  }
-  finally {
+  } finally {
     exporting.value = false
   }
 }
