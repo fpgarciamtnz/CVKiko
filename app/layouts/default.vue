@@ -12,9 +12,18 @@ const navigation = [
   <UDashboardGroup>
     <UDashboardSidebar collapsible>
       <template #header="{ collapsed }">
-        <NuxtLink to="/" class="flex items-center gap-2 min-w-0">
-          <UIcon name="i-lucide-boxes" class="size-6 text-primary shrink-0" />
-          <span v-if="!collapsed" class="font-bold text-lg truncate">CVKiko</span>
+        <NuxtLink
+          to="/"
+          class="flex items-center gap-2 min-w-0"
+        >
+          <UIcon
+            name="i-lucide-boxes"
+            class="size-6 text-primary shrink-0"
+          />
+          <span
+            v-if="!collapsed"
+            class="font-bold text-lg truncate"
+          >CVKiko</span>
         </NuxtLink>
       </template>
 
@@ -28,6 +37,7 @@ const navigation = [
         />
       </template>
 
+      <!-- eslint-disable-next-line vue/no-unused-vars -->
       <template #footer="{ collapsed }">
         <UColorModeButton />
         <UDashboardSidebarCollapse />
