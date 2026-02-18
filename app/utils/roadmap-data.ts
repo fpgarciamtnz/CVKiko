@@ -15,10 +15,10 @@ export interface RoadmapPhase {
   tasks: RoadmapTask[]
 }
 
-export const DIFFICULTY_CONFIG: Record<Difficulty, { label: string, color: string }> = {
-  easy: { label: 'Easy', color: 'green' },
-  medium: { label: 'Medium', color: 'yellow' },
-  hard: { label: 'Hard', color: 'red' }
+export const DIFFICULTY_CONFIG: Record<Difficulty, { label: string, color: 'success' | 'warning' | 'error' }> = {
+  easy: { label: 'Easy', color: 'success' },
+  medium: { label: 'Medium', color: 'warning' },
+  hard: { label: 'Hard', color: 'error' }
 }
 
 export const ROADMAP_PHASES: RoadmapPhase[] = [

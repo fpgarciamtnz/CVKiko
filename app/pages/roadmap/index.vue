@@ -10,7 +10,7 @@ import {
 const STORAGE_KEY = 'cvkiko-roadmap-completed'
 
 const completedTasks = ref<Set<string>>(new Set())
-const expandedPhases = ref<Set<string>>(new Set([ROADMAP_PHASES[0].id]))
+const expandedPhases = ref<Set<string>>(new Set([ROADMAP_PHASES[0]!.id]))
 
 onMounted(() => {
   const stored = localStorage.getItem(STORAGE_KEY)
@@ -222,7 +222,7 @@ async function downloadPdf() {
                 </h2>
                 <UBadge
                   v-if="isPhaseComplete(phase)"
-                  color="green"
+                  color="success"
                   variant="subtle"
                 >
                   Complete
@@ -280,7 +280,7 @@ async function downloadPdf() {
                 </UBadge>
                 <UBadge
                   v-if="task.aiAssisted"
-                  color="blue"
+                  color="info"
                   variant="subtle"
                   size="sm"
                 >
