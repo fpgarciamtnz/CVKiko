@@ -1,51 +1,49 @@
 <script setup>
 const navigation = [
-  { label: 'Dashboard', to: '/' },
-  { label: 'Bricks', to: '/bricks' },
-  { label: 'Builder', to: '/builder' },
-  { label: 'Roadmap', to: '/roadmap' },
-  { label: 'Settings', to: '/settings' }
+  { label: 'Dashboard', icon: 'i-lucide-layout-dashboard', to: '/' },
+  { label: 'Bricks', icon: 'i-lucide-layers', to: '/bricks' },
+  { label: 'Builder', icon: 'i-lucide-file-text', to: '/builder' },
+  { label: 'Roadmap', icon: 'i-lucide-map', to: '/roadmap' },
+  { label: 'Settings', icon: 'i-lucide-settings', to: '/settings' }
 ]
 </script>
 
 <template>
-  <div>
-    <UHeader>
-      <template #left>
-        <NuxtLink
-          to="/"
-          class="flex items-center gap-2"
-        >
-          <UIcon
-            name="i-lucide-boxes"
-            class="w-6 h-6 text-primary"
-          />
-          <span class="font-bold text-lg">CVKiko</span>
+  <UDashboardGroup>
+    <UDashboardSidebar collapsible>
+      <template #header="{ collapsed }">
+        <NuxtLink to="/" class="flex items-center gap-2 min-w-0">
+          <UIcon name="i-lucide-boxes" class="size-6 text-primary shrink-0" />
+          <span v-if="!collapsed" class="font-bold text-lg truncate">CVKiko</span>
         </NuxtLink>
       </template>
 
-      <template #center>
+      <template #default="{ collapsed }">
         <UNavigationMenu
           :items="navigation"
-          class="hidden md:flex"
+          orientation="vertical"
+          :collapsed="collapsed"
+          :tooltip="collapsed"
+          highlight
         />
       </template>
 
-      <template #right>
+      <template #footer="{ collapsed }">
         <UColorModeButton />
+        <UDashboardSidebarCollapse />
       </template>
-    </UHeader>
+    </UDashboardSidebar>
 
-    <UMain>
-      <slot />
-    </UMain>
+    <UDashboardPanel>
+      <UDashboardNavbar>
+        <template #right>
+          <UColorModeButton class="lg:hidden" />
+        </template>
+      </UDashboardNavbar>
 
-    <UFooter class="border-t">
-      <template #left>
-        <p class="text-sm text-muted">
-          CVKiko - Build better CVs with AI
-        </p>
-      </template>
-    </UFooter>
-  </div>
+      <div class="flex-1 overflow-y-auto">
+        <slot />
+      </div>
+    </UDashboardPanel>
+  </UDashboardGroup>
 </template>

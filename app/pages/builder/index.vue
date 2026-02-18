@@ -58,7 +58,7 @@ async function handleDownloadPdf() {
 </script>
 
 <template>
-  <div class="h-[calc(100vh-120px)] flex">
+  <div class="h-full flex">
     <!-- Left Panel - Brick Selection -->
     <div class="w-1/3 border-r overflow-hidden flex flex-col print:hidden">
       <div class="p-4 border-b bg-gray-50 dark:bg-gray-900">
