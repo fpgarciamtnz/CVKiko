@@ -44,7 +44,7 @@ export const ROADMAP_PHASES: RoadmapPhase[] = [
       {
         id: '1c',
         skill: 'Zod Validation',
-        description: 'Install Zod. Create schemas matching brick-types.ts interfaces. Wire into server routes (replace ad-hoc checks) and frontend forms. Add SettingsSchema for email/URL/phone validation.',
+        description: 'Install Zod. Create schemas matching brick-types.ts interfaces. Wire into server routes (replace ad-hoc checks) and frontend forms. Add SettingsSchema for email/URL/phone validation. Validate chat/analyze endpoint: bricks array schema and jobDescription length limit.',
         difficulty: 'easy',
         aiAssisted: true
       }
@@ -65,7 +65,7 @@ export const ROADMAP_PHASES: RoadmapPhase[] = [
       {
         id: '2b',
         skill: 'Security Hardening',
-        description: 'Add security headers (CSP, HSTS, X-Frame-Options). Rate limit chat endpoint (10 req/min). Sanitize markdown with DOMPurify. Ensure Zod validation on every server endpoint.',
+        description: 'Add security headers (CSP, HSTS, X-Frame-Options). Rate limit chat endpoint (10 req/min). Add AI prompt token budget (cap bricks context size). Sanitize markdown with DOMPurify. Ensure Zod validation on every server endpoint.',
         difficulty: 'hard',
         aiAssisted: false
       },
@@ -157,18 +157,25 @@ export const ROADMAP_PHASES: RoadmapPhase[] = [
   },
   {
     id: 'phase-6',
-    title: 'Phase 6: Advanced AI & Docker',
-    description: 'Add RAG-powered CV assistance and containerize the app. Leverages all previous phases.',
+    title: 'Phase 6: AI Hardening, Advanced AI & Docker',
+    description: 'Harden the AI chat pipeline, add RAG-powered CV assistance, and containerize the app. Leverages all previous phases.',
     tasks: [
       {
         id: '6a',
+        skill: 'AI SDK Migration & Chat Hardening',
+        description: 'Migrate chat/analyze endpoint from raw fetch() to Vercel AI SDK (ai, @ai-sdk/anthropic — already installed). Render AI responses as markdown using render-markdown.ts. Fix brick ID validation in extractBrickIds(). Clear stale results on job description change. Remove duplicate result display during loading. Correct default provider to match docs.',
+        difficulty: 'medium',
+        aiAssisted: true
+      },
+      {
+        id: '6b',
         skill: 'RAG-Powered CV Assistant',
         description: 'Embedding pipeline on brick create/update. Vector search endpoint: embed job description, find top-K bricks. Upgrade chat to use retrieved bricks. "Smart Match Score" in builder.',
         difficulty: 'hard',
         aiAssisted: true
       },
       {
-        id: '6b',
+        id: '6c',
         skill: 'Docker Containerization',
         description: 'Multi-stage Dockerfile (build + slim runtime). docker-compose.yml with SQLite volume. .dockerignore. Optional GitHub Actions to build/push image on release.',
         difficulty: 'medium',
