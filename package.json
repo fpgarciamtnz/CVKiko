@@ -10,6 +10,10 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "typecheck": "nuxt typecheck",
+    "test": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:nuxt": "vitest run tests/nuxt",
+    "test:run": "vitest run",
     "deploy": "npm run build && wrangler pages deploy",
     "deploy:preview": "npm run build && wrangler pages deploy --branch preview",
     "db:generate": "drizzle-kit generate",
@@ -35,10 +39,14 @@
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.13.0",
+    "@nuxt/test-utils": "^4.0.0",
     "@types/uuid": "^10.0.0",
+    "@vue/test-utils": "^2.4.6",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9.39.2",
+    "happy-dom": "^20.6.2",
     "typescript": "^5.9.3",
+    "vitest": "^4.0.18",
     "vue-tsc": "^3.2.4",
     "wrangler": "^4.63.0"
   }
