@@ -256,6 +256,15 @@ export const PUBLICATION_TYPES = [
   { value: 'other', label: 'Other' }
 ] as const
 
+export const DOI_REGEX = /^10\.\d{4,9}\/[^\s]+$/
+
+export function normalizeDoi(input: string): string {
+  return input
+    .trim()
+    .replace(/^https?:\/\/doi\.org\//i, '')
+    .replace(/^doi:/i, '')
+}
+
 export const DEGREE_OPTIONS = [
   'High School Diploma',
   'Associate Degree',
