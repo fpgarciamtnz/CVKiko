@@ -2,6 +2,7 @@ import type { jsPDF } from 'jspdf'
 import type { Brick } from './useBricks'
 import type { Settings } from './useSettings'
 import { BRICK_TYPE_CONFIG, formatDateRange, type BrickType } from '~/utils/brick-types'
+import { stripMarkdown } from '~/utils/render-markdown'
 
 export function usePdfExport() {
   async function generateCV(
@@ -65,13 +66,16 @@ export function usePdfExport() {
       y += 2
       doc.setFontSize(10)
       doc.setFont('helvetica', 'normal')
-      const summaryLines = doc.splitTextToSize(settings.summary, contentWidth)
+      const summaryLines = doc.splitTextToSize(stripMarkdown(settings.summary), contentWidth)
       doc.text(summaryLines, margin, y)
       y += summaryLines.length * 4 + 5
     }
 
-    // Sections
-    const sectionOrder: BrickType[] = ['experience', 'education', 'project', 'skill', 'publication']
+    // Sections - use dynamic order from builder
+    const { sectionTypeOrder, contentOverrides } = useCVBuilder()
+    const sectionOrder: BrickType[] = sectionTypeOrder.value.length > 0
+      ? sectionTypeOrder.value
+      : ['experience', 'education', 'project', 'skill', 'publication']
 
     for (const type of sectionOrder) {
       const typeBricks = bricksByType[type]
@@ -132,11 +136,12 @@ export function usePdfExport() {
           y += 4
         }
 
-        // Description - use content field
-        if (brick.content) {
+        // Description - use content override if available, otherwise original content
+        const brickContent = contentOverrides.value[brick.id] || brick.content
+        if (brickContent) {
           doc.setFontSize(10)
           doc.setFont('helvetica', 'normal')
-          const descLines = doc.splitTextToSize(brick.content, contentWidth)
+          const descLines = doc.splitTextToSize(stripMarkdown(brickContent), contentWidth)
           // Limit to avoid overflow
           const maxLines = Math.min(descLines.length, 6)
           for (let i = 0; i < maxLines; i++) {

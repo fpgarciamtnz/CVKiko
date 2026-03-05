@@ -4,16 +4,23 @@ import type { Settings } from '~/composables/useSettings'
 import { BRICK_TYPE_CONFIG, formatDateRange, type BrickType } from '~/utils/brick-types'
 import { renderMarkdown } from '~/utils/render-markdown'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   settings: Settings | null
   bricksByType: Record<BrickType, Brick[]>
-}>()
-
-const sectionOrder: BrickType[] = ['experience', 'education', 'project', 'skill', 'publication', 'custom']
+  sectionOrder?: BrickType[]
+  contentOverrides?: Record<string, string>
+}>(), {
+  sectionOrder: () => ['experience', 'education', 'project', 'skill', 'publication', 'custom'] as BrickType[],
+  contentOverrides: () => ({})
+})
 
 const visibleSections = computed(() => {
-  return sectionOrder.filter(type => props.bricksByType[type]?.length > 0)
+  return props.sectionOrder.filter(type => props.bricksByType[type]?.length > 0)
 })
+
+function getBrickContent(brick: Brick): string {
+  return props.contentOverrides[brick.id] || brick.content
+}
 </script>
 
 <template>
@@ -175,9 +182,9 @@ const visibleSections = computed(() => {
 
           <!-- Rendered Markdown Content -->
           <div
-            v-if="brick.content"
+            v-if="getBrickContent(brick)"
             class="mt-2 text-gray-700 text-sm leading-relaxed cv-content"
-            v-html="renderMarkdown(brick.content)"
+            v-html="renderMarkdown(getBrickContent(brick))"
           />
 
           <div

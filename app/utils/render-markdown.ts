@@ -1,4 +1,18 @@
 /**
+ * Strip markdown symbols for plain-text output (PDF, etc.)
+ */
+export function stripMarkdown(content: string): string {
+  if (!content) return ''
+  return content
+    .replace(/^#{1,3}\s+/gm, '')
+    .replace(/\*\*(.+?)\*\*/g, '$1')
+    .replace(/\*(.+?)\*/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/^- /gm, '• ')
+    .trim()
+}
+
+/**
  * Simple markdown to HTML converter for CV content.
  * Handles headers, bold, italic, links, bullet points, and line breaks.
  */

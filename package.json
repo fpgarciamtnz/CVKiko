@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.35",
+    "@ai-sdk/openai": "^3.0.41",
     "@ai-sdk/vue": "^3.0.69",
     "@iconify-json/lucide": "^1.2.87",
     "@iconify-json/simple-icons": "^1.2.68",
@@ -35,7 +36,9 @@
     "nuxt": "^4.3.0",
     "pixi.js": "^8.16.0",
     "tailwindcss": "^4.1.18",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "vuedraggable": "^4.1.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@nuxt/eslint": "^1.13.0",

@@ -8,9 +8,13 @@ export interface CVConfig {
   jobDescription?: string
 }
 
+const DEFAULT_SECTION_ORDER: BrickType[] = ['experience', 'education', 'project', 'skill', 'publication', 'custom']
+
 export function useCVBuilder() {
   const selectedBrickIds = useState<Set<string>>('cv-selected-bricks', () => new Set())
   const brickOrder = useState<string[]>('cv-brick-order', () => [])
+  const sectionTypeOrder = useState<BrickType[]>('cv-section-order', () => [...DEFAULT_SECTION_ORDER])
+  const contentOverrides = useState<Record<string, string>>('cv-content-overrides', () => ({}))
   const cvConfig = useState<CVConfig>('cv-config', () => ({
     name: 'My CV'
   }))
@@ -24,11 +28,20 @@ export function useCVBuilder() {
   })
 
   const selectedBricksByType = computed(() => {
-    return selectedBricks.value.reduce((acc, brick) => {
+    const grouped = selectedBricks.value.reduce((acc, brick) => {
       if (!acc[brick.type]) acc[brick.type] = []
       acc[brick.type].push(brick)
       return acc
     }, {} as Record<BrickType, Brick[]>)
+
+    // Return in section order
+    const ordered: Record<BrickType, Brick[]> = {} as Record<BrickType, Brick[]>
+    for (const type of sectionTypeOrder.value) {
+      if (grouped[type]) {
+        ordered[type] = grouped[type]
+      }
+    }
+    return ordered
   })
 
   function toggleBrick(brick: Brick) {
@@ -62,6 +75,28 @@ export function useCVBuilder() {
     brickOrder.value = newOrder
   }
 
+  function reorderSections(newOrder: BrickType[]) {
+    sectionTypeOrder.value = newOrder
+  }
+
+  function applySectionOrder(newOrder: BrickType[]) {
+    sectionTypeOrder.value = newOrder
+  }
+
+  function applyContentOverrides(overrides: Record<string, string>) {
+    contentOverrides.value = { ...contentOverrides.value, ...overrides }
+  }
+
+  function applyContentOverride(brickId: string, content: string) {
+    contentOverrides.value = { ...contentOverrides.value, [brickId]: content }
+  }
+
+  function removeContentOverride(brickId: string) {
+    const updated = { ...contentOverrides.value }
+    delete updated[brickId]
+    contentOverrides.value = updated
+  }
+
   function updateConfig(updates: Partial<CVConfig>) {
     cvConfig.value = { ...cvConfig.value, ...updates }
   }
@@ -69,6 +104,8 @@ export function useCVBuilder() {
   return {
     selectedBrickIds,
     brickOrder,
+    sectionTypeOrder,
+    contentOverrides,
     selectedBricks,
     selectedBricksByType,
     cvConfig,
@@ -76,6 +113,11 @@ export function useCVBuilder() {
     selectBricks,
     deselectAll,
     reorderBricks,
+    reorderSections,
+    applySectionOrder,
+    applyContentOverrides,
+    applyContentOverride,
+    removeContentOverride,
     updateConfig
   }
 }
