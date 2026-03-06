@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
 
   const parsed = parseGitHubUrl(url)
   if (!parsed) {
-    return { found: false, error: 'Invalid GitHub URL. Expected format: https://github.com/owner/repo' }
+    return { found: false as const, error: 'Invalid GitHub URL. Expected format: https://github.com/owner/repo' }
   }
 
   const { owner, repo } = parsed
@@ -72,12 +72,12 @@ export default defineEventHandler(async (event) => {
 
     if (!repoResult.data) {
       if (repoResult.status === 404) {
-        return { found: false, error: 'Repository not found. Make sure it\'s a public repository.' }
+        return { found: false as const, error: 'Repository not found. Make sure it\'s a public repository.' }
       }
       if (repoResult.status === 403) {
-        return { found: false, error: 'GitHub API rate limit exceeded. Please try again later.' }
+        return { found: false as const, error: 'GitHub API rate limit exceeded. Please try again later.' }
       }
-      return { found: false, error: `GitHub API error (${repoResult.status})` }
+      return { found: false as const, error: `GitHub API error (${repoResult.status})` }
     }
 
     const repoData = repoResult.data
@@ -148,10 +148,10 @@ ${readmeForAI || '(No README available)'}`
       date
     }
 
-    return { found: true, data }
+    return { found: true as const, data }
   } catch (error) {
     const err = error instanceof Error ? error.message : 'Unknown error'
     console.error('GitHub lookup error:', err)
-    return { found: false, error: 'Failed to fetch GitHub repository data. Please try again.' }
+    return { found: false as const, error: 'Failed to fetch GitHub repository data. Please try again.' }
   }
 })

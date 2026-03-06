@@ -43,7 +43,7 @@ async function lookupDoi() {
       body: { doi: raw }
     })
 
-    if (!result.found || !result.data) {
+    if (!result.found) {
       lookupError.value = result.error || 'DOI not found'
       return
     }

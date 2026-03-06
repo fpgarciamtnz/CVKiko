@@ -38,7 +38,7 @@ async function lookupGitHub() {
       body: { url: raw }
     })
 
-    if (!result.found || !result.data) {
+    if (!result.found) {
       lookupError.value = result.error || 'Repository not found'
       return
     }

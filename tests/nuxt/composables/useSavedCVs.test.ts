@@ -79,7 +79,7 @@ describe('useSavedCVs', () => {
       savedCVs.value = [mockCV('1')]
       await updateCV('1', { name: 'Updated CV' })
 
-      expect(savedCVs.value[0].name).toBe('Updated CV')
+      expect(savedCVs.value[0]!.name).toBe('Updated CV')
     })
 
     it('throws on failure and sets error', async () => {
@@ -100,7 +100,7 @@ describe('useSavedCVs', () => {
       await deleteCV('1')
 
       expect(savedCVs.value).toHaveLength(1)
-      expect(savedCVs.value[0].id).toBe('2')
+      expect(savedCVs.value[0]!.id).toBe('2')
     })
 
     it('throws on failure and sets error', async () => {

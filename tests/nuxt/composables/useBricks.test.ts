@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import type { BrickType } from '../../../app/utils/brick-types'
 
 // Mock $fetch globally
 const fetchMock = vi.fn()
 vi.stubGlobal('$fetch', fetchMock)
 
-const mockBrick = (id: string, type: string = 'experience') => ({
+const mockBrick = (id: string, type: BrickType = 'experience') => ({
   id,
   type,
   title: `Brick ${id}`,
@@ -111,7 +112,7 @@ describe('useBricks', () => {
         method: 'PUT',
         body: { title: 'Updated' }
       })
-      expect(bricks.value[0].title).toBe('Updated')
+      expect(bricks.value[0]!.title).toBe('Updated')
     })
 
     it('throws on failure and sets error', async () => {
@@ -133,7 +134,7 @@ describe('useBricks', () => {
 
       expect(fetchMock).toHaveBeenCalledWith('/api/bricks/1', { method: 'DELETE' })
       expect(bricks.value).toHaveLength(1)
-      expect(bricks.value[0].id).toBe('2')
+      expect(bricks.value[0]!.id).toBe('2')
     })
 
     it('throws on failure and sets error', async () => {

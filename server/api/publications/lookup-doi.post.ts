@@ -89,7 +89,7 @@ export default defineEventHandler(async (event) => {
   const doi = normalizeDoi(rawDoi)
 
   if (!DOI_REGEX.test(doi)) {
-    return { found: false, error: 'Invalid DOI format. Expected format: 10.xxxx/...' }
+    return { found: false as const, error: 'Invalid DOI format. Expected format: 10.xxxx/...' }
   }
 
   try {
@@ -101,9 +101,9 @@ export default defineEventHandler(async (event) => {
 
     if (!response.ok) {
       if (response.status === 404) {
-        return { found: false, error: 'DOI not found in Crossref database' }
+        return { found: false as const, error: 'DOI not found in Crossref database' }
       }
-      return { found: false, error: `Crossref API error (${response.status})` }
+      return { found: false as const, error: `Crossref API error (${response.status})` }
     }
 
     const json = await response.json() as { message: CrossrefMessage }
@@ -121,10 +121,10 @@ export default defineEventHandler(async (event) => {
       citations: message['is-referenced-by-count'] ?? 0
     }
 
-    return { found: true, data }
+    return { found: true as const, data }
   } catch (error) {
     const err = error instanceof Error ? error.message : 'Unknown error'
     console.error('DOI lookup error:', err)
-    return { found: false, error: 'Failed to fetch DOI metadata. Please try again.' }
+    return { found: false as const, error: 'Failed to fetch DOI metadata. Please try again.' }
   }
 })
