@@ -8,7 +8,8 @@ import {
   PUBLICATION_TYPES,
   DEGREE_OPTIONS,
   formatDateRange,
-  structuredDataToMarkdown
+  structuredDataToMarkdown,
+  parseGitHubUrl
 } from '../../../app/utils/brick-types'
 import type {
   ExperienceData,
@@ -453,5 +454,58 @@ describe('DEGREE_OPTIONS', () => {
 
   it('ends with Other', () => {
     expect(DEGREE_OPTIONS[DEGREE_OPTIONS.length - 1]).toBe('Other')
+  })
+})
+
+// ============================================
+// parseGitHubUrl
+// ============================================
+describe('parseGitHubUrl', () => {
+  it('parses standard HTTPS URL', () => {
+    expect(parseGitHubUrl('https://github.com/owner/repo')).toEqual({ owner: 'owner', repo: 'repo' })
+  })
+
+  it('handles trailing slash', () => {
+    expect(parseGitHubUrl('https://github.com/owner/repo/')).toEqual({ owner: 'owner', repo: 'repo' })
+  })
+
+  it('strips .git suffix', () => {
+    expect(parseGitHubUrl('https://github.com/owner/repo.git')).toEqual({ owner: 'owner', repo: 'repo' })
+  })
+
+  it('handles subpaths (extracts owner/repo only)', () => {
+    expect(parseGitHubUrl('https://github.com/owner/repo/tree/main/src')).toEqual({ owner: 'owner', repo: 'repo' })
+  })
+
+  it('handles HTTP variant', () => {
+    expect(parseGitHubUrl('http://github.com/owner/repo')).toEqual({ owner: 'owner', repo: 'repo' })
+  })
+
+  it('trims whitespace', () => {
+    expect(parseGitHubUrl('  https://github.com/owner/repo  ')).toEqual({ owner: 'owner', repo: 'repo' })
+  })
+
+  it('handles owner/repo with dots and hyphens', () => {
+    expect(parseGitHubUrl('https://github.com/my-org/my.repo-name')).toEqual({ owner: 'my-org', repo: 'my.repo-name' })
+  })
+
+  it('returns null for non-GitHub URL', () => {
+    expect(parseGitHubUrl('https://gitlab.com/owner/repo')).toBeNull()
+  })
+
+  it('returns null for empty string', () => {
+    expect(parseGitHubUrl('')).toBeNull()
+  })
+
+  it('returns null for whitespace-only string', () => {
+    expect(parseGitHubUrl('   ')).toBeNull()
+  })
+
+  it('returns null for GitHub URL without repo', () => {
+    expect(parseGitHubUrl('https://github.com/owner')).toBeNull()
+  })
+
+  it('returns null for plain GitHub domain', () => {
+    expect(parseGitHubUrl('https://github.com')).toBeNull()
   })
 })

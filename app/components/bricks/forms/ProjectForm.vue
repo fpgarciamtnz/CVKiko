@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { ProjectData } from '~/utils/brick-types'
+import { parseGitHubUrl } from '~/utils/brick-types'
 
 const props = defineProps<{
   modelValue: ProjectData
@@ -13,6 +14,66 @@ const data = computed({
   get: () => props.modelValue,
   set: val => emit('update:modelValue', val)
 })
+
+// GitHub Lookup state
+const githubInput = ref('')
+const isLookingUp = ref(false)
+const lookupError = ref('')
+const lookupSuccess = ref(false)
+const autoFilledFields = ref(new Set<string>())
+
+const isValidGitHubUrl = computed(() => !!parseGitHubUrl(githubInput.value))
+
+async function lookupGitHub() {
+  const raw = githubInput.value.trim()
+  if (!raw || !isValidGitHubUrl.value) return
+
+  isLookingUp.value = true
+  lookupError.value = ''
+  lookupSuccess.value = false
+
+  try {
+    const result = await $fetch('/api/projects/lookup-github', {
+      method: 'POST',
+      body: { url: raw },
+    })
+
+    if (!result.found || !result.data) {
+      lookupError.value = result.error || 'Repository not found'
+      return
+    }
+
+    const filled = new Set<string>()
+    const incoming = result.data
+
+    const updates: Partial<ProjectData> = {}
+
+    if (incoming.name) { updates.name = incoming.name; filled.add('name') }
+    if (incoming.role) { updates.role = incoming.role; filled.add('role') }
+    if (incoming.description) { updates.description = incoming.description; filled.add('description') }
+    if (incoming.problem) { updates.problem = incoming.problem; filled.add('problem') }
+    if (incoming.features?.length) { updates.features = incoming.features; filled.add('features') }
+    if (incoming.technologies?.length) { updates.technologies = incoming.technologies; filled.add('technologies') }
+    if (incoming.outcome) { updates.outcome = incoming.outcome; filled.add('outcome') }
+    if (incoming.links?.length) { updates.links = incoming.links; filled.add('links') }
+    if (incoming.isPersonal !== undefined) { updates.isPersonal = incoming.isPersonal; filled.add('isPersonal') }
+    if (incoming.date) { updates.date = incoming.date; filled.add('date') }
+
+    data.value = { ...data.value, ...updates }
+    autoFilledFields.value = filled
+    lookupSuccess.value = true
+  }
+  catch {
+    lookupError.value = 'Failed to look up GitHub repository. Please try again.'
+  }
+  finally {
+    isLookingUp.value = false
+  }
+}
+
+function autoFillHint(field: string): string | undefined {
+  return autoFilledFields.value.has(field) ? 'Auto-filled from GitHub' : undefined
+}
 
 // Features management
 function addFeature() {
@@ -99,11 +160,53 @@ const projectTypeOptions = [
 
 <template>
   <div class="space-y-6">
+    <!-- GitHub Lookup Section -->
+    <div class="rounded-lg border border-[var(--ui-border)] bg-[var(--ui-bg-elevated)] p-4 space-y-3">
+      <div class="flex items-center gap-2 text-sm font-medium text-[var(--ui-text-highlighted)]">
+        <UIcon name="i-simple-icons-github" />
+        Auto-fill from GitHub
+      </div>
+      <div class="flex gap-2">
+        <UInput
+          v-model="githubInput"
+          placeholder="e.g., https://github.com/owner/repo"
+          icon="i-lucide-link"
+          class="flex-1"
+          @keydown.enter.prevent="lookupGitHub"
+        />
+        <UButton
+          :loading="isLookingUp"
+          :disabled="!githubInput.trim() || !isValidGitHubUrl"
+          icon="i-lucide-sparkles"
+          @click="lookupGitHub"
+        >
+          Fill from GitHub
+        </UButton>
+      </div>
+      <UAlert
+        v-if="lookupError"
+        color="error"
+        variant="subtle"
+        icon="i-lucide-circle-x"
+        :title="lookupError"
+      />
+      <UAlert
+        v-if="lookupSuccess"
+        color="success"
+        variant="subtle"
+        icon="i-lucide-circle-check"
+        title="Project data loaded from GitHub! Review the auto-filled fields below."
+      />
+    </div>
+
+    <USeparator label="Project Details" />
+
     <!-- Basic Info -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <UFormField
         label="Project Name"
         required
+        :hint="autoFillHint('name')"
       >
         <UInput
           v-model="data.name"
@@ -112,7 +215,7 @@ const projectTypeOptions = [
         />
       </UFormField>
 
-      <UFormField label="Your Role">
+      <UFormField label="Your Role" :hint="autoFillHint('role')">
         <UInput
           v-model="data.role"
           placeholder="e.g., Lead Developer, Solo Project"
@@ -132,7 +235,7 @@ const projectTypeOptions = [
 
       <UFormField
         label="Date"
-        hint="When was this built?"
+        :hint="autoFillHint('date') || 'When was this built?'"
       >
         <UInput
           v-model="data.date"
@@ -145,7 +248,7 @@ const projectTypeOptions = [
     <UFormField
       label="Project Description"
       required
-      hint="Describe what the project does and its purpose"
+      :hint="autoFillHint('description') || 'Describe what the project does and its purpose'"
     >
       <UTextarea
         v-model="data.description"
@@ -157,7 +260,7 @@ const projectTypeOptions = [
     <!-- Problem Solved -->
     <UFormField
       label="Problem Solved"
-      hint="What problem does this project solve? Why did you build it?"
+      :hint="autoFillHint('problem') || 'What problem does this project solve? Why did you build it?'"
     >
       <UTextarea
         v-model="data.problem"
@@ -169,7 +272,7 @@ const projectTypeOptions = [
     <!-- Key Features -->
     <UFormField
       label="Key Features"
-      hint="2-4 main features of your project"
+      :hint="autoFillHint('features') || '2-4 main features of your project'"
     >
       <div class="space-y-2">
         <div
@@ -209,7 +312,7 @@ const projectTypeOptions = [
     <!-- Technologies -->
     <UFormField
       label="Tech Stack"
-      hint="Technologies, languages, frameworks used"
+      :hint="autoFillHint('technologies') || 'Technologies, languages, frameworks used'"
     >
       <div class="space-y-2">
         <div
@@ -255,7 +358,7 @@ const projectTypeOptions = [
     <!-- Outcome -->
     <UFormField
       label="Outcome / Results"
-      hint="Impact, metrics, or results achieved"
+      :hint="autoFillHint('outcome') || 'Impact, metrics, or results achieved'"
     >
       <UTextarea
         v-model="data.outcome"
@@ -267,7 +370,7 @@ const projectTypeOptions = [
     <!-- Links -->
     <UFormField
       label="Links"
-      hint="GitHub, Demo, Documentation, etc."
+      :hint="autoFillHint('links') || 'GitHub, Demo, Documentation, etc.'"
     >
       <div class="space-y-2">
         <div

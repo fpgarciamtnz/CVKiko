@@ -265,6 +265,18 @@ export function normalizeDoi(input: string): string {
     .replace(/^doi:/i, '')
 }
 
+export const GITHUB_REPO_REGEX = /^https?:\/\/github\.com\/([a-zA-Z0-9_.-]+)\/([a-zA-Z0-9_.-]+)/
+
+export function parseGitHubUrl(input: string): { owner: string, repo: string } | null {
+  const trimmed = input.trim()
+  if (!trimmed) return null
+  const match = trimmed.match(GITHUB_REPO_REGEX)
+  if (!match) return null
+  const owner = match[1]!
+  const repo = match[2]!.replace(/\.git$/, '')
+  return { owner, repo }
+}
+
 export const DEGREE_OPTIONS = [
   'High School Diploma',
   'Associate Degree',
