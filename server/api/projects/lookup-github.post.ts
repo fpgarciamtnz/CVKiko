@@ -22,8 +22,8 @@ async function fetchGitHub<T>(path: string): Promise<{ data: T | null, status: n
   const response = await fetch(`${GITHUB_API}${path}`, {
     headers: {
       'Accept': 'application/vnd.github+json',
-      'User-Agent': 'CVKiko/1.0',
-    },
+      'User-Agent': 'CVKiko/1.0'
+    }
   })
   if (!response.ok) return { data: null, status: response.status }
   return { data: await response.json() as T, status: response.status }
@@ -33,8 +33,8 @@ async function fetchReadme(owner: string, repo: string): Promise<string> {
   const response = await fetch(`${GITHUB_API}/repos/${owner}/${repo}/readme`, {
     headers: {
       'Accept': 'application/vnd.github.raw',
-      'User-Agent': 'CVKiko/1.0',
-    },
+      'User-Agent': 'CVKiko/1.0'
+    }
   })
   if (!response.ok) return ''
   return await response.text()
@@ -45,7 +45,7 @@ const AIProjectSchema = z.object({
   problem: z.string().describe('What problem does this project solve? One sentence.'),
   features: z.array(z.string()).describe('2-4 key features of the project. Short, action-oriented bullet points.'),
   outcome: z.string().describe('Impact or results achieved. If unclear from README, describe the project\'s value proposition.'),
-  role: z.string().describe('Likely role based on the repo (e.g., "Creator", "Lead Developer", "Contributor"). Default to "Creator" for personal projects.'),
+  role: z.string().describe('Likely role based on the repo (e.g., "Creator", "Lead Developer", "Contributor"). Default to "Creator" for personal projects.')
 })
 
 export default defineEventHandler(async (event) => {
@@ -67,7 +67,7 @@ export default defineEventHandler(async (event) => {
     const [repoResult, readme, languagesResult] = await Promise.all([
       fetchGitHub<GitHubRepo>(`/repos/${owner}/${repo}`),
       fetchReadme(owner, repo),
-      fetchGitHub<GitHubLanguages>(`/repos/${owner}/${repo}/languages`),
+      fetchGitHub<GitHubLanguages>(`/repos/${owner}/${repo}/languages`)
     ])
 
     if (!repoResult.data) {
@@ -92,7 +92,7 @@ export default defineEventHandler(async (event) => {
 
     // Build links
     const links: ProjectData['links'] = [
-      { label: 'GitHub', url: `https://github.com/${owner}/${repo}` },
+      { label: 'GitHub', url: `https://github.com/${owner}/${repo}` }
     ]
     if (repoData.homepage) {
       links.push({ label: 'Demo', url: repoData.homepage })
@@ -107,7 +107,7 @@ export default defineEventHandler(async (event) => {
       problem: '',
       features: [''],
       outcome: '',
-      role: 'Creator',
+      role: 'Creator'
     }
 
     const readmeForAI = readme.substring(0, 6000)
@@ -126,11 +126,10 @@ Topics: ${(repoData.topics ?? []).join(', ') || 'None'}
 Is fork: ${repoData.fork}
 
 README content:
-${readmeForAI || '(No README available)'}`,
+${readmeForAI || '(No README available)'}`
         })
         aiFields = object
-      }
-      catch (aiError) {
+      } catch (aiError) {
         console.error('AI extraction failed, using fallback:', aiError)
         // Keep the deterministic fallback values
       }
@@ -146,12 +145,11 @@ ${readmeForAI || '(No README available)'}`,
       role: aiFields.role,
       links,
       isPersonal: !repoData.fork,
-      date,
+      date
     }
 
     return { found: true, data }
-  }
-  catch (error) {
+  } catch (error) {
     const err = error instanceof Error ? error.message : 'Unknown error'
     console.error('GitHub lookup error:', err)
     return { found: false, error: 'Failed to fetch GitHub repository data. Please try again.' }

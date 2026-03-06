@@ -35,7 +35,7 @@ async function lookupGitHub() {
   try {
     const result = await $fetch('/api/projects/lookup-github', {
       method: 'POST',
-      body: { url: raw },
+      body: { url: raw }
     })
 
     if (!result.found || !result.data) {
@@ -48,25 +48,53 @@ async function lookupGitHub() {
 
     const updates: Partial<ProjectData> = {}
 
-    if (incoming.name) { updates.name = incoming.name; filled.add('name') }
-    if (incoming.role) { updates.role = incoming.role; filled.add('role') }
-    if (incoming.description) { updates.description = incoming.description; filled.add('description') }
-    if (incoming.problem) { updates.problem = incoming.problem; filled.add('problem') }
-    if (incoming.features?.length) { updates.features = incoming.features; filled.add('features') }
-    if (incoming.technologies?.length) { updates.technologies = incoming.technologies; filled.add('technologies') }
-    if (incoming.outcome) { updates.outcome = incoming.outcome; filled.add('outcome') }
-    if (incoming.links?.length) { updates.links = incoming.links; filled.add('links') }
-    if (incoming.isPersonal !== undefined) { updates.isPersonal = incoming.isPersonal; filled.add('isPersonal') }
-    if (incoming.date) { updates.date = incoming.date; filled.add('date') }
+    if (incoming.name) {
+      updates.name = incoming.name
+      filled.add('name')
+    }
+    if (incoming.role) {
+      updates.role = incoming.role
+      filled.add('role')
+    }
+    if (incoming.description) {
+      updates.description = incoming.description
+      filled.add('description')
+    }
+    if (incoming.problem) {
+      updates.problem = incoming.problem
+      filled.add('problem')
+    }
+    if (incoming.features?.length) {
+      updates.features = incoming.features
+      filled.add('features')
+    }
+    if (incoming.technologies?.length) {
+      updates.technologies = incoming.technologies
+      filled.add('technologies')
+    }
+    if (incoming.outcome) {
+      updates.outcome = incoming.outcome
+      filled.add('outcome')
+    }
+    if (incoming.links?.length) {
+      updates.links = incoming.links
+      filled.add('links')
+    }
+    if (incoming.isPersonal !== undefined) {
+      updates.isPersonal = incoming.isPersonal
+      filled.add('isPersonal')
+    }
+    if (incoming.date) {
+      updates.date = incoming.date
+      filled.add('date')
+    }
 
     data.value = { ...data.value, ...updates }
     autoFilledFields.value = filled
     lookupSuccess.value = true
-  }
-  catch {
+  } catch {
     lookupError.value = 'Failed to look up GitHub repository. Please try again.'
-  }
-  finally {
+  } finally {
     isLookingUp.value = false
   }
 }
@@ -215,7 +243,10 @@ const projectTypeOptions = [
         />
       </UFormField>
 
-      <UFormField label="Your Role" :hint="autoFillHint('role')">
+      <UFormField
+        label="Your Role"
+        :hint="autoFillHint('role')"
+      >
         <UInput
           v-model="data.role"
           placeholder="e.g., Lead Developer, Solo Project"
