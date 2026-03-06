@@ -5,6 +5,8 @@ import { BRICK_TYPE_CONFIG, formatDateRange, type BrickType } from '~/utils/bric
 import { stripMarkdown } from '~/utils/render-markdown'
 
 export function usePdfExport() {
+  const { sectionTypeOrder, contentOverrides } = useCVBuilder()
+
   async function generateCV(
     settings: Settings | null,
     bricksByType: Record<BrickType, Brick[]>
@@ -72,7 +74,6 @@ export function usePdfExport() {
     }
 
     // Sections - use dynamic order from builder
-    const { sectionTypeOrder, contentOverrides } = useCVBuilder()
     const sectionOrder: BrickType[] = sectionTypeOrder.value.length > 0
       ? sectionTypeOrder.value
       : ['experience', 'education', 'project', 'skill', 'publication']

@@ -1,5 +1,5 @@
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
+  const config = useRuntimeConfig(event)
   const { jobDescription, bricks } = await readBody<{
     jobDescription: string
     bricks: Array<{ id: string, type: string, title: string, frontmatter?: { subtitle?: string }, content?: string, tags?: string[] }>

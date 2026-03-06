@@ -1,9 +1,10 @@
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import type { LanguageModel } from 'ai'
+import type { H3Event } from 'h3'
 
-export function getModel(): LanguageModel {
-  const config = useRuntimeConfig()
+export function getModel(event: H3Event): LanguageModel {
+  const config = useRuntimeConfig(event)
   const provider = config.aiProvider || 'groq'
 
   if (provider === 'groq' && config.groqApiKey) {

@@ -70,7 +70,7 @@ For each brick adjustment:
 4. Give a relevance score (0-10) based on how relevant the brick is to the job`
 
   try {
-    const model = getModel()
+    const model = getModel(event)
 
     const result = streamObject({
       model,
