@@ -92,9 +92,8 @@ export function useCVBuilder() {
   }
 
   function removeContentOverride(brickId: string) {
-    const updated = { ...contentOverrides.value }
-    delete updated[brickId]
-    contentOverrides.value = updated
+    const { [brickId]: _, ...rest } = contentOverrides.value
+    contentOverrides.value = rest
   }
 
   function updateConfig(updates: Partial<CVConfig>) {

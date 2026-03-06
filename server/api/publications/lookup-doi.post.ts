@@ -12,17 +12,17 @@ interface CrossrefDateParts {
 }
 
 interface CrossrefMessage {
-  title?: string[]
-  author?: CrossrefAuthor[]
-  type?: string
+  'title'?: string[]
+  'author'?: CrossrefAuthor[]
+  'type'?: string
   'container-title'?: string[]
-  published?: CrossrefDateParts
+  'published'?: CrossrefDateParts
   'published-print'?: CrossrefDateParts
   'published-online'?: CrossrefDateParts
-  created?: CrossrefDateParts
-  abstract?: string
-  DOI?: string
-  URL?: string
+  'created'?: CrossrefDateParts
+  'abstract'?: string
+  'DOI'?: string
+  'URL'?: string
   'is-referenced-by-count'?: number
 }
 
@@ -35,7 +35,7 @@ const TYPE_MAP: Record<string, PublicationData['publicationType']> = {
   'edited-book': 'book',
   'posted-content': 'article',
   'peer-review': 'journal',
-  'patent': 'patent',
+  'patent': 'patent'
 }
 
 function extractDate(message: CrossrefMessage): string {
@@ -43,7 +43,7 @@ function extractDate(message: CrossrefMessage): string {
     message.published,
     message['published-print'],
     message['published-online'],
-    message.created,
+    message.created
   ]
 
   for (const source of sources) {
@@ -82,7 +82,7 @@ export default defineEventHandler(async (event) => {
   if (!rawDoi) {
     throw createError({
       statusCode: 400,
-      message: 'DOI is required',
+      message: 'DOI is required'
     })
   }
 
@@ -95,8 +95,8 @@ export default defineEventHandler(async (event) => {
   try {
     const response = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}`, {
       headers: {
-        'User-Agent': 'CVKiko/1.0 (https://github.com/fpgarcia; mailto:contact@fpgarcia.dev)',
-      },
+        'User-Agent': 'CVKiko/1.0 (https://github.com/fpgarcia; mailto:contact@fpgarcia.dev)'
+      }
     })
 
     if (!response.ok) {
@@ -118,12 +118,11 @@ export default defineEventHandler(async (event) => {
       abstract: message.abstract ? stripJatsXml(message.abstract) : '',
       doi: message.DOI ?? doi,
       url: message.URL ?? '',
-      citations: message['is-referenced-by-count'] ?? 0,
+      citations: message['is-referenced-by-count'] ?? 0
     }
 
     return { found: true, data }
-  }
-  catch (error) {
+  } catch (error) {
     const err = error instanceof Error ? error.message : 'Unknown error'
     console.error('DOI lookup error:', err)
     return { found: false, error: 'Failed to fetch DOI metadata. Please try again.' }

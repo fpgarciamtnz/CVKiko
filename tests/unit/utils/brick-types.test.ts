@@ -173,9 +173,9 @@ describe('structuredDataToMarkdown — education', () => {
   })
 
   it('includes Honors line', () => {
-    const data: EducationData = { ...empty, honors: ['Cum Laude', "Dean's List"] }
+    const data: EducationData = { ...empty, honors: ['Cum Laude', 'Dean\'s List'] }
     const md = structuredDataToMarkdown('education', data)
-    expect(md).toContain("**Honors:** Cum Laude, Dean's List")
+    expect(md).toContain('**Honors:** Cum Laude, Dean\'s List')
   })
 
   it('includes Activities heading and bullets', () => {
@@ -337,6 +337,7 @@ describe('structuredDataToMarkdown — custom', () => {
 
 describe('structuredDataToMarkdown — unknown type', () => {
   it('returns empty string for unknown type', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(structuredDataToMarkdown('unknown' as any, {})).toBe('')
   })
 })
@@ -370,42 +371,42 @@ describe('BRICK_TYPE_CONFIG', () => {
   })
 
   it('experience defaultData returns correct shape', () => {
-    const data = BRICK_TYPE_CONFIG.experience.defaultData() as any
+    const data = BRICK_TYPE_CONFIG.experience.defaultData() as ExperienceData
     expect(data.isInternship).toBe(false)
     expect(data.responsibilities).toEqual([''])
     expect(data.technologies).toEqual([])
   })
 
   it('education defaultData returns correct shape', () => {
-    const data = BRICK_TYPE_CONFIG.education.defaultData() as any
+    const data = BRICK_TYPE_CONFIG.education.defaultData() as EducationData
     expect(data.isExpected).toBe(false)
     expect(data.coursework).toEqual([])
     expect(data.thesis).toBe('')
   })
 
   it('project defaultData returns correct shape', () => {
-    const data = BRICK_TYPE_CONFIG.project.defaultData() as any
+    const data = BRICK_TYPE_CONFIG.project.defaultData() as ProjectData
     expect(data.isPersonal).toBe(true)
     expect(data.features).toEqual([''])
     expect(data.links).toEqual([])
   })
 
   it('skill defaultData returns correct shape', () => {
-    const data = BRICK_TYPE_CONFIG.skill.defaultData() as any
+    const data = BRICK_TYPE_CONFIG.skill.defaultData() as SkillData
     expect(data.proficiency).toBe('intermediate')
     expect(data.category).toBe('technical')
     expect(data.yearsOfExperience).toBe(0)
   })
 
   it('publication defaultData returns correct shape', () => {
-    const data = BRICK_TYPE_CONFIG.publication.defaultData() as any
+    const data = BRICK_TYPE_CONFIG.publication.defaultData() as PublicationData
     expect(data.publicationType).toBe('article')
     expect(data.authors).toEqual([''])
     expect(data.citations).toBe(0)
   })
 
   it('custom defaultData returns correct shape', () => {
-    const data = BRICK_TYPE_CONFIG.custom.defaultData() as any
+    const data = BRICK_TYPE_CONFIG.custom.defaultData() as CustomData
     expect(data.content).toBe('')
   })
 })

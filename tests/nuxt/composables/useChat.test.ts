@@ -75,8 +75,10 @@ describe('useChat', () => {
     })
 
     it('analyzing is true during call, false after', async () => {
-      let resolveFetch: (v: any) => void
-      fetchMock.mockImplementation(() => new Promise(resolve => { resolveFetch = resolve }))
+      let resolveFetch: (v: unknown) => void
+      fetchMock.mockImplementation(() => new Promise((resolve) => {
+        resolveFetch = resolve
+      }))
 
       const { analyzing, analyzeJobDescription } = useChat()
       const promise = analyzeJobDescription('job desc', [])

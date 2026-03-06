@@ -119,7 +119,6 @@ function moveBrickDown(sectionIdx: number, brickIdx: number) {
 function updateBrickOrderForSection(type: BrickType, newSectionIds: string[]) {
   // Rebuild brickOrder, replacing the bricks of this type with the new order
   const currentOrder = [...selectedBricks.value]
-  const otherBricks = currentOrder.filter(b => b.type !== type).map(b => b.id)
   // Insert the reordered bricks at the position of the first brick of this type
   const newOrder: string[] = []
   let inserted = false

@@ -4,7 +4,7 @@ import type { Brick } from '../../../app/composables/useBricks'
 function makeBrick(id: string, type: string = 'experience'): Brick {
   return {
     id,
-    type: type as any,
+    type: type as Brick['type'],
     title: `Brick ${id}`,
     content: '',
     tags: [],

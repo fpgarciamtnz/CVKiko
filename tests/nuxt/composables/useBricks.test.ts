@@ -47,8 +47,10 @@ describe('useBricks', () => {
     })
 
     it('loading is true during fetch, false after', async () => {
-      let resolveFetch: (v: any) => void
-      fetchMock.mockImplementation(() => new Promise(resolve => { resolveFetch = resolve }))
+      let resolveFetch: (v: unknown) => void
+      fetchMock.mockImplementation(() => new Promise((resolve) => {
+        resolveFetch = resolve
+      }))
 
       const { loading, fetchBricks } = useBricks()
       const promise = fetchBricks()

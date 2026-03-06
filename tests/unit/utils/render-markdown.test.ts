@@ -7,10 +7,12 @@ describe('renderMarkdown', () => {
   })
 
   it('returns empty string for null input', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(renderMarkdown(null as any)).toBe('')
   })
 
   it('returns empty string for undefined input', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     expect(renderMarkdown(undefined as any)).toBe('')
   })
 

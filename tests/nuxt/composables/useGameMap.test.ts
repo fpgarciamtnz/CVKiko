@@ -5,7 +5,7 @@ import type { Settings } from '../../../app/composables/useSettings'
 function makeBrick(id: string, type: string, isActive: boolean = true): Brick {
   return {
     id,
-    type: type as any,
+    type: type as Brick['type'],
     title: `Brick ${id}`,
     content: '',
     tags: [],

@@ -18,11 +18,11 @@ function dispatchKey(type: 'keydown' | 'keyup', code: string) {
 }
 
 describe('useKeyboard2D', () => {
-  let keys: any
+  let keys: Record<string, boolean>
 
   beforeEach(async () => {
     const wrapper = await mountSuspended(KeyboardWrapper)
-    keys = (wrapper.vm as any).keys
+    keys = (wrapper.vm as unknown as { keys: Record<string, boolean> }).keys
   })
 
   describe('keydown sets keys to true', () => {

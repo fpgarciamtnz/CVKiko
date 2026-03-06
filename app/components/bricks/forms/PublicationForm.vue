@@ -40,7 +40,7 @@ async function lookupDoi() {
   try {
     const result = await $fetch('/api/publications/lookup-doi', {
       method: 'POST',
-      body: { doi: raw },
+      body: { doi: raw }
     })
 
     if (!result.found || !result.data) {
@@ -54,15 +54,42 @@ async function lookupDoi() {
 
     const updates: Partial<PublicationData> = {}
 
-    if (incoming.title) { updates.title = incoming.title; filled.add('title') }
-    if (incoming.authors?.length) { updates.authors = incoming.authors; filled.add('authors') }
-    if (incoming.publicationType) { updates.publicationType = incoming.publicationType; filled.add('publicationType') }
-    if (incoming.publicationName) { updates.publicationName = incoming.publicationName; filled.add('publicationName') }
-    if (incoming.date) { updates.date = incoming.date; filled.add('date') }
-    if (incoming.abstract) { updates.abstract = incoming.abstract; filled.add('abstract') }
-    if (incoming.doi) { updates.doi = incoming.doi; filled.add('doi') }
-    if (incoming.url) { updates.url = incoming.url; filled.add('url') }
-    if (incoming.citations !== undefined) { updates.citations = incoming.citations; filled.add('citations') }
+    if (incoming.title) {
+      updates.title = incoming.title
+      filled.add('title')
+    }
+    if (incoming.authors?.length) {
+      updates.authors = incoming.authors
+      filled.add('authors')
+    }
+    if (incoming.publicationType) {
+      updates.publicationType = incoming.publicationType
+      filled.add('publicationType')
+    }
+    if (incoming.publicationName) {
+      updates.publicationName = incoming.publicationName
+      filled.add('publicationName')
+    }
+    if (incoming.date) {
+      updates.date = incoming.date
+      filled.add('date')
+    }
+    if (incoming.abstract) {
+      updates.abstract = incoming.abstract
+      filled.add('abstract')
+    }
+    if (incoming.doi) {
+      updates.doi = incoming.doi
+      filled.add('doi')
+    }
+    if (incoming.url) {
+      updates.url = incoming.url
+      filled.add('url')
+    }
+    if (incoming.citations !== undefined) {
+      updates.citations = incoming.citations
+      filled.add('citations')
+    }
 
     data.value = { ...data.value, ...updates, contributions: preserved }
     autoFilledFields.value = filled
@@ -70,11 +97,9 @@ async function lookupDoi() {
 
     // Sync doiInput with the resolved DOI
     if (incoming.doi) doiInput.value = incoming.doi
-  }
-  catch {
+  } catch {
     lookupError.value = 'Failed to look up DOI. Please try again.'
-  }
-  finally {
+  } finally {
     isLookingUp.value = false
   }
 }
