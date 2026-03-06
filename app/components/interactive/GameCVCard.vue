@@ -239,7 +239,7 @@ const categoryLabel = computed(() => {
                 v-if="zone.brick.frontmatter?.startDate"
                 class="text-xs text-slate-500 whitespace-nowrap"
               >
-                {{ formatDateRange(zone.brick.frontmatter.startDate as string, zone.brick.frontmatter.endDate as string) }}
+                {{ formatDateRange(zone.brick.frontmatter.startDate as string, zone.brick.frontmatter.endDate as string, zone.brick.type) }}
               </span>
             </div>
 

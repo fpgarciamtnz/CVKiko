@@ -283,8 +283,14 @@ export const DEGREE_OPTIONS = [
 // UTILITY FUNCTIONS
 // ============================================
 
-export function formatDateRange(startDate?: string | null, endDate?: string | null): string {
+export function formatDateRange(startDate?: string | null, endDate?: string | null, brickType?: BrickType): string {
   if (!startDate) return ''
+
+  if (brickType === 'education') {
+    const source = endDate || startDate
+    const year = new Date(source).getFullYear()
+    return endDate ? `${year}` : `Expected ${year}`
+  }
 
   const formatDate = (date: string) => {
     const d = new Date(date)

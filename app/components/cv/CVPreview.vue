@@ -176,7 +176,7 @@ function getBrickContent(brick: Brick): string {
               v-if="brick.frontmatter?.startDate"
               class="text-sm text-gray-500 whitespace-nowrap ml-4"
             >
-              {{ formatDateRange(brick.frontmatter.startDate, brick.frontmatter.endDate) }}
+              {{ formatDateRange(brick.frontmatter.startDate, brick.frontmatter.endDate, type) }}
             </span>
           </div>
 

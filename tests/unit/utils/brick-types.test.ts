@@ -54,6 +54,26 @@ describe('formatDateRange', () => {
     const result = formatDateRange('2023-01-15', null)
     expect(result).toBe('Jan 2023 - Present')
   })
+
+  it('returns just the year for education bricks with endDate', () => {
+    const result = formatDateRange('2020-06-15', '2020-06-15', 'education')
+    expect(result).toBe('2020')
+  })
+
+  it('returns Expected {year} for education bricks without endDate', () => {
+    const result = formatDateRange('2026-05-20', '', 'education')
+    expect(result).toBe('Expected 2026')
+  })
+
+  it('returns Expected {year} for education bricks with null endDate', () => {
+    const result = formatDateRange('2026-05-20', null, 'education')
+    expect(result).toBe('Expected 2026')
+  })
+
+  it('keeps default behavior when brickType is not education', () => {
+    const result = formatDateRange('2023-01-15', '2024-06-20', 'experience')
+    expect(result).toBe('Jan 2023 - Jun 2024')
+  })
 })
 
 // ============================================

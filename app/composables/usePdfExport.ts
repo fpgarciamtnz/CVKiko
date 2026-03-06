@@ -118,7 +118,7 @@ export function usePdfExport() {
         doc.text(title, margin, y)
 
         if (fm.startDate) {
-          const dateStr = formatDateRange(fm.startDate, fm.endDate)
+          const dateStr = formatDateRange(fm.startDate, fm.endDate, type)
           doc.setFont('helvetica', 'normal')
           const dateWidth = doc.getTextWidth(dateStr)
           doc.text(dateStr, pageWidth - margin - dateWidth, y)

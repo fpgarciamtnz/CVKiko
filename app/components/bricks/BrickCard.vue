@@ -16,7 +16,7 @@ const emit = defineEmits<{
 
 const config = computed(() => BRICK_TYPE_CONFIG[props.brick.type])
 const dateRange = computed(() =>
-  formatDateRange(props.brick.frontmatter?.startDate, props.brick.frontmatter?.endDate)
+  formatDateRange(props.brick.frontmatter?.startDate, props.brick.frontmatter?.endDate, props.brick.type)
 )
 
 // Get first paragraph of content as preview
