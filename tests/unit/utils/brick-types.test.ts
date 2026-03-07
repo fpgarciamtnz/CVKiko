@@ -346,13 +346,13 @@ describe('structuredDataToMarkdown — unknown type', () => {
 // Constants & Config
 // ============================================
 describe('BRICK_TYPES', () => {
-  it('has exactly 6 types', () => {
-    expect(BRICK_TYPES).toHaveLength(6)
+  it('has exactly 11 types', () => {
+    expect(BRICK_TYPES).toHaveLength(11)
   })
 
   it('contains all expected types', () => {
     expect(BRICK_TYPES).toEqual(
-      expect.arrayContaining(['experience', 'education', 'project', 'skill', 'publication', 'custom'])
+      expect.arrayContaining(['experience', 'education', 'project', 'skill', 'publication', 'custom', 'teaching', 'grant', 'presentation', 'award', 'service'])
     )
   })
 })

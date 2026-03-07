@@ -19,7 +19,7 @@ export function getModel(event: H3Event): LanguageModel {
     const anthropic = createAnthropic({
       apiKey: config.anthropicApiKey
     })
-    return anthropic('claude-3-5-sonnet-20241022')
+    return anthropic('claude-haiku-4-5-20251001')
   }
 
   if (provider === 'cloudflare' && config.cfAccountId && config.cfApiToken) {

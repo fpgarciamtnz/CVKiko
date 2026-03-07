@@ -29,6 +29,11 @@ function makeSettings(overrides: Partial<Settings> = {}): Settings {
     linkedIn: null,
     github: null,
     website: null,
+    orcid: null,
+    pronouns: null,
+    academicTitle: null,
+    department: null,
+    institution: null,
     updatedAt: null,
     ...overrides
   }

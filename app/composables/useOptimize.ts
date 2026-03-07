@@ -2,7 +2,7 @@ import { experimental_useObject as useObject } from '@ai-sdk/vue'
 import { z } from 'zod'
 import type { BrickType } from '~/utils/brick-types'
 
-const BrickTypeEnum = z.enum(['experience', 'education', 'project', 'skill', 'publication', 'custom'])
+const BrickTypeEnum = z.enum(['experience', 'education', 'project', 'skill', 'publication', 'custom', 'teaching', 'grant', 'presentation', 'award', 'service'])
 
 const OptimizationResultSchema = z.object({
   sectionOrder: z.array(BrickTypeEnum),
@@ -23,7 +23,8 @@ export function useOptimize() {
     reorderSections,
     reorderBricks,
     applyContentOverride,
-    brickOrder
+    brickOrder,
+    cvMode
   } = useCVBuilder()
 
   const { object, submit, isLoading, error, stop } = useObject({
@@ -44,7 +45,8 @@ export function useOptimize() {
     submit({
       jobDescription,
       selectedBricks: bricksData,
-      currentSectionOrder: sectionTypeOrder.value
+      currentSectionOrder: sectionTypeOrder.value,
+      cvMode: cvMode.value
     })
   }
 

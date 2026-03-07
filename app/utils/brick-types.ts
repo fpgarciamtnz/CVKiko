@@ -1,4 +1,4 @@
-export type BrickType = 'experience' | 'education' | 'project' | 'skill' | 'publication' | 'custom'
+export type BrickType = 'experience' | 'education' | 'project' | 'skill' | 'publication' | 'custom' | 'teaching' | 'grant' | 'presentation' | 'award' | 'service'
 
 // ============================================
 // STRUCTURED DATA INTERFACES FOR EACH BRICK TYPE
@@ -64,10 +64,67 @@ export interface PublicationData {
   doi: string
   url: string
   citations: number // Optional
+  status: 'published' | 'in_press' | 'under_review' | 'accepted' | 'submitted' | 'preprint' | ''
+  authorHighlightName: string // Name to bold in author lists
 }
 
 export interface CustomData {
   content: string // Markdown content for flexible blocks
+}
+
+export interface TeachingData {
+  role: string
+  courseName: string
+  courseCode: string
+  institution: string
+  department: string
+  startDate: string
+  endDate: string
+  responsibilities: string[]
+  studentLevel: 'undergraduate' | 'graduate' | 'doctoral' | 'mixed' | ''
+  enrollmentSize: number
+}
+
+export interface GrantData {
+  title: string
+  fundingAgency: string
+  role: 'PI' | 'Co-PI' | 'Co-I' | 'Senior Personnel' | 'Consultant' | ''
+  amount: string
+  startDate: string
+  endDate: string
+  status: 'awarded' | 'pending' | 'completed' | 'declined' | ''
+  grantNumber: string
+  description: string
+}
+
+export interface PresentationData {
+  title: string
+  presentationType: 'talk' | 'poster' | 'keynote' | 'invited' | 'panel' | 'workshop' | 'other'
+  event: string
+  location: string
+  date: string
+  isInvited: boolean
+  abstract: string
+  coAuthors: string[]
+  url: string
+}
+
+export interface AwardData {
+  name: string
+  organization: string
+  date: string
+  description: string
+  amount: string
+  category: 'award' | 'honor' | 'fellowship' | 'scholarship' | 'other'
+}
+
+export interface ServiceData {
+  role: string
+  organization: string
+  serviceType: 'editorial' | 'review' | 'committee' | 'mentoring' | 'organizing' | 'other'
+  startDate: string
+  endDate: string
+  description: string
 }
 
 // Union type for all brick data
@@ -78,6 +135,11 @@ export type BrickData
     | { type: 'skill', data: SkillData }
     | { type: 'publication', data: PublicationData }
     | { type: 'custom', data: CustomData }
+    | { type: 'teaching', data: TeachingData }
+    | { type: 'grant', data: GrantData }
+    | { type: 'presentation', data: PresentationData }
+    | { type: 'award', data: AwardData }
+    | { type: 'service', data: ServiceData }
 
 // ============================================
 // BRICK FRONTMATTER (for backwards compatibility)
@@ -200,7 +262,9 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
       contributions: [''],
       doi: '',
       url: '',
-      citations: 0
+      citations: 0,
+      status: '',
+      authorHighlightName: ''
     })
   },
   custom: {
@@ -211,6 +275,91 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     description: 'Any custom content block',
     defaultData: (): CustomData => ({
       content: ''
+    })
+  },
+  teaching: {
+    label: 'Teaching',
+    pluralLabel: 'Teaching Experience',
+    icon: 'i-lucide-presentation',
+    color: 'teal',
+    description: 'Courses taught, TA positions, and mentoring',
+    defaultData: (): TeachingData => ({
+      role: '',
+      courseName: '',
+      courseCode: '',
+      institution: '',
+      department: '',
+      startDate: '',
+      endDate: '',
+      responsibilities: [''],
+      studentLevel: '',
+      enrollmentSize: 0
+    })
+  },
+  grant: {
+    label: 'Grant',
+    pluralLabel: 'Grants & Funding',
+    icon: 'i-lucide-banknote',
+    color: 'emerald',
+    description: 'Research grants and funding awards',
+    defaultData: (): GrantData => ({
+      title: '',
+      fundingAgency: '',
+      role: '',
+      amount: '',
+      startDate: '',
+      endDate: '',
+      status: '',
+      grantNumber: '',
+      description: ''
+    })
+  },
+  presentation: {
+    label: 'Presentation',
+    pluralLabel: 'Presentations',
+    icon: 'i-lucide-mic',
+    color: 'violet',
+    description: 'Talks, posters, and conference presentations',
+    defaultData: (): PresentationData => ({
+      title: '',
+      presentationType: 'talk',
+      event: '',
+      location: '',
+      date: '',
+      isInvited: false,
+      abstract: '',
+      coAuthors: [],
+      url: ''
+    })
+  },
+  award: {
+    label: 'Award',
+    pluralLabel: 'Awards & Honors',
+    icon: 'i-lucide-trophy',
+    color: 'yellow',
+    description: 'Awards, honors, fellowships, and scholarships',
+    defaultData: (): AwardData => ({
+      name: '',
+      organization: '',
+      date: '',
+      description: '',
+      amount: '',
+      category: 'award'
+    })
+  },
+  service: {
+    label: 'Service',
+    pluralLabel: 'Professional Service',
+    icon: 'i-lucide-handshake',
+    color: 'sky',
+    description: 'Editorial, review, committee, and mentoring roles',
+    defaultData: (): ServiceData => ({
+      role: '',
+      organization: '',
+      serviceType: 'committee',
+      startDate: '',
+      endDate: '',
+      description: ''
     })
   }
 }
@@ -254,6 +403,68 @@ export const PUBLICATION_TYPES = [
   { value: 'book', label: 'Book/Chapter' },
   { value: 'patent', label: 'Patent' },
   { value: 'other', label: 'Other' }
+] as const
+
+export const PUBLICATION_STATUSES = [
+  { value: '', label: 'Not specified' },
+  { value: 'published', label: 'Published' },
+  { value: 'in_press', label: 'In Press' },
+  { value: 'accepted', label: 'Accepted' },
+  { value: 'under_review', label: 'Under Review' },
+  { value: 'submitted', label: 'Submitted' },
+  { value: 'preprint', label: 'Preprint' }
+] as const
+
+export const PRESENTATION_TYPES = [
+  { value: 'talk', label: 'Talk' },
+  { value: 'poster', label: 'Poster' },
+  { value: 'keynote', label: 'Keynote' },
+  { value: 'invited', label: 'Invited Talk' },
+  { value: 'panel', label: 'Panel' },
+  { value: 'workshop', label: 'Workshop' },
+  { value: 'other', label: 'Other' }
+] as const
+
+export const GRANT_STATUSES = [
+  { value: '', label: 'Not specified' },
+  { value: 'awarded', label: 'Awarded' },
+  { value: 'pending', label: 'Pending' },
+  { value: 'completed', label: 'Completed' },
+  { value: 'declined', label: 'Declined' }
+] as const
+
+export const GRANT_ROLES = [
+  { value: '', label: 'Not specified' },
+  { value: 'PI', label: 'Principal Investigator (PI)' },
+  { value: 'Co-PI', label: 'Co-Principal Investigator' },
+  { value: 'Co-I', label: 'Co-Investigator' },
+  { value: 'Senior Personnel', label: 'Senior Personnel' },
+  { value: 'Consultant', label: 'Consultant' }
+] as const
+
+export const SERVICE_TYPES = [
+  { value: 'editorial', label: 'Editorial Board' },
+  { value: 'review', label: 'Peer Review' },
+  { value: 'committee', label: 'Committee' },
+  { value: 'mentoring', label: 'Mentoring' },
+  { value: 'organizing', label: 'Event Organizing' },
+  { value: 'other', label: 'Other' }
+] as const
+
+export const AWARD_CATEGORIES = [
+  { value: 'award', label: 'Award' },
+  { value: 'honor', label: 'Honor' },
+  { value: 'fellowship', label: 'Fellowship' },
+  { value: 'scholarship', label: 'Scholarship' },
+  { value: 'other', label: 'Other' }
+] as const
+
+export const TEACHING_STUDENT_LEVELS = [
+  { value: '', label: 'Not specified' },
+  { value: 'undergraduate', label: 'Undergraduate' },
+  { value: 'graduate', label: 'Graduate' },
+  { value: 'doctoral', label: 'Doctoral' },
+  { value: 'mixed', label: 'Mixed' }
 ] as const
 
 export const DOI_REGEX = /^10\.\d{4,9}\/[^\s]+$/
@@ -408,6 +619,10 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       if (pub.authors.length > 0) {
         md += `**Authors:** ${pub.authors.join(', ')}\n\n`
       }
+      if (pub.status) {
+        const statusLabel = PUBLICATION_STATUSES.find(s => s.value === pub.status)?.label || pub.status
+        md += `**Status:** ${statusLabel}\n\n`
+      }
       if (pub.abstract) {
         md += `## Abstract\n\n${pub.abstract}\n\n`
       }
@@ -422,6 +637,102 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
     case 'custom': {
       const custom = data as CustomData
       return custom.content
+    }
+    case 'teaching': {
+      const t = data as TeachingData
+      let md = ''
+      if (t.courseCode) {
+        md += `**Course:** ${t.courseCode} - ${t.courseName}\n\n`
+      }
+      if (t.department) {
+        md += `**Department:** ${t.department}\n\n`
+      }
+      if (t.studentLevel) {
+        const levelLabel = TEACHING_STUDENT_LEVELS.find(l => l.value === t.studentLevel)?.label || t.studentLevel
+        md += `**Level:** ${levelLabel}`
+        if (t.enrollmentSize > 0) {
+          md += ` (${t.enrollmentSize} students)`
+        }
+        md += '\n\n'
+      }
+      if (t.responsibilities.filter(r => r.trim()).length > 0) {
+        md += '## Responsibilities\n\n'
+        t.responsibilities.filter(r => r.trim()).forEach((r) => {
+          md += `- ${r}\n`
+        })
+      }
+      return md
+    }
+    case 'grant': {
+      const g = data as GrantData
+      let md = ''
+      if (g.fundingAgency) {
+        md += `**Funding Agency:** ${g.fundingAgency}\n\n`
+      }
+      if (g.role) {
+        md += `**Role:** ${g.role}\n\n`
+      }
+      if (g.amount) {
+        md += `**Amount:** ${g.amount}\n\n`
+      }
+      if (g.status) {
+        const statusLabel = GRANT_STATUSES.find(s => s.value === g.status)?.label || g.status
+        md += `**Status:** ${statusLabel}\n\n`
+      }
+      if (g.grantNumber) {
+        md += `**Grant #:** ${g.grantNumber}\n\n`
+      }
+      if (g.description) {
+        md += `${g.description}\n`
+      }
+      return md
+    }
+    case 'presentation': {
+      const p = data as PresentationData
+      let md = ''
+      const typeLabel = PRESENTATION_TYPES.find(t => t.value === p.presentationType)?.label || p.presentationType
+      md += `**Type:** ${typeLabel}`
+      if (p.isInvited) {
+        md += ' (Invited)'
+      }
+      md += '\n\n'
+      if (p.event) {
+        md += `**Event:** ${p.event}\n\n`
+      }
+      if (p.coAuthors.length > 0) {
+        md += `**Co-Authors:** ${p.coAuthors.join(', ')}\n\n`
+      }
+      if (p.abstract) {
+        md += `${p.abstract}\n`
+      }
+      return md
+    }
+    case 'award': {
+      const a = data as AwardData
+      let md = ''
+      if (a.organization) {
+        md += `**Awarded by:** ${a.organization}\n\n`
+      }
+      if (a.amount) {
+        md += `**Amount:** ${a.amount}\n\n`
+      }
+      if (a.description) {
+        md += `${a.description}\n`
+      }
+      return md
+    }
+    case 'service': {
+      const s = data as ServiceData
+      let md = ''
+      const typeLabel = SERVICE_TYPES.find(t => t.value === s.serviceType)?.label || s.serviceType
+      md += `**Type:** ${typeLabel}\n\n`
+      if (s.organization) {
+        md += `**Organization:** ${s.organization}\n\n`
+      }
+      if (s.description) {
+        md += `${s.description}\n`
+      }
+      return md
     }
     default:
       return ''

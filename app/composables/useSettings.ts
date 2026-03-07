@@ -8,6 +8,11 @@ export interface Settings {
   linkedIn: string | null
   github: string | null
   website: string | null
+  orcid: string | null
+  pronouns: string | null
+  academicTitle: string | null
+  department: string | null
+  institution: string | null
   updatedAt: string | null
 }
 

@@ -16,7 +16,12 @@ export default defineEventHandler(async (event) => {
       summary: '',
       linkedIn: '',
       github: '',
-      website: ''
+      website: '',
+      orcid: '',
+      pronouns: '',
+      academicTitle: '',
+      department: '',
+      institution: ''
     })
     ;[result] = await db.select().from(settings).where(eq(settings.id, 'default'))
   }

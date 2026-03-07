@@ -1,7 +1,7 @@
 import { streamObject } from 'ai'
 import { z } from 'zod'
 
-const BrickTypeEnum = z.enum(['experience', 'education', 'project', 'skill', 'publication', 'custom'])
+const BrickTypeEnum = z.enum(['experience', 'education', 'project', 'skill', 'publication', 'custom', 'teaching', 'grant', 'presentation', 'award', 'service'])
 
 const OptimizationResultSchema = z.object({
   sectionOrder: z.array(BrickTypeEnum).describe('Recommended order of section types for this job'),
@@ -19,7 +19,7 @@ const OptimizationResultSchema = z.object({
 })
 
 export default defineEventHandler(async (event) => {
-  const { jobDescription, selectedBricks, currentSectionOrder } = await readBody<{
+  const { jobDescription, selectedBricks, currentSectionOrder, cvMode } = await readBody<{
     jobDescription: string
     selectedBricks: Array<{
       id: string
@@ -30,6 +30,7 @@ export default defineEventHandler(async (event) => {
       frontmatter?: { subtitle?: string, location?: string, startDate?: string, endDate?: string }
     }>
     currentSectionOrder: string[]
+    cvMode?: 'industry' | 'academic'
   }>(event)
 
   if (!jobDescription) {
@@ -49,6 +50,10 @@ export default defineEventHandler(async (event) => {
     subtitle: b.frontmatter?.subtitle
   }))
 
+  const modeInstructions = cvMode === 'academic'
+    ? `\n\nACADEMIC MODE: This is an academic CV. Emphasize research contributions, methodology, teaching philosophy, grant amounts, and publication impact. Use formal academic language. Prioritize publications, grants, and teaching experience.`
+    : `\n\nINDUSTRY MODE: This is an industry resume. Emphasize achievements with quantified results, relevant keywords, and action verbs. Focus on impact and business value.`
+
   const systemPrompt = `You are a CV optimization assistant. Your job is to optimize a CV for a specific job description.
 
 CRITICAL RULES:
@@ -57,6 +62,7 @@ CRITICAL RULES:
 - Preserve all truthful information from the original content
 - Focus on highlighting relevant keywords and rephrasing to match the job's language
 - Reorder sections and bricks to put the most relevant content first
+${modeInstructions}
 
 The user's selected CV bricks:
 ${JSON.stringify(bricksContext, null, 2)}

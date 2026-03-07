@@ -12,7 +12,12 @@ const form = reactive({
   summary: settings.value?.summary || '',
   linkedIn: settings.value?.linkedIn || '',
   github: settings.value?.github || '',
-  website: settings.value?.website || ''
+  website: settings.value?.website || '',
+  orcid: settings.value?.orcid || '',
+  pronouns: settings.value?.pronouns || '',
+  academicTitle: settings.value?.academicTitle || '',
+  department: settings.value?.department || '',
+  institution: settings.value?.institution || ''
 })
 
 // Watch for settings changes and update form
@@ -26,6 +31,11 @@ watch(settings, (newSettings) => {
     form.linkedIn = newSettings.linkedIn || ''
     form.github = newSettings.github || ''
     form.website = newSettings.website || ''
+    form.orcid = newSettings.orcid || ''
+    form.pronouns = newSettings.pronouns || ''
+    form.academicTitle = newSettings.academicTitle || ''
+    form.department = newSettings.department || ''
+    form.institution = newSettings.institution || ''
   }
 })
 
@@ -72,6 +82,13 @@ async function handleSubmit() {
               />
             </UFormField>
 
+            <UFormField label="Pronouns">
+              <UInput
+                v-model="form.pronouns"
+                placeholder="e.g., he/him, she/her, they/them"
+              />
+            </UFormField>
+
             <div class="grid md:grid-cols-2 gap-4">
               <UFormField label="Email">
                 <UInput
@@ -110,6 +127,54 @@ async function handleSubmit() {
               placeholder="A brief summary of your professional background and career goals..."
             />
           </UFormField>
+        </div>
+
+        <!-- Academic Profile -->
+        <div>
+          <h3 class="text-lg font-semibold mb-4">
+            Academic Profile
+          </h3>
+          <p class="text-sm text-gray-500 mb-4">
+            These fields are shown when using Academic CV mode
+          </p>
+          <div class="space-y-4">
+            <UFormField
+              label="Academic Title"
+              hint="e.g., Associate Professor, Postdoctoral Researcher"
+            >
+              <UInput
+                v-model="form.academicTitle"
+                placeholder="e.g., Assistant Professor"
+                icon="i-lucide-graduation-cap"
+              />
+            </UFormField>
+
+            <div class="grid md:grid-cols-2 gap-4">
+              <UFormField label="Department">
+                <UInput
+                  v-model="form.department"
+                  placeholder="e.g., Computer Science"
+                />
+              </UFormField>
+              <UFormField label="Institution">
+                <UInput
+                  v-model="form.institution"
+                  placeholder="e.g., Stanford University"
+                />
+              </UFormField>
+            </div>
+
+            <UFormField
+              label="ORCID"
+              hint="Your ORCID identifier (numbers only)"
+            >
+              <UInput
+                v-model="form.orcid"
+                placeholder="e.g., 0000-0002-1234-5678"
+                icon="i-lucide-fingerprint"
+              />
+            </UFormField>
+          </div>
         </div>
 
         <!-- Social Links -->

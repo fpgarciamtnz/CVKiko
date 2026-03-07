@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PublicationData } from '~/utils/brick-types'
-import { PUBLICATION_TYPES, DOI_REGEX, normalizeDoi } from '~/utils/brick-types'
+import { PUBLICATION_TYPES, PUBLICATION_STATUSES, DOI_REGEX, normalizeDoi } from '~/utils/brick-types'
 
 const props = defineProps<{
   modelValue: PublicationData
@@ -180,6 +180,11 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
   label: pt.label,
   value: pt.value
 }))
+
+const statusOptions = PUBLICATION_STATUSES.map(s => ({
+  label: s.label,
+  value: s.value
+}))
 </script>
 
 <template>
@@ -308,6 +313,31 @@ const publicationTypeOptions = PUBLICATION_TYPES.map(pt => ({
           v-model="data.publicationName"
           placeholder="e.g., Nature, IEEE Conference on AI"
           icon="i-lucide-book"
+        />
+      </UFormField>
+    </div>
+
+    <!-- Status & Author Highlight -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <UFormField
+        label="Publication Status"
+        hint="For academic CVs"
+      >
+        <USelectMenu
+          v-model="data.status"
+          :items="statusOptions"
+          value-key="value"
+        />
+      </UFormField>
+
+      <UFormField
+        label="Author Highlight Name"
+        hint="Your name to bold in author lists"
+      >
+        <UInput
+          v-model="data.authorHighlightName"
+          placeholder="e.g., J. Smith"
+          icon="i-lucide-user"
         />
       </UFormField>
     </div>

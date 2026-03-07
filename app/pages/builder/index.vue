@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import VueDraggable from 'vuedraggable'
 import { BRICK_TYPE_CONFIG, BRICK_TYPES, type BrickType } from '~/utils/brick-types'
+import { CV_MODE_CONFIG, CV_MODES, type CVMode } from '~/utils/cv-modes'
 
 const { bricks, bricksByType, fetchBricks } = useBricks()
 const { settings, fetchSettings } = useSettings()
@@ -8,13 +9,18 @@ const {
   selectedBrickIds,
   selectedBricks,
   selectedBricksByType,
+  flatOrderedBricks,
   sectionTypeOrder,
   contentOverrides,
+  layoutMode,
+  cvMode,
   toggleBrick,
   selectBricks,
   deselectAll,
   reorderBricks,
-  reorderSections
+  reorderSections,
+  setCVMode,
+  setLayoutMode
 } = useCVBuilder()
 
 const { exportToPdf } = usePdfExport()
@@ -55,6 +61,17 @@ const orderedSections = computed(() => {
       label: BRICK_TYPE_CONFIG[type].pluralLabel,
       bricks: selectedBricksByType.value[type] || []
     }))
+})
+
+// Freeform reorder data
+const freeformBrickList = computed(() => {
+  return flatOrderedBricks.value.map(b => ({
+    id: b.id,
+    title: b.title,
+    type: b.type,
+    typeLabel: BRICK_TYPE_CONFIG[b.type].label,
+    icon: BRICK_TYPE_CONFIG[b.type].icon
+  }))
 })
 
 function handleSectionDragEnd() {
@@ -136,6 +153,25 @@ function updateBrickOrderForSection(type: BrickType, newSectionIds: string[]) {
   reorderBricks(newOrder)
 }
 
+// Freeform reorder
+function moveFreeformBrickUp(idx: number) {
+  if (idx <= 0) return
+  const newOrder = flatOrderedBricks.value.map(b => b.id)
+  const tmp = newOrder[idx]!
+  newOrder[idx] = newOrder[idx - 1]!
+  newOrder[idx - 1] = tmp
+  reorderBricks(newOrder)
+}
+
+function moveFreeformBrickDown(idx: number) {
+  if (idx >= flatOrderedBricks.value.length - 1) return
+  const newOrder = flatOrderedBricks.value.map(b => b.id)
+  const tmp = newOrder[idx]!
+  newOrder[idx] = newOrder[idx + 1]!
+  newOrder[idx + 1] = tmp
+  reorderBricks(newOrder)
+}
+
 function selectAllFiltered() {
   const ids = filteredBricks.value.map(b => b.id)
   selectBricks(ids)
@@ -152,6 +188,11 @@ function handlePrint() {
 async function handleDownloadPdf() {
   await exportToPdf(settings.value, selectedBricksByType.value)
 }
+
+const modeOptions = CV_MODES.map(m => ({
+  label: CV_MODE_CONFIG[m].label,
+  value: m
+}))
 </script>
 
 <template>
@@ -159,7 +200,7 @@ async function handleDownloadPdf() {
     <!-- Left Panel - Brick Selection -->
     <div class="w-1/3 border-r overflow-hidden flex flex-col print:hidden">
       <div class="p-4 border-b bg-gray-50 dark:bg-gray-900">
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-3">
           <div>
             <h2 class="text-lg font-semibold">
               Select Bricks
@@ -186,6 +227,41 @@ async function handleDownloadPdf() {
               Select All
             </UButton>
           </div>
+        </div>
+
+        <!-- CV Mode & Layout Toggle -->
+        <div class="flex gap-2 mb-3">
+          <USelectMenu
+            :model-value="cvMode"
+            :items="modeOptions"
+            value-key="value"
+            size="xs"
+            class="flex-1"
+            @update:model-value="setCVMode($event as CVMode)"
+          >
+            <template #leading>
+              <UIcon
+                :name="cvMode === 'academic' ? 'i-lucide-graduation-cap' : 'i-lucide-briefcase'"
+                class="w-3 h-3"
+              />
+            </template>
+          </USelectMenu>
+          <UButtonGroup size="xs">
+            <UButton
+              :variant="layoutMode === 'grouped' ? 'solid' : 'ghost'"
+              :color="layoutMode === 'grouped' ? 'primary' : 'neutral'"
+              @click="setLayoutMode('grouped')"
+            >
+              Grouped
+            </UButton>
+            <UButton
+              :variant="layoutMode === 'freeform' ? 'solid' : 'ghost'"
+              :color="layoutMode === 'freeform' ? 'primary' : 'neutral'"
+              @click="setLayoutMode('freeform')"
+            >
+              Free-form
+            </UButton>
+          </UButtonGroup>
         </div>
 
         <!-- Tabs -->
@@ -265,73 +341,112 @@ async function handleDownloadPdf() {
             v-if="showOrder"
             class="mt-3 space-y-3"
           >
-            <VueDraggable
-              :model-value="orderedSections"
-              item-key="type"
-              handle=".section-handle"
-              @end="handleSectionDragEnd"
-            >
-              <template #item="{ element: section, index: sIdx }">
-                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 mb-2">
-                  <!-- Section Header -->
-                  <div class="flex items-center gap-1 mb-1">
-                    <UIcon
-                      name="i-lucide-grip-vertical"
-                      class="w-4 h-4 text-gray-400 cursor-grab section-handle"
-                    />
-                    <span class="text-xs font-semibold uppercase tracking-wide flex-1">
-                      {{ section.label }}
-                    </span>
-                    <UButton
-                      icon="i-lucide-chevron-up"
-                      variant="ghost"
-                      color="neutral"
-                      size="xs"
-                      :disabled="sIdx === 0"
-                      class="!p-0.5"
-                      @click="moveSectionUp(Number(sIdx))"
-                    />
-                    <UButton
-                      icon="i-lucide-chevron-down"
-                      variant="ghost"
-                      color="neutral"
-                      size="xs"
-                      :disabled="Number(sIdx) === orderedSections.length - 1"
-                      class="!p-0.5"
-                      @click="moveSectionDown(Number(sIdx))"
-                    />
-                  </div>
-                  <!-- Bricks in section -->
-                  <div class="space-y-1 pl-5">
-                    <div
-                      v-for="(brick, bIdx) in section.bricks"
-                      :key="brick.id"
-                      class="flex items-center gap-1 text-xs py-0.5"
-                    >
-                      <span class="flex-1 truncate">{{ brick.title }}</span>
+            <!-- Freeform Reorder -->
+            <template v-if="layoutMode === 'freeform'">
+              <div class="space-y-1">
+                <div
+                  v-for="(item, idx) in freeformBrickList"
+                  :key="item.id"
+                  class="flex items-center gap-1 text-xs py-1 px-2 bg-gray-50 dark:bg-gray-800 rounded"
+                >
+                  <UIcon
+                    :name="item.icon"
+                    class="w-3 h-3 text-gray-400"
+                  />
+                  <span class="flex-1 truncate">{{ item.title }}</span>
+                  <span class="text-gray-400 text-[10px]">{{ item.typeLabel }}</span>
+                  <UButton
+                    icon="i-lucide-chevron-up"
+                    variant="ghost"
+                    color="neutral"
+                    size="xs"
+                    :disabled="idx === 0"
+                    class="!p-0.5"
+                    @click="moveFreeformBrickUp(idx)"
+                  />
+                  <UButton
+                    icon="i-lucide-chevron-down"
+                    variant="ghost"
+                    color="neutral"
+                    size="xs"
+                    :disabled="idx === freeformBrickList.length - 1"
+                    class="!p-0.5"
+                    @click="moveFreeformBrickDown(idx)"
+                  />
+                </div>
+              </div>
+            </template>
+
+            <!-- Grouped Reorder -->
+            <template v-else>
+              <VueDraggable
+                :model-value="orderedSections"
+                item-key="type"
+                handle=".section-handle"
+                @end="handleSectionDragEnd"
+              >
+                <template #item="{ element: section, index: sIdx }">
+                  <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 mb-2">
+                    <!-- Section Header -->
+                    <div class="flex items-center gap-1 mb-1">
+                      <UIcon
+                        name="i-lucide-grip-vertical"
+                        class="w-4 h-4 text-gray-400 cursor-grab section-handle"
+                      />
+                      <span class="text-xs font-semibold uppercase tracking-wide flex-1">
+                        {{ section.label }}
+                      </span>
                       <UButton
                         icon="i-lucide-chevron-up"
                         variant="ghost"
                         color="neutral"
                         size="xs"
-                        :disabled="bIdx === 0"
+                        :disabled="sIdx === 0"
                         class="!p-0.5"
-                        @click="moveBrickUp(Number(sIdx), Number(bIdx))"
+                        @click="moveSectionUp(Number(sIdx))"
                       />
                       <UButton
                         icon="i-lucide-chevron-down"
                         variant="ghost"
                         color="neutral"
                         size="xs"
-                        :disabled="bIdx === section.bricks.length - 1"
+                        :disabled="Number(sIdx) === orderedSections.length - 1"
                         class="!p-0.5"
-                        @click="moveBrickDown(Number(sIdx), Number(bIdx))"
+                        @click="moveSectionDown(Number(sIdx))"
                       />
                     </div>
+                    <!-- Bricks in section -->
+                    <div class="space-y-1 pl-5">
+                      <div
+                        v-for="(brick, bIdx) in section.bricks"
+                        :key="brick.id"
+                        class="flex items-center gap-1 text-xs py-0.5"
+                      >
+                        <span class="flex-1 truncate">{{ brick.title }}</span>
+                        <UButton
+                          icon="i-lucide-chevron-up"
+                          variant="ghost"
+                          color="neutral"
+                          size="xs"
+                          :disabled="bIdx === 0"
+                          class="!p-0.5"
+                          @click="moveBrickUp(Number(sIdx), Number(bIdx))"
+                        />
+                        <UButton
+                          icon="i-lucide-chevron-down"
+                          variant="ghost"
+                          color="neutral"
+                          size="xs"
+                          :disabled="bIdx === section.bricks.length - 1"
+                          class="!p-0.5"
+                          @click="moveBrickDown(Number(sIdx), Number(bIdx))"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </template>
-            </VueDraggable>
+                </template>
+              </VueDraggable>
+            </template>
           </div>
         </div>
       </div>
@@ -405,6 +520,9 @@ async function handleDownloadPdf() {
             :bricks-by-type="selectedBricksByType"
             :section-order="sectionTypeOrder"
             :content-overrides="contentOverrides"
+            :layout-mode="layoutMode"
+            :cv-mode="cvMode"
+            :flat-ordered-bricks="flatOrderedBricks"
           />
         </div>
       </div>

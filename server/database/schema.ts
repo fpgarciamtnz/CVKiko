@@ -12,13 +12,18 @@ export const settings = sqliteTable('settings', {
   linkedIn: text('linked_in').default(''),
   github: text('github').default(''),
   website: text('website').default(''),
+  orcid: text('orcid').default(''),
+  pronouns: text('pronouns').default(''),
+  academicTitle: text('academic_title').default(''),
+  department: text('department').default(''),
+  institution: text('institution').default(''),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
 
 // ============ BRICKS (Structured data + optional markdown) ============
 export const bricks = sqliteTable('bricks', {
   id: text('id').primaryKey(),
-  type: text('type', { enum: ['experience', 'education', 'project', 'skill', 'publication', 'custom'] }).notNull(),
+  type: text('type', { enum: ['experience', 'education', 'project', 'skill', 'publication', 'custom', 'teaching', 'grant', 'presentation', 'award', 'service'] }).notNull(),
   title: text('title').notNull(),
   // Markdown content - for custom type or generated display
   content: text('content').default(''),
@@ -53,6 +58,8 @@ export const cvs = sqliteTable('cvs', {
   targetCompany: text('target_company'),
   jobDescription: text('job_description'),
   templateId: text('template_id').default('default'),
+  layoutMode: text('layout_mode', { enum: ['grouped', 'freeform'] }).default('grouped'),
+  cvMode: text('cv_mode', { enum: ['industry', 'academic'] }).default('industry'),
   createdAt: integer('created_at', { mode: 'timestamp' }).$defaultFn(() => new Date()),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })

@@ -18,7 +18,12 @@ export default defineEventHandler(async (event) => {
       summary: body.summary ?? '',
       linkedIn: body.linkedIn ?? '',
       github: body.github ?? '',
-      website: body.website ?? ''
+      website: body.website ?? '',
+      orcid: body.orcid ?? '',
+      pronouns: body.pronouns ?? '',
+      academicTitle: body.academicTitle ?? '',
+      department: body.department ?? '',
+      institution: body.institution ?? ''
     })
   } else {
     await db.update(settings).set({

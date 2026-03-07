@@ -1,5 +1,8 @@
 import type { Brick } from './useBricks'
 import type { BrickType } from '~/utils/brick-types'
+import { CV_MODE_CONFIG, type CVMode } from '~/utils/cv-modes'
+
+export type LayoutMode = 'grouped' | 'freeform'
 
 export interface CVConfig {
   name: string
@@ -18,6 +21,8 @@ export function useCVBuilder() {
   const cvConfig = useState<CVConfig>('cv-config', () => ({
     name: 'My CV'
   }))
+  const layoutMode = useState<LayoutMode>('cv-layout-mode', () => 'grouped')
+  const cvMode = useState<CVMode>('cv-mode', () => 'industry')
 
   const { bricks } = useBricks()
 
@@ -42,6 +47,11 @@ export function useCVBuilder() {
       }
     }
     return ordered
+  })
+
+  // Flat ordered bricks for freeform layout - returns bricks in exact brickOrder sequence
+  const flatOrderedBricks = computed(() => {
+    return selectedBricks.value
   })
 
   function toggleBrick(brick: Brick) {
@@ -100,6 +110,15 @@ export function useCVBuilder() {
     cvConfig.value = { ...cvConfig.value, ...updates }
   }
 
+  function setCVMode(mode: CVMode) {
+    cvMode.value = mode
+    sectionTypeOrder.value = [...CV_MODE_CONFIG[mode].defaultSectionOrder]
+  }
+
+  function setLayoutMode(mode: LayoutMode) {
+    layoutMode.value = mode
+  }
+
   return {
     selectedBrickIds,
     brickOrder,
@@ -107,7 +126,10 @@ export function useCVBuilder() {
     contentOverrides,
     selectedBricks,
     selectedBricksByType,
+    flatOrderedBricks,
     cvConfig,
+    layoutMode,
+    cvMode,
     toggleBrick,
     selectBricks,
     deselectAll,
@@ -117,6 +139,8 @@ export function useCVBuilder() {
     applyContentOverrides,
     applyContentOverride,
     removeContentOverride,
-    updateConfig
+    updateConfig,
+    setCVMode,
+    setLayoutMode
   }
 }

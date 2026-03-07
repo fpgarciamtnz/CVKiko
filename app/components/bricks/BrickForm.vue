@@ -7,7 +7,12 @@ import type {
   ProjectData,
   SkillData,
   PublicationData,
-  CustomData
+  CustomData,
+  TeachingData,
+  GrantData,
+  PresentationData,
+  AwardData,
+  ServiceData
 } from '~/utils/brick-types'
 import { BRICK_TYPE_CONFIG, BRICK_TYPES, structuredDataToMarkdown } from '~/utils/brick-types'
 
@@ -67,6 +72,36 @@ const customData = ref<CustomData>(
     : (BRICK_TYPE_CONFIG.custom.defaultData() as CustomData)
 )
 
+const teachingData = ref<TeachingData>(
+  props.brick?.type === 'teaching' && props.brick.structuredData
+    ? (props.brick.structuredData as unknown as TeachingData)
+    : (BRICK_TYPE_CONFIG.teaching.defaultData() as TeachingData)
+)
+
+const grantData = ref<GrantData>(
+  props.brick?.type === 'grant' && props.brick.structuredData
+    ? (props.brick.structuredData as unknown as GrantData)
+    : (BRICK_TYPE_CONFIG.grant.defaultData() as GrantData)
+)
+
+const presentationData = ref<PresentationData>(
+  props.brick?.type === 'presentation' && props.brick.structuredData
+    ? (props.brick.structuredData as unknown as PresentationData)
+    : (BRICK_TYPE_CONFIG.presentation.defaultData() as PresentationData)
+)
+
+const awardData = ref<AwardData>(
+  props.brick?.type === 'award' && props.brick.structuredData
+    ? (props.brick.structuredData as unknown as AwardData)
+    : (BRICK_TYPE_CONFIG.award.defaultData() as AwardData)
+)
+
+const serviceData = ref<ServiceData>(
+  props.brick?.type === 'service' && props.brick.structuredData
+    ? (props.brick.structuredData as unknown as ServiceData)
+    : (BRICK_TYPE_CONFIG.service.defaultData() as ServiceData)
+)
+
 // Clear title when switching brick type (only for new bricks)
 watch(selectedType, () => {
   if (!isEditing.value) {
@@ -75,7 +110,7 @@ watch(selectedType, () => {
 })
 
 // Auto-generate title based on structured data
-watch([experienceData, educationData, projectData, skillData, publicationData, customData], () => {
+watch([experienceData, educationData, projectData, skillData, publicationData, customData, teachingData, grantData, presentationData, awardData, serviceData], () => {
   if (!isEditing.value) {
     switch (selectedType.value) {
       case 'experience':
@@ -109,6 +144,31 @@ watch([experienceData, educationData, projectData, skillData, publicationData, c
           if (firstLine) {
             title.value = firstLine.slice(0, 60)
           }
+        }
+        break
+      case 'teaching':
+        if (teachingData.value.courseName && teachingData.value.institution) {
+          title.value = `${teachingData.value.role || 'Teaching'} - ${teachingData.value.courseName}`
+        }
+        break
+      case 'grant':
+        if (grantData.value.title) {
+          title.value = grantData.value.title
+        }
+        break
+      case 'presentation':
+        if (presentationData.value.title) {
+          title.value = presentationData.value.title
+        }
+        break
+      case 'award':
+        if (awardData.value.name) {
+          title.value = awardData.value.name
+        }
+        break
+      case 'service':
+        if (serviceData.value.role && serviceData.value.organization) {
+          title.value = `${serviceData.value.role} - ${serviceData.value.organization}`
         }
         break
     }
@@ -154,6 +214,16 @@ function getCurrentStructuredData() {
       return publicationData.value
     case 'custom':
       return customData.value
+    case 'teaching':
+      return teachingData.value
+    case 'grant':
+      return grantData.value
+    case 'presentation':
+      return presentationData.value
+    case 'award':
+      return awardData.value
+    case 'service':
+      return serviceData.value
   }
 }
 
@@ -203,6 +273,49 @@ function buildFrontmatter() {
         subtitle: pub.publicationName,
         startDate: pub.date,
         url: pub.url || pub.doi
+      }
+    }
+    case 'teaching': {
+      const t = data as TeachingData
+      return {
+        subtitle: t.institution,
+        location: t.department,
+        startDate: t.startDate,
+        endDate: t.endDate,
+        role: t.role
+      }
+    }
+    case 'grant': {
+      const g = data as GrantData
+      return {
+        subtitle: g.fundingAgency,
+        startDate: g.startDate,
+        endDate: g.endDate
+      }
+    }
+    case 'presentation': {
+      const p = data as PresentationData
+      return {
+        subtitle: p.event,
+        location: p.location,
+        startDate: p.date,
+        url: p.url
+      }
+    }
+    case 'award': {
+      const a = data as AwardData
+      return {
+        subtitle: a.organization,
+        startDate: a.date
+      }
+    }
+    case 'service': {
+      const s = data as ServiceData
+      return {
+        subtitle: s.organization,
+        startDate: s.startDate,
+        endDate: s.endDate,
+        role: s.role
       }
     }
     default:
@@ -325,6 +438,26 @@ defineExpose({ submit })
       <BricksFormsCustomForm
         v-else-if="selectedType === 'custom'"
         v-model="customData"
+      />
+      <BricksFormsTeachingForm
+        v-else-if="selectedType === 'teaching'"
+        v-model="teachingData"
+      />
+      <BricksFormsGrantForm
+        v-else-if="selectedType === 'grant'"
+        v-model="grantData"
+      />
+      <BricksFormsPresentationForm
+        v-else-if="selectedType === 'presentation'"
+        v-model="presentationData"
+      />
+      <BricksFormsAwardForm
+        v-else-if="selectedType === 'award'"
+        v-model="awardData"
+      />
+      <BricksFormsServiceForm
+        v-else-if="selectedType === 'service'"
+        v-model="serviceData"
       />
     </div>
 
