@@ -21,6 +21,9 @@ const isLookingUp = ref(false)
 const lookupError = ref('')
 const lookupSuccess = ref(false)
 const autoFilledFields = ref(new Set<string>())
+const isSynthesizingDescription = ref(false)
+const synthesizeError = ref('')
+const synthesizeSuccess = ref(false)
 
 const isValidGitHubUrl = computed(() => !!parseGitHubUrl(githubInput.value))
 
@@ -101,6 +104,48 @@ async function lookupGitHub() {
 
 function autoFillHint(field: string): string | undefined {
   return autoFilledFields.value.has(field) ? 'Auto-filled from GitHub' : undefined
+}
+
+async function synthesizeDescription() {
+  const goal = data.value.problem.trim()
+  const outcome = data.value.outcome.trim()
+
+  if (!goal && !outcome) {
+    synthesizeError.value = 'Add a goal or outcome first.'
+    synthesizeSuccess.value = false
+    return
+  }
+
+  isSynthesizingDescription.value = true
+  synthesizeError.value = ''
+  synthesizeSuccess.value = false
+
+  try {
+    const result = await $fetch<{ success: boolean, description: string }>('/api/projects/synthesize-description', {
+      method: 'POST',
+      body: {
+        name: data.value.name,
+        role: data.value.role,
+        goal,
+        outcome,
+        technologies: data.value.technologies
+      }
+    })
+
+    if (result.success && result.description.trim()) {
+      data.value = {
+        ...data.value,
+        description: result.description.trim()
+      }
+      synthesizeSuccess.value = true
+    } else {
+      synthesizeError.value = 'Could not generate a description.'
+    }
+  } catch {
+    synthesizeError.value = 'Failed to synthesize description. Check AI settings and try again.'
+  } finally {
+    isSynthesizingDescription.value = false
+  }
 }
 
 // Features management
@@ -286,11 +331,35 @@ const projectTypeOptions = [
         :rows="4"
         placeholder="e.g., A full-stack e-commerce platform that enables small businesses to sell products online with integrated payment processing. Features include inventory management, order tracking, and analytics dashboard."
       />
+      <div class="mt-2 flex flex-wrap items-center gap-2">
+        <UButton
+          size="sm"
+          variant="soft"
+          color="neutral"
+          icon="i-lucide-wand-sparkles"
+          :loading="isSynthesizingDescription"
+          @click="synthesizeDescription"
+        >
+          Synthesize from Goal + Outcome
+        </UButton>
+        <span
+          v-if="synthesizeSuccess"
+          class="text-xs text-green-600"
+        >
+          Description updated
+        </span>
+        <span
+          v-if="synthesizeError"
+          class="text-xs text-red-600"
+        >
+          {{ synthesizeError }}
+        </span>
+      </div>
     </UFormField>
 
-    <!-- Problem Solved -->
+    <!-- Goal -->
     <UFormField
-      label="Problem Solved"
+      label="Goal"
       :hint="autoFillHint('problem') || 'What problem does this project solve? Why did you build it?'"
     >
       <UTextarea

@@ -224,48 +224,29 @@ export function usePdfExport() {
             ? formatDateRange(edu.graduationDate, edu.isExpected ? '' : edu.graduationDate, 'education')
             : formatDateRange(fm.startDate as string, fm.endDate as string, 'education')
 
-          writeTitleRow(degree, graduation, seen)
-
           const institutionValue = edu.institution || String(fm.subtitle || '')
-          const institution = includesIgnoreCase(degree, institutionValue) ? '' : institutionValue
-          const locationValue = edu.location || String(fm.location || '')
-          const institutionLine = uniqueNonEmpty([
-            institution,
-            locationValue
-          ]).join(' | ')
-          writeWrapped(institutionLine, { fontSize: 10, fontStyle: 'italic', seen })
-
           const fieldValue = edu.field || String(fm.field || '')
-          if (!includesIgnoreCase(degree, fieldValue)) {
-            writeWrapped(fieldValue, { fontSize: 10, fontStyle: 'normal', seen })
-          }
+          const compactEducationLine = uniqueNonEmpty([
+            degree,
+            fieldValue && !includesIgnoreCase(degree, fieldValue) ? fieldValue : '',
+            institutionValue && !includesIgnoreCase(degree, institutionValue) ? institutionValue : ''
+          ]).join(' | ')
+
+          writeTitleRow(compactEducationLine, graduation, seen)
           y += 3
           continue
         }
 
         if (type === 'publication') {
           const pub = (brick.structuredData || {}) as Partial<PublicationData>
-          const title = pub.title || brick.title
-          writeTitleRow(title, undefined, seen)
-
-          const authors = uniqueNonEmpty(pub.authors || []).join(', ')
-          writeWrapped(authors, { fontSize: 10, fontStyle: 'normal', maxLines: 2, seen })
+          const title = normalizePlainText(pub.title || brick.title)
+          writeTitleRow(`Article: ${title}`, undefined, seen)
 
           const status = pub.status
             ? PUBLICATION_STATUSES.find(s => s.value === pub.status)?.label || pub.status
             : ''
           const venueLine = uniqueNonEmpty([pub.publicationName || String(fm.subtitle || ''), status]).join(' | ')
           writeWrapped(venueLine, { fontSize: 10, fontStyle: 'italic', seen })
-
-          const contributions = uniqueNonEmpty(pub.contributions || [])
-          if (contributions.length > 0) {
-            writeWrapped(`Contributions: ${contributions.slice(0, 2).join('; ')}`, {
-              fontSize: 9,
-              fontStyle: 'normal',
-              maxLines: 2,
-              seen
-            })
-          }
 
           const publicationUrl = toDoiUrl(pub.url || pub.doi || String(fm.url || ''))
           writeWrapped(publicationUrl, {
