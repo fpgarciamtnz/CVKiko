@@ -342,29 +342,17 @@ const statusOptions = PUBLICATION_STATUSES.map(s => ({
       </UFormField>
     </div>
 
-    <!-- Date & Citations -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <UFormField
-        label="Publication Date"
-        :hint="autoFillHint('date')"
-      >
-        <UInput
-          v-model="data.date"
-          type="month"
-        />
-      </UFormField>
-
-      <UFormField
-        label="Citations"
-        :hint="autoFillHint('citations') || 'Optional'"
-      >
-        <UInputNumber
-          v-model="data.citations"
-          :min="0"
-          placeholder="0"
-        />
-      </UFormField>
-    </div>
+    <!-- Citations -->
+    <UFormField
+      label="Citations"
+      :hint="autoFillHint('citations') || 'Optional'"
+    >
+      <UInputNumber
+        v-model="data.citations"
+        :min="0"
+        placeholder="0"
+      />
+    </UFormField>
 
     <!-- DOI (read-only display if auto-filled) & URL -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -391,18 +379,6 @@ const statusOptions = PUBLICATION_STATUSES.map(s => ({
         />
       </UFormField>
     </div>
-
-    <!-- Abstract -->
-    <UFormField
-      label="Abstract"
-      :hint="autoFillHint('abstract') || 'Brief summary of the publication'"
-    >
-      <UTextarea
-        v-model="data.abstract"
-        :rows="4"
-        placeholder="A brief summary of the publication's content and findings..."
-      />
-    </UFormField>
 
     <USeparator label="Your Contributions" />
 

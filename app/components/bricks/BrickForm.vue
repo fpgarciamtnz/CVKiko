@@ -119,8 +119,10 @@ watch([experienceData, educationData, projectData, skillData, publicationData, c
         }
         break
       case 'education':
-        if (educationData.value.degree && educationData.value.institution) {
-          title.value = `${educationData.value.degree} - ${educationData.value.institution}`
+        if (educationData.value.degree) {
+          title.value = educationData.value.field
+            ? `${educationData.value.degree} in ${educationData.value.field}`
+            : educationData.value.degree
         }
         break
       case 'project':
@@ -135,7 +137,12 @@ watch([experienceData, educationData, projectData, skillData, publicationData, c
         break
       case 'publication':
         if (publicationData.value.title) {
-          title.value = publicationData.value.title
+          if (publicationData.value.date) {
+            const year = new Date(publicationData.value.date).getFullYear()
+            title.value = Number.isNaN(year) ? publicationData.value.title : `${publicationData.value.title} (${year})`
+          } else {
+            title.value = publicationData.value.title
+          }
         }
         break
       case 'custom':
@@ -247,10 +254,11 @@ function buildFrontmatter() {
     case 'education': {
       const edu = data as EducationData
       return {
-        subtitle: edu.field,
+        subtitle: edu.institution,
         location: edu.location,
         startDate: edu.graduationDate,
-        endDate: edu.isExpected ? '' : edu.graduationDate
+        endDate: edu.isExpected ? '' : edu.graduationDate,
+        field: edu.field
       }
     }
     case 'project': {
@@ -271,8 +279,14 @@ function buildFrontmatter() {
       const pub = data as PublicationData
       return {
         subtitle: pub.publicationName,
-        startDate: pub.date,
         url: pub.url || pub.doi
+      }
+    }
+    case 'custom': {
+      const custom = data as CustomData
+      return {
+        startDate: custom.startDate,
+        endDate: custom.isCurrent ? '' : custom.endDate
       }
     }
     case 'teaching': {
@@ -478,7 +492,7 @@ defineExpose({ submit })
     <!-- Tags -->
     <UFormField
       label="Tags"
-      hint="For filtering and organizing your bricks"
+      hint="For filtering and organizing your bricks (internal use, not shown in PDF)"
     >
       <div class="space-y-2">
         <div

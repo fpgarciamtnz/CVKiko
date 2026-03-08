@@ -13,10 +13,46 @@ const data = computed({
   get: () => props.modelValue,
   set: val => emit('update:modelValue', val)
 })
+
+watch(() => data.value.isCurrent, (isCurrent) => {
+  if (isCurrent) {
+    data.value = { ...data.value, endDate: '' }
+  }
+})
 </script>
 
 <template>
   <div class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <UFormField
+        label="Start Date"
+        hint="When this started"
+      >
+        <UInput
+          v-model="data.startDate"
+          type="month"
+          icon="i-lucide-calendar"
+        />
+      </UFormField>
+
+      <UFormField
+        label="End Date"
+        hint="Leave empty if still in progress"
+      >
+        <UInput
+          v-model="data.endDate"
+          type="month"
+          icon="i-lucide-calendar"
+          :disabled="data.isCurrent"
+        />
+      </UFormField>
+    </div>
+
+    <UCheckbox
+      v-model="data.isCurrent"
+      label="This is still ongoing"
+    />
+
     <UFormField
       label="Content (Markdown)"
       hint="Free-form content using Markdown syntax"

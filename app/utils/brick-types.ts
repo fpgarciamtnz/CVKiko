@@ -70,6 +70,9 @@ export interface PublicationData {
 
 export interface CustomData {
   content: string // Markdown content for flexible blocks
+  startDate: string
+  endDate: string
+  isCurrent: boolean
 }
 
 export interface TeachingData {
@@ -175,7 +178,7 @@ export interface BrickTypeConfig {
 export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
   experience: {
     label: 'Experience',
-    pluralLabel: 'Work Experience',
+    pluralLabel: 'Professional Experience',
     icon: 'i-lucide-briefcase',
     color: 'blue',
     description: 'Work history, jobs, and professional roles',
@@ -268,13 +271,16 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   custom: {
-    label: 'Custom',
-    pluralLabel: 'Custom Sections',
+    label: 'Other',
+    pluralLabel: 'Others',
     icon: 'i-lucide-puzzle',
     color: 'gray',
     description: 'Any custom content block',
     defaultData: (): CustomData => ({
-      content: ''
+      content: '',
+      startDate: '',
+      endDate: '',
+      isCurrent: false
     })
   },
   teaching: {
@@ -535,16 +541,13 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       if (exp.isInternship) {
         md += '**Internship**\n\n'
       }
-      if (exp.responsibilities.filter(r => r.trim()).length > 0) {
-        md += '## Responsibilities\n\n'
-        exp.responsibilities.filter(r => r.trim()).forEach((r) => {
+      const responsibilities = exp.responsibilities.filter(r => r.trim())
+      const achievements = exp.achievements.filter(a => a.trim())
+      if (responsibilities.length > 0 || achievements.length > 0) {
+        responsibilities.forEach((r) => {
           md += `- ${r}\n`
         })
-        md += '\n'
-      }
-      if (exp.achievements.filter(a => a.trim()).length > 0) {
-        md += '## Achievements\n\n'
-        exp.achievements.filter(a => a.trim()).forEach((a) => {
+        achievements.forEach((a) => {
           md += `- ${a}\n`
         })
         md += '\n'
@@ -582,23 +585,20 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       const proj = data as ProjectData
       let md = ''
       if (proj.description) {
-        md += `${proj.description}\n\n`
+        md += `${proj.description}\n`
       }
       if (proj.problem) {
-        md += `**Problem:** ${proj.problem}\n\n`
+        md += `${md ? '\n' : ''}**Goal:** ${proj.problem}\n`
       }
-      if (proj.features.filter(f => f.trim()).length > 0) {
-        md += '## Key Features\n\n'
-        proj.features.filter(f => f.trim()).forEach((f) => {
-          md += `- ${f}\n`
-        })
-        md += '\n'
+      const features = proj.features.filter(f => f.trim())
+      if (features.length > 0) {
+        md += `${md ? '\n' : ''}**Highlights:** ${features.join('; ')}\n`
       }
       if (proj.technologies.length > 0) {
-        md += `**Tech Stack:** ${proj.technologies.join(', ')}\n\n`
+        md += `${md ? '\n' : ''}**Tech Stack:** ${proj.technologies.join(', ')}\n`
       }
       if (proj.outcome) {
-        md += `**Outcome:** ${proj.outcome}\n`
+        md += `${md ? '\n' : ''}**Outcome:** ${proj.outcome}\n`
       }
       return md
     }
@@ -617,20 +617,15 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       const pub = data as PublicationData
       let md = ''
       if (pub.authors.length > 0) {
-        md += `**Authors:** ${pub.authors.join(', ')}\n\n`
+        md += `**Authors:** ${pub.authors.join(', ')}\n`
       }
       if (pub.status) {
         const statusLabel = PUBLICATION_STATUSES.find(s => s.value === pub.status)?.label || pub.status
-        md += `**Status:** ${statusLabel}\n\n`
+        md += `${md ? '\n' : ''}**Status:** ${statusLabel}\n`
       }
-      if (pub.abstract) {
-        md += `## Abstract\n\n${pub.abstract}\n\n`
-      }
-      if (pub.contributions.filter(c => c.trim()).length > 0) {
-        md += '## Key Contributions\n\n'
-        pub.contributions.filter(c => c.trim()).forEach((c) => {
-          md += `- ${c}\n`
-        })
+      const contributions = pub.contributions.filter(c => c.trim())
+      if (contributions.length > 0) {
+        md += `${md ? '\n' : ''}**Contributions:** ${contributions.join('; ')}\n`
       }
       return md
     }

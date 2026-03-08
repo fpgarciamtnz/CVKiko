@@ -103,10 +103,9 @@ describe('structuredDataToMarkdown — experience', () => {
     expect(structuredDataToMarkdown('experience', data)).toContain('**Internship**')
   })
 
-  it('includes Responsibilities heading and bullets', () => {
+  it('includes responsibility bullets without section headings', () => {
     const data: ExperienceData = { ...empty, responsibilities: ['Led team', 'Wrote code'] }
     const md = structuredDataToMarkdown('experience', data)
-    expect(md).toContain('## Responsibilities')
     expect(md).toContain('- Led team')
     expect(md).toContain('- Wrote code')
   })
@@ -120,10 +119,9 @@ describe('structuredDataToMarkdown — experience', () => {
     expect(md).not.toContain('- \n')
   })
 
-  it('includes Achievements heading and bullets', () => {
+  it('includes achievement bullets', () => {
     const data: ExperienceData = { ...empty, achievements: ['Increased revenue 20%'] }
     const md = structuredDataToMarkdown('experience', data)
-    expect(md).toContain('## Achievements')
     expect(md).toContain('- Increased revenue 20%')
   })
 
@@ -136,8 +134,8 @@ describe('structuredDataToMarkdown — experience', () => {
   it('omits sections when arrays are empty', () => {
     const data: ExperienceData = { ...empty, technologies: ['React'] }
     const md = structuredDataToMarkdown('experience', data)
-    expect(md).not.toContain('## Responsibilities')
-    expect(md).not.toContain('## Achievements')
+    expect(md).not.toContain('Responsibilities')
+    expect(md).not.toContain('Achievements')
     expect(md).toContain('**Technologies:** React')
   })
 })
@@ -215,18 +213,16 @@ describe('structuredDataToMarkdown — project', () => {
     expect(md.startsWith('A cool tool')).toBe(true)
   })
 
-  it('includes Problem line', () => {
+  it('includes Goal line', () => {
     const data: ProjectData = { ...empty, problem: 'Slow builds' }
     const md = structuredDataToMarkdown('project', data)
-    expect(md).toContain('**Problem:** Slow builds')
+    expect(md).toContain('**Goal:** Slow builds')
   })
 
-  it('includes Key Features heading with filtered bullets', () => {
+  it('includes compact highlights line', () => {
     const data: ProjectData = { ...empty, features: ['Fast', '', 'Reliable'] }
     const md = structuredDataToMarkdown('project', data)
-    expect(md).toContain('## Key Features')
-    expect(md).toContain('- Fast')
-    expect(md).toContain('- Reliable')
+    expect(md).toContain('**Highlights:** Fast; Reliable')
   })
 
   it('includes Tech Stack line', () => {
@@ -300,7 +296,9 @@ describe('structuredDataToMarkdown — publication', () => {
     contributions: [],
     doi: '',
     url: '',
-    citations: 0
+    citations: 0,
+    status: '',
+    authorHighlightName: ''
   }
 
   it('includes Authors line', () => {
@@ -309,19 +307,17 @@ describe('structuredDataToMarkdown — publication', () => {
     expect(md).toContain('**Authors:** Alice, Bob')
   })
 
-  it('includes Abstract heading and text', () => {
+  it('does not include abstract in compact output', () => {
     const data: PublicationData = { ...empty, abstract: 'This paper explores...' }
     const md = structuredDataToMarkdown('publication', data)
-    expect(md).toContain('## Abstract')
-    expect(md).toContain('This paper explores...')
+    expect(md).not.toContain('Abstract')
+    expect(md).not.toContain('This paper explores...')
   })
 
-  it('includes Key Contributions heading with filtered bullets', () => {
+  it('includes compact contributions line', () => {
     const data: PublicationData = { ...empty, contributions: ['Novel algorithm', '', 'Benchmark'] }
     const md = structuredDataToMarkdown('publication', data)
-    expect(md).toContain('## Key Contributions')
-    expect(md).toContain('- Novel algorithm')
-    expect(md).toContain('- Benchmark')
+    expect(md).toContain('**Contributions:** Novel algorithm; Benchmark')
   })
 })
 
@@ -330,7 +326,7 @@ describe('structuredDataToMarkdown — publication', () => {
 // ============================================
 describe('structuredDataToMarkdown — custom', () => {
   it('returns data.content directly', () => {
-    const data: CustomData = { content: 'Hello world' }
+    const data: CustomData = { content: 'Hello world', startDate: '', endDate: '', isCurrent: false }
     expect(structuredDataToMarkdown('custom', data)).toBe('Hello world')
   })
 })
@@ -408,6 +404,9 @@ describe('BRICK_TYPE_CONFIG', () => {
   it('custom defaultData returns correct shape', () => {
     const data = BRICK_TYPE_CONFIG.custom.defaultData() as CustomData
     expect(data.content).toBe('')
+    expect(data.startDate).toBe('')
+    expect(data.endDate).toBe('')
+    expect(data.isCurrent).toBe(false)
   })
 })
 

@@ -1,8 +1,54 @@
 import type { jsPDF } from 'jspdf'
 import type { Brick } from './useBricks'
 import type { Settings } from './useSettings'
-import { BRICK_TYPE_CONFIG, formatDateRange, type BrickType } from '~/utils/brick-types'
+import {
+  BRICK_TYPE_CONFIG,
+  PUBLICATION_STATUSES,
+  formatDateRange,
+  type BrickType,
+  type EducationData,
+  type ExperienceData,
+  type ProjectData,
+  type PublicationData,
+  type CustomData
+} from '~/utils/brick-types'
 import { stripMarkdown } from '~/utils/render-markdown'
+
+type FontStyle = 'normal' | 'bold' | 'italic'
+
+function normalizePlainText(value: string): string {
+  return stripMarkdown(value).replace(/\s+/g, ' ').trim()
+}
+
+function uniqueNonEmpty(values: string[]): string[] {
+  const seen = new Set<string>()
+  const unique: string[] = []
+
+  for (const value of values) {
+    const normalized = normalizePlainText(value)
+    if (!normalized) continue
+    const key = normalized.toLowerCase()
+    if (seen.has(key)) continue
+    seen.add(key)
+    unique.push(normalized)
+  }
+
+  return unique
+}
+
+function toDoiUrl(value: string): string {
+  const trimmed = value.trim()
+  if (!trimmed) return ''
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed
+  if (trimmed.startsWith('10.')) return `https://doi.org/${trimmed}`
+  return trimmed
+}
+
+function includesIgnoreCase(text: string, part: string): boolean {
+  const source = normalizePlainText(text).toLowerCase()
+  const needle = normalizePlainText(part).toLowerCase()
+  return !!needle && source.includes(needle)
+}
 
 export function usePdfExport() {
   const { sectionTypeOrder, contentOverrides } = useCVBuilder()
@@ -23,7 +69,6 @@ export function usePdfExport() {
     const contentWidth = pageWidth - (margin * 2)
     let y = margin
 
-    // Helper to check page break
     const checkPageBreak = (height: number) => {
       if (y + height > pageHeight - margin) {
         doc.addPage()
@@ -31,7 +76,73 @@ export function usePdfExport() {
       }
     }
 
-    // Header - Name
+    const writeWrapped = (
+      text: string,
+      options: {
+        fontSize?: number
+        fontStyle?: FontStyle
+        lineHeight?: number
+        color?: [number, number, number]
+        maxLines?: number
+        seen?: Set<string>
+      } = {}
+    ) => {
+      const normalized = normalizePlainText(text)
+      if (!normalized) return
+
+      const seen = options.seen
+      if (seen) {
+        const key = normalized.toLowerCase()
+        if (seen.has(key)) return
+        seen.add(key)
+      }
+
+      doc.setFontSize(options.fontSize ?? 10)
+      doc.setFont('helvetica', options.fontStyle ?? 'normal')
+      if (options.color) doc.setTextColor(...options.color)
+
+      const lines = doc.splitTextToSize(normalized, contentWidth)
+      const limitedLines = options.maxLines ? lines.slice(0, options.maxLines) : lines
+      const lineHeight = options.lineHeight ?? 4
+
+      for (const line of limitedLines) {
+        checkPageBreak(lineHeight + 1)
+        doc.text(line, margin, y)
+        y += lineHeight
+      }
+
+      if (options.color) doc.setTextColor(0, 0, 0)
+    }
+
+    const writeTitleRow = (title: string, dateText?: string, seen?: Set<string>) => {
+      const normalizedTitle = normalizePlainText(title)
+      if (!normalizedTitle) return
+
+      const dedupeSet = seen
+      if (dedupeSet) {
+        const key = normalizedTitle.toLowerCase()
+        if (dedupeSet.has(key)) return
+        dedupeSet.add(key)
+      }
+
+      checkPageBreak(7)
+      doc.setFontSize(11)
+      doc.setFont('helvetica', 'bold')
+      doc.text(normalizedTitle, margin, y)
+
+      if (dateText) {
+        const normalizedDate = normalizePlainText(dateText)
+        if (normalizedDate) {
+          doc.setFont('helvetica', 'normal')
+          const dateWidth = doc.getTextWidth(normalizedDate)
+          doc.text(normalizedDate, pageWidth - margin - dateWidth, y)
+        }
+      }
+
+      y += 5
+    }
+
+    // Header
     doc.setFontSize(24)
     doc.setFont('helvetica', 'bold')
     doc.text(settings?.name || 'Your Name', margin, y)
@@ -57,26 +168,22 @@ export function usePdfExport() {
     if (settings?.website) linkParts.push(settings.website)
 
     if (linkParts.length > 0) {
-      doc.setTextColor(0, 0, 238) // Blue for links
+      doc.setTextColor(0, 0, 238)
       doc.text(linkParts.join('  |  '), margin, y)
-      doc.setTextColor(0, 0, 0) // Reset to black
+      doc.setTextColor(0, 0, 0)
       y += 8
     }
 
     // Summary
     if (settings?.summary) {
       y += 2
-      doc.setFontSize(10)
-      doc.setFont('helvetica', 'normal')
-      const summaryLines = doc.splitTextToSize(stripMarkdown(settings.summary), contentWidth)
-      doc.text(summaryLines, margin, y)
-      y += summaryLines.length * 4 + 5
+      writeWrapped(settings.summary, { fontSize: 10, fontStyle: 'normal', lineHeight: 4 })
+      y += 3
     }
 
-    // Sections - use dynamic order from builder
     const sectionOrder: BrickType[] = sectionTypeOrder.value.length > 0
       ? sectionTypeOrder.value
-      : ['experience', 'education', 'project', 'skill', 'publication']
+      : ['experience', 'education', 'project', 'skill', 'publication', 'custom']
 
     for (const type of sectionOrder) {
       const typeBricks = bricksByType[type]
@@ -84,7 +191,6 @@ export function usePdfExport() {
 
       checkPageBreak(20)
 
-      // Section header
       y += 5
       doc.setFontSize(12)
       doc.setFont('helvetica', 'bold')
@@ -94,86 +200,208 @@ export function usePdfExport() {
       doc.line(margin, y, pageWidth - margin, y)
       y += 6
 
-      // Skills rendered as a list
       if (type === 'skill') {
         doc.setFontSize(10)
         doc.setFont('helvetica', 'normal')
-        const skills = typeBricks.map(b => b.title).join('  •  ')
+        const skills = typeBricks.map(b => b.title).filter(Boolean).join('  -  ')
         const skillLines = doc.splitTextToSize(skills, contentWidth)
         doc.text(skillLines, margin, y)
         y += skillLines.length * 4 + 4
         continue
       }
 
-      // Other sections
       for (const brick of typeBricks) {
         checkPageBreak(25)
 
         const fm = brick.frontmatter
-
-        // Title and dates on same line
-        doc.setFontSize(11)
-        doc.setFont('helvetica', 'bold')
-        const title = brick.title
-        doc.text(title, margin, y)
-
-        if (fm.startDate) {
-          const dateStr = formatDateRange(fm.startDate, fm.endDate, type)
-          doc.setFont('helvetica', 'normal')
-          const dateWidth = doc.getTextWidth(dateStr)
-          doc.text(dateStr, pageWidth - margin - dateWidth, y)
-        }
-        y += 5
-
-        // Subtitle (company/school)
-        if (fm.subtitle) {
-          doc.setFontSize(10)
-          doc.setFont('helvetica', 'italic')
-          let subtitleText = fm.subtitle
-          if (fm.location) {
-            subtitleText += ` | ${fm.location}`
-          }
-          doc.text(subtitleText, margin, y)
-          y += 4
-        }
-
-        // Description - use content override if available, otherwise original content
         const brickContent = contentOverrides.value[brick.id] || brick.content
-        if (brickContent) {
-          doc.setFontSize(10)
-          doc.setFont('helvetica', 'normal')
-          const descLines = doc.splitTextToSize(stripMarkdown(brickContent), contentWidth)
-          // Limit to avoid overflow
-          const maxLines = Math.min(descLines.length, 6)
-          for (let i = 0; i < maxLines; i++) {
-            checkPageBreak(5)
-            doc.text(descLines[i], margin, y)
-            y += 4
+        const seen = new Set<string>()
+
+        if (type === 'education') {
+          const edu = (brick.structuredData || {}) as Partial<EducationData>
+          const degree = edu.degree || brick.title
+          const graduation = edu.graduationDate
+            ? formatDateRange(edu.graduationDate, edu.isExpected ? '' : edu.graduationDate, 'education')
+            : formatDateRange(fm.startDate as string, fm.endDate as string, 'education')
+
+          writeTitleRow(degree, graduation, seen)
+
+          const institutionValue = edu.institution || String(fm.subtitle || '')
+          const institution = includesIgnoreCase(degree, institutionValue) ? '' : institutionValue
+          const locationValue = edu.location || String(fm.location || '')
+          const institutionLine = uniqueNonEmpty([
+            institution,
+            locationValue
+          ]).join(' | ')
+          writeWrapped(institutionLine, { fontSize: 10, fontStyle: 'italic', seen })
+
+          const fieldValue = edu.field || String(fm.field || '')
+          if (!includesIgnoreCase(degree, fieldValue)) {
+            writeWrapped(fieldValue, { fontSize: 10, fontStyle: 'normal', seen })
           }
+          y += 3
+          continue
         }
 
-        // Tags
-        if (brick.tags?.length) {
-          doc.setFontSize(9)
-          doc.setFont('helvetica', 'normal')
-          doc.setTextColor(100, 100, 100)
-          const tagsText = brick.tags.join(' • ')
-          const tagLines = doc.splitTextToSize(tagsText, contentWidth)
-          doc.text(tagLines[0], margin, y)
-          doc.setTextColor(0, 0, 0)
-          y += 4
+        if (type === 'publication') {
+          const pub = (brick.structuredData || {}) as Partial<PublicationData>
+          const title = pub.title || brick.title
+          writeTitleRow(title, undefined, seen)
+
+          const authors = uniqueNonEmpty(pub.authors || []).join(', ')
+          writeWrapped(authors, { fontSize: 10, fontStyle: 'normal', maxLines: 2, seen })
+
+          const status = pub.status
+            ? PUBLICATION_STATUSES.find(s => s.value === pub.status)?.label || pub.status
+            : ''
+          const venueLine = uniqueNonEmpty([pub.publicationName || String(fm.subtitle || ''), status]).join(' | ')
+          writeWrapped(venueLine, { fontSize: 10, fontStyle: 'italic', seen })
+
+          const contributions = uniqueNonEmpty(pub.contributions || [])
+          if (contributions.length > 0) {
+            writeWrapped(`Contributions: ${contributions.slice(0, 2).join('; ')}`, {
+              fontSize: 9,
+              fontStyle: 'normal',
+              maxLines: 2,
+              seen
+            })
+          }
+
+          const publicationUrl = toDoiUrl(pub.url || pub.doi || String(fm.url || ''))
+          writeWrapped(publicationUrl, {
+            fontSize: 9,
+            fontStyle: 'normal',
+            color: [0, 0, 238],
+            seen
+          })
+
+          y += 3
+          continue
         }
 
-        // URL
-        if (fm.url) {
-          doc.setFontSize(9)
-          doc.setTextColor(0, 0, 238)
-          doc.text(fm.url, margin, y)
-          doc.setTextColor(0, 0, 0)
-          y += 4
+        if (type === 'project') {
+          const proj = (brick.structuredData || {}) as Partial<ProjectData>
+          writeTitleRow(proj.name || brick.title, undefined, seen)
+
+          writeWrapped(proj.role || String(fm.subtitle || ''), { fontSize: 10, fontStyle: 'italic', seen })
+          writeWrapped(`Goal: ${proj.problem || proj.description || ''}`, {
+            fontSize: 9,
+            fontStyle: 'normal',
+            maxLines: 2,
+            seen
+          })
+          writeWrapped(`Outcome: ${proj.outcome || ''}`, {
+            fontSize: 9,
+            fontStyle: 'normal',
+            maxLines: 2,
+            seen
+          })
+          if (proj.technologies?.length) {
+            writeWrapped(`Tech stack: ${uniqueNonEmpty(proj.technologies).join(', ')}`, {
+              fontSize: 9,
+              fontStyle: 'normal',
+              maxLines: 2,
+              seen
+            })
+          }
+
+          const projectUrl = proj.links?.find(link => link?.url)?.url || String(fm.url || '')
+          writeWrapped(projectUrl, {
+            fontSize: 9,
+            fontStyle: 'normal',
+            color: [0, 0, 238],
+            seen
+          })
+
+          y += 3
+          continue
         }
 
-        y += 3 // spacing between bricks
+        if (type === 'experience') {
+          const exp = (brick.structuredData || {}) as Partial<ExperienceData>
+          const dateStr = formatDateRange(String(fm.startDate || ''), String(fm.endDate || ''), type)
+
+          const roleTitle = exp.jobTitle || brick.title
+          writeTitleRow(roleTitle, dateStr, seen)
+
+          const companyValue = exp.company || String(fm.subtitle || '')
+          const company = includesIgnoreCase(roleTitle, companyValue) ? '' : companyValue
+          const locationValue = exp.location || String(fm.location || '')
+          const subtitleLine = uniqueNonEmpty([
+            company,
+            locationValue
+          ]).join(' | ')
+          writeWrapped(subtitleLine, { fontSize: 10, fontStyle: 'italic', seen })
+
+          const structuredHighlights = uniqueNonEmpty([
+            ...(exp.responsibilities || []),
+            ...(exp.achievements || [])
+          ])
+          const fallbackHighlights = uniqueNonEmpty(stripMarkdown(brickContent).split(/\r?\n+/))
+            .filter(line => !/^responsibilities:?$/i.test(line) && !/^achievements:?$/i.test(line))
+          const highlights = (structuredHighlights.length > 0 ? structuredHighlights : fallbackHighlights).slice(0, 3)
+
+          highlights.forEach((item) => {
+            writeWrapped(`- ${item}`, { fontSize: 9, fontStyle: 'normal', maxLines: 2, seen })
+          })
+
+          if (exp.technologies?.length) {
+            writeWrapped(`Tech stack: ${uniqueNonEmpty(exp.technologies).join(', ')}`, {
+              fontSize: 9,
+              fontStyle: 'normal',
+              maxLines: 2,
+              seen
+            })
+          }
+
+          y += 3
+          continue
+        }
+
+        if (type === 'custom') {
+          const custom = (brick.structuredData || {}) as Partial<CustomData>
+          const dateStr = formatDateRange(
+            custom.startDate || String(fm.startDate || ''),
+            custom.isCurrent ? '' : (custom.endDate || String(fm.endDate || '')),
+            type
+          )
+          writeTitleRow(brick.title, dateStr, seen)
+          writeWrapped(custom.content || brickContent, {
+            fontSize: 10,
+            fontStyle: 'normal',
+            maxLines: 4,
+            seen
+          })
+          y += 3
+          continue
+        }
+
+        // Fallback for remaining brick types
+        const dateStr = fm.startDate
+          ? formatDateRange(String(fm.startDate), String(fm.endDate || ''), type)
+          : ''
+
+        writeTitleRow(brick.title, dateStr, seen)
+
+        const subtitleParts = uniqueNonEmpty([String(fm.subtitle || ''), String(fm.location || '')]).join(' | ')
+        writeWrapped(subtitleParts, { fontSize: 10, fontStyle: 'italic', seen })
+
+        writeWrapped(brickContent, {
+          fontSize: 10,
+          fontStyle: 'normal',
+          maxLines: 4,
+          seen
+        })
+
+        const url = String(fm.url || '')
+        writeWrapped(url, {
+          fontSize: 9,
+          fontStyle: 'normal',
+          color: [0, 0, 238],
+          seen
+        })
+
+        y += 3
       }
     }
 
