@@ -83,6 +83,10 @@ cp .env.example .env
 | `AI_PROVIDER` | Yes | `cloudflare`, `groq`, or `anthropic` |
 | `CLOUDFLARE_ACCOUNT_ID` | If using Cloudflare | Cloudflare dashboard > Account ID |
 | `CLOUDFLARE_API_TOKEN` | If using Cloudflare | API token with Workers AI access |
+| `CF_TIER_MODE` | Optional (Cloudflare) | `tier1`, `tier2`, `tier3`, or `auto` (tries all 3) |
+| `CF_TIER1_MODEL` | Optional (Cloudflare) | Tier 1 model ID |
+| `CF_TIER2_MODEL` | Optional (Cloudflare) | Tier 2 model ID |
+| `CF_TIER3_MODEL` | Optional (Cloudflare) | Tier 3 model ID |
 | `GROQ_API_KEY` | If using Groq | From [console.groq.com](https://console.groq.com/) |
 | `ANTHROPIC_API_KEY` | If using Anthropic | From [console.anthropic.com](https://console.anthropic.com/) |
 

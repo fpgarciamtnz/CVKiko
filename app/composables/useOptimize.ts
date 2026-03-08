@@ -1,20 +1,18 @@
-import { experimental_useObject as useObject } from '@ai-sdk/vue'
-import { z } from 'zod'
 import type { BrickType } from '~/utils/brick-types'
 
-const BrickTypeEnum = z.enum(['experience', 'education', 'project', 'skill', 'publication', 'custom', 'teaching', 'grant', 'presentation', 'award', 'service'])
+interface OptimizationAdjustment {
+  brickId: string
+  adjustedContent: string
+  reasoning: string
+  relevanceScore: number
+}
 
-const OptimizationResultSchema = z.object({
-  sectionOrder: z.array(BrickTypeEnum),
-  brickAdjustments: z.array(z.object({
-    brickId: z.string(),
-    adjustedContent: z.string(),
-    reasoning: z.string(),
-    relevanceScore: z.number()
-  })),
-  withinSectionOrder: z.record(BrickTypeEnum, z.array(z.string())),
-  overallTips: z.array(z.string())
-})
+interface OptimizationResult {
+  sectionOrder: BrickType[]
+  brickAdjustments: OptimizationAdjustment[]
+  withinSectionOrder: Record<BrickType, string[]>
+  overallTips: string[]
+}
 
 export function useOptimize() {
   const {
@@ -27,12 +25,12 @@ export function useOptimize() {
     cvMode
   } = useCVBuilder()
 
-  const { object, submit, isLoading, error, stop } = useObject({
-    api: '/api/chat/optimize',
-    schema: OptimizationResultSchema
-  })
+  const optimizationResult = ref<OptimizationResult | null>(null)
+  const isOptimizing = ref(false)
+  const error = ref<Error | null>(null)
+  const abortController = ref<AbortController | null>(null)
 
-  function optimize(jobDescription: string) {
+  async function optimize(jobDescription: string) {
     const bricksData = selectedBricks.value.map(b => ({
       id: b.id,
       type: b.type,
@@ -42,22 +40,49 @@ export function useOptimize() {
       frontmatter: b.frontmatter
     }))
 
-    submit({
-      jobDescription,
-      selectedBricks: bricksData,
-      currentSectionOrder: sectionTypeOrder.value,
-      cvMode: cvMode.value
-    })
+    abortController.value?.abort()
+    abortController.value = new AbortController()
+    optimizationResult.value = null
+    error.value = null
+    isOptimizing.value = true
+
+    try {
+      const result = await $fetch<OptimizationResult>('/api/chat/optimize', {
+        method: 'POST',
+        body: {
+          jobDescription,
+          selectedBricks: bricksData,
+          currentSectionOrder: sectionTypeOrder.value,
+          cvMode: cvMode.value
+        },
+        signal: abortController.value.signal
+      })
+      optimizationResult.value = result
+    } catch (e: unknown) {
+      const err = e as { name?: string, data?: { message?: string }, message?: string }
+      if (err.name !== 'AbortError') {
+        error.value = new Error(err.data?.message || err.message || 'Optimization failed')
+      }
+    } finally {
+      isOptimizing.value = false
+      abortController.value = null
+    }
+  }
+
+  function stop() {
+    abortController.value?.abort()
+    abortController.value = null
+    isOptimizing.value = false
   }
 
   function acceptSectionOrder() {
-    const result = object.value
+    const result = optimizationResult.value
     if (!result?.sectionOrder) return
     reorderSections(result.sectionOrder.filter((s): s is BrickType => !!s))
   }
 
   function acceptBrickContent(brickId: string) {
-    const result = object.value
+    const result = optimizationResult.value
     if (!result?.brickAdjustments) return
     const adjustment = result.brickAdjustments.find(a => a?.brickId === brickId)
     if (adjustment?.adjustedContent) {
@@ -66,7 +91,7 @@ export function useOptimize() {
   }
 
   function acceptWithinSectionOrder() {
-    const result = object.value
+    const result = optimizationResult.value
     if (!result?.withinSectionOrder) return
 
     const sectionOrder = result.sectionOrder?.filter((s): s is BrickType => !!s) || sectionTypeOrder.value
@@ -93,7 +118,7 @@ export function useOptimize() {
   function acceptAllChanges() {
     acceptSectionOrder()
     acceptWithinSectionOrder()
-    const result = object.value
+    const result = optimizationResult.value
     if (result?.brickAdjustments) {
       for (const adj of result.brickAdjustments) {
         if (adj?.brickId && adj?.adjustedContent) {
@@ -104,8 +129,8 @@ export function useOptimize() {
   }
 
   return {
-    optimizationResult: object,
-    isOptimizing: isLoading,
+    optimizationResult,
+    isOptimizing,
     error,
     optimize,
     stop,

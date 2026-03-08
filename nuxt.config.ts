@@ -21,6 +21,10 @@ export default defineNuxtConfig({
     groqApiKey: process.env.GROQ_API_KEY || '',
     cfAccountId: process.env.CLOUDFLARE_ACCOUNT_ID || '',
     cfApiToken: process.env.CLOUDFLARE_API_TOKEN || '',
+    cfTierMode: process.env.CF_TIER_MODE || 'tier1', // tier1 | tier2 | tier3 | auto
+    cfTier1Model: process.env.CF_TIER1_MODEL || '@cf/meta/llama-3.1-8b-instruct',
+    cfTier2Model: process.env.CF_TIER2_MODEL || '@cf/meta/llama-3.1-70b-instruct',
+    cfTier3Model: process.env.CF_TIER3_MODEL || '@cf/mistral/mistral-7b-instruct-v0.2',
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || ''
   },
 

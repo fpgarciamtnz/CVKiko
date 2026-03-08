@@ -1,5 +1,6 @@
-import { streamObject } from 'ai'
+import { generateObject } from 'ai'
 import { z } from 'zod'
+import { getCloudflareTierModels, getModel, resolveAIConfig } from '../../utils/ai-providers'
 
 const BrickTypeEnum = z.enum(['experience', 'education', 'project', 'skill', 'publication', 'custom', 'teaching', 'grant', 'presentation', 'award', 'service'])
 
@@ -76,16 +77,35 @@ For each brick adjustment:
 4. Give a relevance score (0-10) based on how relevant the brick is to the job`
 
   try {
-    const model = getModel(event)
+    const aiConfig = resolveAIConfig(event)
+    const cloudflareModels = aiConfig.provider === 'cloudflare' && aiConfig.cfTierMode === 'auto'
+      ? getCloudflareTierModels(event)
+      : []
 
-    const result = streamObject({
-      model,
-      schema: OptimizationResultSchema,
-      prompt: `Optimize this CV for the following job description:\n\n${jobDescription}`,
-      system: systemPrompt
-    })
+    const candidateModels = cloudflareModels.length > 0 ? cloudflareModels : [undefined]
+    let lastError: unknown
 
-    return result.toTextStreamResponse()
+    for (const cloudflareModel of candidateModels) {
+      try {
+        const model = getModel(event, { cloudflareModel })
+        const { object } = await generateObject({
+          model,
+          schema: OptimizationResultSchema,
+          prompt: `Optimize this CV for the following job description:\n\n${jobDescription}`,
+          system: systemPrompt
+        })
+
+        return object
+      } catch (error: unknown) {
+        lastError = error
+        console.error('AI optimization attempt failed', {
+          provider: aiConfig.provider,
+          cloudflareModel: cloudflareModel || 'default'
+        }, error)
+      }
+    }
+
+    throw lastError || new Error('CV optimization failed')
   } catch (error: unknown) {
     const err = error as Error
     console.error('AI optimization error:', error)
