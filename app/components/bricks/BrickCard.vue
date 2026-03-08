@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Brick } from '~/composables/useBricks'
-import { BRICK_TYPE_CONFIG, formatDateRange } from '~/utils/brick-types'
+import { BRICK_TYPE_CONFIG, formatBrickDateRange } from '~/utils/brick-types'
 
 const props = defineProps<{
   brick: Brick
@@ -15,9 +15,7 @@ const emit = defineEmits<{
 }>()
 
 const config = computed(() => BRICK_TYPE_CONFIG[props.brick.type])
-const dateRange = computed(() =>
-  formatDateRange(props.brick.frontmatter?.startDate, props.brick.frontmatter?.endDate, props.brick.type)
-)
+const dateRange = computed(() => formatBrickDateRange(props.brick))
 
 // Get first paragraph of content as preview
 const contentPreview = computed(() => {

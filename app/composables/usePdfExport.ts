@@ -4,6 +4,7 @@ import type { Settings } from './useSettings'
 import {
   BRICK_TYPE_CONFIG,
   PUBLICATION_STATUSES,
+  formatBrickDateRange,
   formatDateRange,
   type BrickType,
   type EducationData,
@@ -300,7 +301,7 @@ export function usePdfExport() {
 
         if (type === 'experience') {
           const exp = (brick.structuredData || {}) as Partial<ExperienceData>
-          const dateStr = formatDateRange(String(fm.startDate || ''), String(fm.endDate || ''), type)
+          const dateStr = formatBrickDateRange(brick)
 
           const roleTitle = exp.jobTitle || brick.title
           writeTitleRow(roleTitle, dateStr, seen)

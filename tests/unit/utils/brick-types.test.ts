@@ -8,6 +8,7 @@ import {
   PUBLICATION_TYPES,
   DEGREE_OPTIONS,
   formatDateRange,
+  formatBrickDateRange,
   structuredDataToMarkdown,
   parseGitHubUrl
 } from '../../../app/utils/brick-types'
@@ -328,6 +329,40 @@ describe('structuredDataToMarkdown — custom', () => {
   it('returns data.content directly', () => {
     const data: CustomData = { content: 'Hello world', startDate: '', endDate: '', isCurrent: false }
     expect(structuredDataToMarkdown('custom', data)).toBe('Hello world')
+  })
+})
+
+describe('formatBrickDateRange', () => {
+  it('uses frontmatter dates for experience when structured dates are missing', () => {
+    expect(formatBrickDateRange({
+      type: 'experience',
+      frontmatter: { startDate: '2023-01-15', endDate: '2024-06-20' },
+      structuredData: {}
+    })).toBe('Jan 2023 - Jun 2024')
+  })
+
+  it('prefers structured experience dates when available', () => {
+    expect(formatBrickDateRange({
+      type: 'experience',
+      frontmatter: { startDate: '2023-01-15', endDate: '2024-06-20' },
+      structuredData: { startDate: '2022-02-01', endDate: '2023-03-01' }
+    })).toBe('Feb 2022 - Mar 2023')
+  })
+
+  it('respects empty structured endDate for current experience entries', () => {
+    expect(formatBrickDateRange({
+      type: 'experience',
+      frontmatter: { startDate: '2023-01-15', endDate: '2024-06-20' },
+      structuredData: { startDate: '2023-01-15', endDate: '' }
+    })).toBe('Jan 2023 - Present')
+  })
+
+  it('keeps frontmatter behavior for non-experience bricks', () => {
+    expect(formatBrickDateRange({
+      type: 'project',
+      frontmatter: { startDate: '2021-01-01', endDate: '2021-12-01' },
+      structuredData: { date: '2025-01-01' }
+    })).toBe('Jan 2021 - Dec 2021')
   })
 })
 

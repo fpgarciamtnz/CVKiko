@@ -2,7 +2,7 @@
 import type { Brick } from '~/composables/useBricks'
 import type { Settings } from '~/composables/useSettings'
 import type { LayoutMode } from '~/composables/useCVBuilder'
-import { BRICK_TYPE_CONFIG, PUBLICATION_STATUSES, formatDateRange, type BrickType, type PublicationData } from '~/utils/brick-types'
+import { BRICK_TYPE_CONFIG, PUBLICATION_STATUSES, formatBrickDateRange, type BrickType, type PublicationData } from '~/utils/brick-types'
 import type { CVMode } from '~/utils/cv-modes'
 import { renderMarkdown } from '~/utils/render-markdown'
 
@@ -59,6 +59,10 @@ function highlightAuthor(authorList: string, highlightName: string): string {
     new RegExp(`(${highlightName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'),
     '<strong>$1</strong>'
   )
+}
+
+function getDateRange(brick: Brick): string {
+  return formatBrickDateRange(brick)
 }
 </script>
 
@@ -244,10 +248,10 @@ function highlightAuthor(authorList: string, highlightName: string): string {
                 </p>
               </div>
               <span
-                v-if="brick.frontmatter?.startDate"
+                v-if="getDateRange(brick)"
                 class="text-sm text-gray-500 whitespace-nowrap ml-4"
               >
-                {{ formatDateRange(brick.frontmatter.startDate, brick.frontmatter.endDate, section.type) }}
+                {{ getDateRange(brick) }}
               </span>
             </div>
 
@@ -327,10 +331,10 @@ function highlightAuthor(authorList: string, highlightName: string): string {
                   {{ getPublicationStatusLabel((brick.structuredData as unknown as PublicationData).status) }}
                 </span>
                 <span
-                  v-if="brick.frontmatter?.startDate"
+                  v-if="getDateRange(brick)"
                   class="text-sm text-gray-500 whitespace-nowrap"
                 >
-                  {{ formatDateRange(brick.frontmatter.startDate, brick.frontmatter.endDate, type) }}
+                  {{ getDateRange(brick) }}
                 </span>
               </div>
             </div>
@@ -379,10 +383,10 @@ function highlightAuthor(authorList: string, highlightName: string): string {
                 </p>
               </div>
               <span
-                v-if="brick.frontmatter?.startDate"
+                v-if="getDateRange(brick)"
                 class="text-sm text-gray-500 whitespace-nowrap ml-4"
               >
-                {{ formatDateRange(brick.frontmatter.startDate, brick.frontmatter.endDate, type) }}
+                {{ getDateRange(brick) }}
               </span>
             </div>
 

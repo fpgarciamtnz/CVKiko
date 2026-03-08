@@ -532,6 +532,35 @@ export function formatDateRange(startDate?: string | null, endDate?: string | nu
   return `${start} - ${end}`
 }
 
+interface BrickDateSource {
+  type: BrickType
+  frontmatter?: BrickFrontmatter | null
+  structuredData?: Record<string, unknown> | null
+}
+
+function asDateString(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : ''
+}
+
+// Keep date rendering consistent across cards, preview, and PDF.
+export function formatBrickDateRange(brick: BrickDateSource): string {
+  const fmStart = asDateString(brick.frontmatter?.startDate)
+  const fmEnd = asDateString(brick.frontmatter?.endDate)
+
+  if (brick.type === 'experience') {
+    const exp = (brick.structuredData || {}) as Partial<ExperienceData>
+    const expStart = asDateString(exp.startDate)
+    const hasExpEnd = typeof exp.endDate === 'string'
+    const expEnd = hasExpEnd ? asDateString(exp.endDate) : ''
+
+    const start = expStart || fmStart
+    const end = hasExpEnd ? expEnd : fmEnd
+    return formatDateRange(start, end, brick.type)
+  }
+
+  return formatDateRange(fmStart, fmEnd, brick.type)
+}
+
 // Convert structured data to display-ready markdown/text
 export function structuredDataToMarkdown(type: BrickType, data: unknown): string {
   switch (type) {
