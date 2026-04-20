@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Brick } from '../../../app/composables/useBricks'
 import type { Settings } from '../../../app/composables/useSettings'
 import type { BrickType } from '../../../app/utils/brick-types'
+import type { PlacedSection } from '../../../app/composables/useCVBuilder'
+import { BRICK_TYPES } from '../../../app/utils/brick-types'
 
 const capturedDocs: MockJsPDF[] = []
 
@@ -86,20 +88,12 @@ function createBrick(id: string, type: BrickType, title: string, content: string
   }
 }
 
-function emptyBricksByType(): Record<BrickType, Brick[]> {
-  return {
-    experience: [],
-    education: [],
-    project: [],
-    skill: [],
-    publication: [],
-    custom: [],
-    teaching: [],
-    grant: [],
-    presentation: [],
-    award: [],
-    service: []
-  }
+function emptyPlacementSections(): PlacedSection[] {
+  return BRICK_TYPES.map(type => ({
+    type,
+    brickIds: [],
+    bricks: []
+  }))
 }
 
 const mockSettings: Settings = {
@@ -123,22 +117,27 @@ const mockSettings: Settings = {
 describe('usePdfExport', () => {
   beforeEach(() => {
     capturedDocs.length = 0
-    const { sectionTypeOrder, contentOverrides } = useCVBuilder()
-    sectionTypeOrder.value = ['experience', 'education', 'project', 'skill', 'publication', 'custom']
+    const { contentOverrides } = useCVBuilder()
     contentOverrides.value = {}
   })
 
-  it('generates a PDF from CV data', async () => {
+  it('generates a PDF from placement sections', async () => {
     const { generateCV } = usePdfExport()
-    const bricksByType = emptyBricksByType()
-    bricksByType.experience = [
+    const sections = emptyPlacementSections()
+
+    const experienceSection = sections.find(section => section.type === 'experience')!
+    experienceSection.bricks = [
       createBrick('exp-1', 'experience', 'Senior Engineer', '- Built scalable systems')
     ]
-    bricksByType.skill = [
-      createBrick('skill-1', 'skill', 'TypeScript', '')
-    ]
+    experienceSection.brickIds = ['exp-1']
 
-    await generateCV(mockSettings, bricksByType)
+    const projectSection = sections.find(section => section.type === 'project')!
+    projectSection.bricks = [
+      createBrick('proj-1', 'project', 'Builder Revamp', 'Improved exports')
+    ]
+    projectSection.brickIds = ['proj-1']
+
+    await generateCV(mockSettings, sections)
 
     expect(capturedDocs).toHaveLength(1)
     const output = capturedDocs[0]!.output()
@@ -147,37 +146,36 @@ describe('usePdfExport', () => {
     expect(output).toContain('Senior Engineer')
   })
 
-  it('includes selected bricks and content overrides in PDF output', async () => {
+  it('includes content overrides in PDF output', async () => {
     const { contentOverrides } = useCVBuilder()
     contentOverrides.value = { 'exp-1': '- Delivered override result' }
 
     const { generateCV } = usePdfExport()
-    const bricksByType = emptyBricksByType()
-    bricksByType.experience = [
+    const sections = emptyPlacementSections()
+
+    const experienceSection = sections.find(section => section.type === 'experience')!
+    experienceSection.bricks = [
       createBrick('exp-1', 'experience', 'Platform Engineer', '- Original text')
     ]
-    bricksByType.project = [
-      createBrick('proj-1', 'project', 'Builder Revamp', 'Improved exports')
-    ]
+    experienceSection.brickIds = ['exp-1']
 
-    await generateCV(mockSettings, bricksByType)
+    await generateCV(mockSettings, sections)
 
     const output = capturedDocs[0]!.output()
     expect(output).toContain('Platform Engineer')
     expect(output).toContain('Delivered override result')
-    expect(output).toContain('Builder Revamp')
   })
 
   it('handles empty CV data gracefully', async () => {
     const { generateCV } = usePdfExport()
 
-    await expect(generateCV(null, emptyBricksByType())).resolves.toBeTruthy()
+    await expect(generateCV(null, emptyPlacementSections())).resolves.toBeTruthy()
     expect(capturedDocs[0]!.output()).toContain('Your Name')
   })
 
   it('saves PDF with requested filename', async () => {
     const { exportToPdf } = usePdfExport()
-    await exportToPdf(mockSettings, emptyBricksByType(), 'my-cv.pdf')
+    await exportToPdf(mockSettings, emptyPlacementSections(), 'my-cv.pdf')
 
     expect(capturedDocs[0]!.savedFilename).toBe('my-cv.pdf')
   })

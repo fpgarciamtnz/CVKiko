@@ -1,5 +1,12 @@
 import { useDb, cvs, cvBricks, type NewCV, type NewCVBrick } from '../../database'
 import { eq } from 'drizzle-orm'
+import type { BrickType } from '~/utils/brick-types'
+
+const BRICK_TYPES: BrickType[] = ['experience', 'education', 'project', 'skill', 'publication', 'custom', 'teaching', 'grant', 'presentation', 'award', 'service']
+
+function isBrickType(value: unknown): value is BrickType {
+  return typeof value === 'string' && BRICK_TYPES.includes(value as BrickType)
+}
 
 function slugify(text: string): string {
   return text
@@ -17,6 +24,7 @@ export default defineEventHandler(async (event) => {
     name: string
     slug?: string
     brickIds?: string[]
+    placements?: Array<{ brickId: string, sectionType: BrickType, order: number }>
     isPublished?: boolean
   }>(event)
 
@@ -45,13 +53,28 @@ export default defineEventHandler(async (event) => {
 
   await db.insert(cvs).values(newCV)
 
-  // Insert junction rows
-  if (body.brickIds && body.brickIds.length > 0) {
+  const normalizedPlacements = (body.placements || [])
+    .filter(p => typeof p?.brickId === 'string' && p.brickId && isBrickType(p.sectionType))
+    .sort((a, b) => a.order - b.order)
+    .filter((placement, index, arr) => arr.findIndex(item => item.brickId === placement.brickId) === index)
+
+  // Insert junction rows (placements preferred, brickIds as backward-compatible fallback)
+  if (normalizedPlacements.length > 0) {
+    const junctionRows: NewCVBrick[] = normalizedPlacements.map((placement, index) => ({
+      id: crypto.randomUUID(),
+      cvId: newCV.id,
+      brickId: placement.brickId,
+      sectionOrder: index,
+      cvSectionType: placement.sectionType
+    }))
+    await db.insert(cvBricks).values(junctionRows)
+  } else if (body.brickIds && body.brickIds.length > 0) {
     const junctionRows: NewCVBrick[] = body.brickIds.map((brickId, index) => ({
       id: crypto.randomUUID(),
       cvId: newCV.id,
       brickId,
-      sectionOrder: index
+      sectionOrder: index,
+      cvSectionType: null
     }))
     await db.insert(cvBricks).values(junctionRows)
   }

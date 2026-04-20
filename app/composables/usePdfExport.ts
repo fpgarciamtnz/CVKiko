@@ -1,12 +1,11 @@
 import type { jsPDF } from 'jspdf'
-import type { Brick } from './useBricks'
 import type { Settings } from './useSettings'
+import type { PlacedSection } from './useCVBuilder'
 import {
   BRICK_TYPE_CONFIG,
   PUBLICATION_STATUSES,
   formatBrickDateRange,
   formatDateRange,
-  type BrickType,
   type EducationData,
   type ExperienceData,
   type ProjectData,
@@ -91,11 +90,11 @@ const PDF_THEME = {
 }
 
 export function usePdfExport() {
-  const { sectionTypeOrder, contentOverrides } = useCVBuilder()
+  const { contentOverrides } = useCVBuilder()
 
   async function generateCV(
     settings: Settings | null,
-    bricksByType: Record<BrickType, Brick[]>
+    placementSections: PlacedSection[]
   ): Promise<jsPDF> {
     const { jsPDF } = await import('jspdf')
     const doc = new jsPDF({
@@ -249,13 +248,9 @@ export function usePdfExport() {
       y += PDF_THEME.spacing.summaryBottom
     }
 
-    const sectionOrder: BrickType[] = sectionTypeOrder.value.length > 0
-      ? sectionTypeOrder.value
-      : ['experience', 'education', 'project', 'skill', 'publication', 'custom']
-
-    for (const type of sectionOrder) {
-      const typeBricks = bricksByType[type]
-      if (!typeBricks?.length) continue
+    for (const section of placementSections) {
+      const sectionBricks = section.bricks
+      if (!sectionBricks.length) continue
 
       checkPageBreak(16)
 
@@ -263,30 +258,31 @@ export function usePdfExport() {
       doc.setFontSize(PDF_THEME.fontSize.section)
       doc.setFont('helvetica', 'bold')
       doc.setTextColor(...PDF_THEME.colors.heading)
-      doc.text(BRICK_TYPE_CONFIG[type].pluralLabel.toUpperCase(), marginX, y)
+      doc.text(BRICK_TYPE_CONFIG[section.type].pluralLabel.toUpperCase(), marginX, y)
       y += PDF_THEME.spacing.sectionHeaderBottom
       drawSectionDivider()
       y += PDF_THEME.spacing.sectionBodyTop
       doc.setTextColor(...PDF_THEME.colors.text)
 
-      if (type === 'skill') {
+      const skillBricks = sectionBricks.filter(brick => brick.type === 'skill')
+      if (skillBricks.length > 0) {
         doc.setFontSize(PDF_THEME.fontSize.body)
         doc.setFont('helvetica', 'normal')
-        const skills = typeBricks.map(b => b.title).filter(Boolean).join('  |  ')
+        const skills = skillBricks.map(b => b.title).filter(Boolean).join('  |  ')
         const skillLines = doc.splitTextToSize(skills, contentWidth)
         doc.text(skillLines, marginX, y)
         y += skillLines.length * PDF_THEME.lineHeight.normal + PDF_THEME.spacing.entryBottom
-        continue
       }
 
-      for (const brick of typeBricks) {
+      for (const brick of sectionBricks.filter(item => item.type !== 'skill')) {
         checkPageBreak(22)
 
         const fm = brick.frontmatter
         const brickContent = contentOverrides.value[brick.id] || brick.content
         const seen = new Set<string>()
+        const brickType = brick.type
 
-        if (type === 'education') {
+        if (brickType === 'education') {
           const edu = (brick.structuredData || {}) as Partial<EducationData>
           const degree = edu.degree || brick.title
           const graduation = edu.graduationDate
@@ -306,7 +302,7 @@ export function usePdfExport() {
           continue
         }
 
-        if (type === 'publication') {
+        if (brickType === 'publication') {
           const pub = (brick.structuredData || {}) as Partial<PublicationData>
           const title = normalizePlainText(pub.title || brick.title)
           writeTitleRow(`Article: ${title}`, undefined, seen)
@@ -334,7 +330,7 @@ export function usePdfExport() {
           continue
         }
 
-        if (type === 'project') {
+        if (brickType === 'project') {
           const proj = (brick.structuredData || {}) as Partial<ProjectData>
           writeTitleRow(proj.name || brick.title, undefined, seen)
 
@@ -378,7 +374,7 @@ export function usePdfExport() {
           continue
         }
 
-        if (type === 'experience') {
+        if (brickType === 'experience') {
           const exp = (brick.structuredData || {}) as Partial<ExperienceData>
           const dateStr = formatBrickDateRange(brick)
 
@@ -430,12 +426,12 @@ export function usePdfExport() {
           continue
         }
 
-        if (type === 'custom') {
+        if (brickType === 'custom') {
           const custom = (brick.structuredData || {}) as Partial<CustomData>
           const dateStr = formatDateRange(
             custom.startDate || String(fm.startDate || ''),
             custom.isCurrent ? '' : (custom.endDate || String(fm.endDate || '')),
-            type
+            brickType
           )
           writeTitleRow(brick.title, dateStr, seen)
           writeWrapped(custom.content || brickContent, {
@@ -450,7 +446,7 @@ export function usePdfExport() {
 
         // Fallback for remaining brick types
         const dateStr = fm.startDate
-          ? formatDateRange(String(fm.startDate), String(fm.endDate || ''), type)
+          ? formatDateRange(String(fm.startDate), String(fm.endDate || ''), brickType)
           : ''
 
         writeTitleRow(brick.title, dateStr, seen)
@@ -487,19 +483,19 @@ export function usePdfExport() {
 
   async function exportToPdf(
     settings: Settings | null,
-    bricksByType: Record<BrickType, Brick[]>,
+    placementSections: PlacedSection[],
     filename?: string
   ) {
-    const doc = await generateCV(settings, bricksByType)
+    const doc = await generateCV(settings, placementSections)
     const name = filename || `cv-${new Date().toISOString().split('T')[0]}.pdf`
     doc.save(name)
   }
 
   async function getPreviewUrl(
     settings: Settings | null,
-    bricksByType: Record<BrickType, Brick[]>
+    placementSections: PlacedSection[]
   ): Promise<string> {
-    const doc = await generateCV(settings, bricksByType)
+    const doc = await generateCV(settings, placementSections)
     return doc.output('datauristring')
   }
 

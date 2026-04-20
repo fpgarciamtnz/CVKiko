@@ -1,11 +1,11 @@
 import type { Brick } from '~/composables/useBricks'
 import type { Settings } from '~/composables/useSettings'
 import type { BrickType } from '~/utils/brick-types'
-import { BRICK_TYPE_CONFIG } from '~/utils/brick-types'
+import { BRICK_TYPE_CONFIG, BRICK_TYPES } from '~/utils/brick-types'
 import type { District, MapZone, RoadSegment, TownMap } from '~/utils/map-data'
 import { BUILDING_SIZES, ZONE_COLORS } from '~/utils/map-data'
 
-const SECTION_ORDER: BrickType[] = ['experience', 'education', 'project', 'skill', 'publication', 'custom']
+const DEFAULT_SECTION_ORDER: BrickType[] = [...BRICK_TYPES]
 
 const ROAD_WIDTH = 60
 const MARGIN = 400
@@ -15,7 +15,7 @@ const DISTRICT_GAP_Y = 400 // vertical gap between district rows
 const BUILDING_GAP = 30 // gap between buildings within a district
 const SKILL_COLS = 5 // grid columns for skills
 
-export function useGameMap(bricks: Ref<Brick[]>, settings: Ref<Settings | null>) {
+export function useGameMap(bricks: Ref<Brick[]>, settings: Ref<Settings | null>, sectionOrder?: Ref<BrickType[]>) {
   const townMap = computed<TownMap>(() => {
     const zones: MapZone[] = []
     const roads: RoadSegment[] = []
@@ -43,8 +43,20 @@ export function useGameMap(bricks: Ref<Brick[]>, settings: Ref<Settings | null>)
     let currentY = heroY + heroSize.height / 2 + DISTRICT_GAP_Y
     let sideIndex = 0 // alternates left (0) / right (1)
 
-    for (const type of SECTION_ORDER) {
-      const typeBricks = bricks.value.filter(b => b.type === type && b.isActive)
+    const sectionTypesFromBricks = Array.from(new Set(
+      bricks.value
+        .filter(brick => brick.isActive)
+        .map(brick => brick.cvSectionType || brick.type)
+    ))
+    const requestedOrder = sectionOrder?.value || []
+    const normalizedSectionOrder = [
+      ...requestedOrder.filter(type => BRICK_TYPES.includes(type)),
+      ...sectionTypesFromBricks.filter(type => !requestedOrder.includes(type)),
+      ...DEFAULT_SECTION_ORDER.filter(type => !requestedOrder.includes(type) && !sectionTypesFromBricks.includes(type))
+    ]
+
+    for (const type of normalizedSectionOrder) {
+      const typeBricks = bricks.value.filter(b => (b.cvSectionType || b.type) === type && b.isActive)
       if (typeBricks.length === 0) continue
 
       const config = BRICK_TYPE_CONFIG[type]

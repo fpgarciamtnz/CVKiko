@@ -70,6 +70,7 @@ export const cvBricks = sqliteTable('cv_bricks', {
   cvId: text('cv_id').notNull().references(() => cvs.id, { onDelete: 'cascade' }),
   brickId: text('brick_id').notNull().references(() => bricks.id, { onDelete: 'cascade' }),
   sectionOrder: integer('section_order').notNull(),
+  cvSectionType: text('cv_section_type', { enum: ['experience', 'education', 'project', 'skill', 'publication', 'custom', 'teaching', 'grant', 'presentation', 'award', 'service'] }),
   // Custom overrides for this CV
   customContent: text('custom_content'),
   isHighlighted: integer('is_highlighted', { mode: 'boolean' }).default(false)

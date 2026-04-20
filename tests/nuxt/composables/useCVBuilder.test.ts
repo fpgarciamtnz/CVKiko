@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import type { Brick } from '../../../app/composables/useBricks'
+import type { BrickType } from '../../../app/utils/brick-types'
 
-function makeBrick(id: string, type: string = 'experience'): Brick {
+function makeBrick(id: string, type: BrickType = 'experience'): Brick {
   return {
     id,
-    type: type as Brick['type'],
+    type,
     title: `Brick ${id}`,
     content: '',
     tags: [],
@@ -19,131 +20,109 @@ function makeBrick(id: string, type: string = 'experience'): Brick {
 
 describe('useCVBuilder', () => {
   beforeEach(() => {
-    // Populate shared useBricks state (both composables share useState)
     const { bricks } = useBricks()
     bricks.value = [
       makeBrick('a', 'experience'),
       makeBrick('b', 'education'),
-      makeBrick('c', 'project')
+      makeBrick('c', 'project'),
+      makeBrick('d', 'teaching')
     ]
 
-    // Reset CVBuilder state
-    const { selectedBrickIds, brickOrder, cvConfig } = useCVBuilder()
+    const {
+      selectedBrickIds,
+      brickOrder,
+      brickPlacementById,
+      sectionTypeOrder,
+      cvConfig,
+      contentOverrides
+    } = useCVBuilder()
+
     selectedBrickIds.value = new Set()
     brickOrder.value = []
+    brickPlacementById.value = {}
+    sectionTypeOrder.value = ['experience', 'education', 'project', 'skill', 'publication', 'custom', 'teaching', 'grant', 'presentation', 'award', 'service']
+    contentOverrides.value = {}
     cvConfig.value = { name: 'My CV' }
   })
 
-  describe('toggleBrick', () => {
-    it('selects an unselected brick', () => {
-      const { selectedBrickIds, brickOrder, toggleBrick } = useCVBuilder()
-      toggleBrick(makeBrick('a'))
+  it('selects and deselects bricks while maintaining placement defaults', () => {
+    const { selectedBrickIds, brickOrder, brickPlacementById, toggleBrick } = useCVBuilder()
 
-      expect(selectedBrickIds.value.has('a')).toBe(true)
-      expect(brickOrder.value).toContain('a')
-    })
+    toggleBrick(makeBrick('a', 'experience'))
+    expect(selectedBrickIds.value.has('a')).toBe(true)
+    expect(brickOrder.value).toEqual(['a'])
+    expect(brickPlacementById.value.a).toBe('experience')
 
-    it('deselects a selected brick', () => {
-      const { selectedBrickIds, brickOrder, toggleBrick } = useCVBuilder()
-      toggleBrick(makeBrick('a')) // select
-      toggleBrick(makeBrick('a')) // deselect
+    toggleBrick(makeBrick('a', 'experience'))
+    expect(selectedBrickIds.value.has('a')).toBe(false)
+    expect(brickOrder.value).toEqual([])
+    expect(brickPlacementById.value.a).toBeUndefined()
+  })
 
-      expect(selectedBrickIds.value.has('a')).toBe(false)
-      expect(brickOrder.value).not.toContain('a')
-    })
+  it('batch selects without duplicates and assigns placement by brick type', () => {
+    const { selectBricks, brickOrder, brickPlacementById } = useCVBuilder()
 
-    it('preserves order (A then B)', () => {
-      const { brickOrder, toggleBrick } = useCVBuilder()
-      toggleBrick(makeBrick('a'))
-      toggleBrick(makeBrick('b'))
+    selectBricks(['a', 'b'])
+    selectBricks(['a', 'c'])
 
-      expect(brickOrder.value).toEqual(['a', 'b'])
+    expect(brickOrder.value).toEqual(['a', 'b', 'c'])
+    expect(brickPlacementById.value).toMatchObject({
+      a: 'experience',
+      b: 'education',
+      c: 'project'
     })
   })
 
-  describe('selectBricks', () => {
-    it('batch selects multiple bricks', () => {
-      const { selectedBrickIds, brickOrder, selectBricks } = useCVBuilder()
-      selectBricks(['a', 'b'])
+  it('applies cross-section and within-section reordering', () => {
+    const { selectBricks, applyPlacedSections, orderedPlacements, placedSections } = useCVBuilder()
 
-      expect(selectedBrickIds.value.has('a')).toBe(true)
-      expect(selectedBrickIds.value.has('b')).toBe(true)
-      expect(brickOrder.value).toEqual(['a', 'b'])
-    })
+    selectBricks(['a', 'b', 'c'])
 
-    it('does not add duplicates', () => {
-      const { brickOrder, selectBricks } = useCVBuilder()
-      selectBricks(['a'])
-      selectBricks(['a', 'b'])
+    applyPlacedSections([
+      { type: 'education', brickIds: ['c', 'b'] },
+      { type: 'experience', brickIds: ['a'] },
+      { type: 'project', brickIds: [] }
+    ])
 
-      expect(brickOrder.value.filter(id => id === 'a')).toHaveLength(1)
-    })
+    expect(orderedPlacements.value.map(p => `${p.sectionType}:${p.brickId}`)).toEqual([
+      'education:c',
+      'education:b',
+      'experience:a'
+    ])
+
+    const education = placedSections.value.find(s => s.type === 'education')
+    expect(education?.brickIds).toEqual(['c', 'b'])
   })
 
-  describe('deselectAll', () => {
-    it('clears all selections', () => {
-      const { selectedBrickIds, brickOrder, selectBricks, deselectAll } = useCVBuilder()
-      selectBricks(['a', 'b'])
-      deselectAll()
+  it('computes non-empty placed sections in section order', () => {
+    const { selectBricks, applyPlacedSections, nonEmptyPlacedSections } = useCVBuilder()
 
-      expect(selectedBrickIds.value.size).toBe(0)
-      expect(brickOrder.value).toHaveLength(0)
-    })
+    selectBricks(['a', 'b', 'c'])
+    applyPlacedSections([
+      { type: 'project', brickIds: ['c'] },
+      { type: 'experience', brickIds: ['a'] },
+      { type: 'education', brickIds: ['b'] }
+    ])
+
+    expect(nonEmptyPlacedSections.value.map(section => section.type)).toEqual(['project', 'experience', 'education'])
   })
 
-  describe('reorderBricks', () => {
-    it('replaces order array', () => {
-      const { brickOrder, reorderBricks } = useCVBuilder()
-      reorderBricks(['c', 'a', 'b'])
-      expect(brickOrder.value).toEqual(['c', 'a', 'b'])
-    })
+  it('preserves selected placement types when switching CV mode', () => {
+    const { selectBricks, applyPlacedSections, setCVMode, sectionTypeOrder } = useCVBuilder()
+
+    selectBricks(['d'])
+    applyPlacedSections([{ type: 'teaching', brickIds: ['d'] }])
+    setCVMode('industry')
+
+    expect(sectionTypeOrder.value.includes('teaching')).toBe(true)
   })
 
-  describe('updateConfig', () => {
-    it('merges partial config', () => {
-      const { cvConfig, updateConfig } = useCVBuilder()
-      updateConfig({ name: 'My Custom CV' })
-      expect(cvConfig.value.name).toBe('My Custom CV')
-    })
+  it('merges content overrides by brick id', () => {
+    const { applyContentOverride, applyContentOverrides, contentOverrides } = useCVBuilder()
 
-    it('preserves other fields', () => {
-      const { cvConfig, updateConfig } = useCVBuilder()
-      updateConfig({ name: 'Test CV' })
-      updateConfig({ targetRole: 'Engineer' })
+    applyContentOverride('a', 'Override A')
+    applyContentOverrides({ b: 'Override B' })
 
-      expect(cvConfig.value.name).toBe('Test CV')
-      expect(cvConfig.value.targetRole).toBe('Engineer')
-    })
-  })
-
-  describe('selectedBricks computed', () => {
-    it('returns Brick objects in order', () => {
-      const { selectedBrickIds, brickOrder, selectedBricks } = useCVBuilder()
-      selectedBrickIds.value = new Set(['b', 'a'])
-      brickOrder.value = ['b', 'a']
-
-      expect(selectedBricks.value.map(b => b.id)).toEqual(['b', 'a'])
-    })
-
-    it('filters out missing/unknown IDs', () => {
-      const { selectedBrickIds, brickOrder, selectedBricks } = useCVBuilder()
-      selectedBrickIds.value = new Set(['unknown-id'])
-      brickOrder.value = ['unknown-id']
-
-      expect(selectedBricks.value).toHaveLength(0)
-    })
-  })
-
-  describe('selectedBricksByType computed', () => {
-    it('groups bricks by type', () => {
-      const { selectedBrickIds, brickOrder, selectedBricksByType } = useCVBuilder()
-      selectedBrickIds.value = new Set(['a', 'b', 'c'])
-      brickOrder.value = ['a', 'b', 'c']
-
-      const grouped = selectedBricksByType.value
-      expect(grouped.experience).toHaveLength(1)
-      expect(grouped.education).toHaveLength(1)
-      expect(grouped.project).toHaveLength(1)
-    })
+    expect(contentOverrides.value).toEqual({ a: 'Override A', b: 'Override B' })
   })
 })

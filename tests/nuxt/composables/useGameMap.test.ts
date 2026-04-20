@@ -149,6 +149,17 @@ describe('useGameMap', () => {
       const buildingZones = townMap.value.zones.filter(z => z.kind === 'building')
       expect(buildingZones).toHaveLength(1)
     })
+
+    it('uses cvSectionType placement when provided', () => {
+      const placedBrick = makeBrick('1', 'project')
+      placedBrick.cvSectionType = 'experience'
+      const bricks = ref<Brick[]>([placedBrick])
+      const settings = ref<Settings | null>(null)
+      const sectionOrder = ref<Brick['type'][]>(['experience', 'project'])
+      const { townMap } = useGameMap(bricks, settings, sectionOrder)
+
+      expect(townMap.value.districts[0]?.type).toBe('experience')
+    })
   })
 
   describe('roads', () => {

@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { Brick } from '~/composables/useBricks'
 import type { Settings } from '~/composables/useSettings'
+import type { BrickType } from '~/utils/brick-types'
 
 defineProps<{
   bricks: Brick[]
   settings: Settings | null
+  sectionOrder?: BrickType[]
 }>()
 
 const model = defineModel<boolean>()
@@ -23,6 +25,7 @@ const model = defineModel<boolean>()
           <InteractiveInteractiveScene
             :bricks="bricks"
             :settings="settings"
+            :section-order="sectionOrder"
           />
           <template #fallback>
             <div class="flex items-center justify-center h-full text-slate-500">

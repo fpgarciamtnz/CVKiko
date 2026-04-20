@@ -53,6 +53,11 @@ export const ZONE_COLORS: Record<string, number> = {
   project: 0x27ae60,
   skill: 0xf39c12,
   publication: 0xe74c3c,
+  teaching: 0x16a085,
+  grant: 0x1f9d55,
+  presentation: 0x9b59b6,
+  award: 0xf1c40f,
+  service: 0x3498db,
   custom: 0x95a5a6,
   contact: 0x1abc9c
 }

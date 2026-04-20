@@ -1,5 +1,6 @@
-import { useDb, cvs, cvBricks } from '../../database'
-import { eq } from 'drizzle-orm'
+import { useDb, cvs, cvBricks, bricks } from '../../database'
+import { eq, inArray } from 'drizzle-orm'
+import type { BrickType } from '~/utils/brick-types'
 
 export default defineEventHandler(async (event) => {
   const db = useDb(event)
@@ -22,9 +23,25 @@ export default defineEventHandler(async (event) => {
   }
 
   const brickLinks = await db.select().from(cvBricks).where(eq(cvBricks.cvId, id)).orderBy(cvBricks.sectionOrder)
+  const brickIds = brickLinks.map(link => link.brickId)
+
+  const brickTypeMap = new Map<string, BrickType>()
+  if (brickIds.length > 0) {
+    const linkedBricks = await db.select({ id: bricks.id, type: bricks.type }).from(bricks).where(inArray(bricks.id, brickIds))
+    for (const brick of linkedBricks) {
+      brickTypeMap.set(brick.id, brick.type as BrickType)
+    }
+  }
+
+  const placements = brickLinks.map((link) => ({
+    brickId: link.brickId,
+    sectionType: (link.cvSectionType as BrickType | null) || brickTypeMap.get(link.brickId) || 'custom',
+    order: link.sectionOrder
+  }))
 
   return {
     ...cv,
-    brickIds: brickLinks.map(link => link.brickId)
+    brickIds,
+    placements
   }
 })

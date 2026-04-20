@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { CVPlacement } from '~/composables/useCVBuilder'
+
 const props = defineProps<{
-  brickIds: string[]
+  placements: CVPlacement[]
 }>()
 
 const model = defineModel<boolean>()
@@ -36,7 +38,8 @@ async function handleSave() {
     const cv = await saveCV({
       name: name.value.trim(),
       slug: slug.value,
-      brickIds: props.brickIds
+      placements: props.placements,
+      brickIds: props.placements.map(p => p.brickId)
     })
     if (cv) {
       const origin = window.location.origin
@@ -101,7 +104,7 @@ function handleClose() {
             </template>
           </UInput>
           <p class="text-xs text-gray-500 mt-1">
-            {{ brickIds.length }} bricks will be included
+            {{ placements.length }} bricks will be included
           </p>
         </div>
         <p

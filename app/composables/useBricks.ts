@@ -3,6 +3,7 @@ import type { BrickType, BrickFrontmatter } from '~/utils/brick-types'
 export interface Brick {
   id: string
   type: BrickType
+  cvSectionType?: BrickType
   title: string
   content: string
   tags: string[]

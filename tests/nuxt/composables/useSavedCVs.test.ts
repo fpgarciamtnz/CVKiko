@@ -68,6 +68,31 @@ describe('useSavedCVs', () => {
       await expect(saveCV({ name: 'Bad', brickIds: [] })).rejects.toBeTruthy()
       expect(error.value).toBe('Save failed')
     })
+
+    it('supports placement payloads', async () => {
+      const created = mockCV('placements')
+      fetchMock.mockResolvedValue(created)
+
+      const { saveCV } = useSavedCVs()
+      await saveCV({
+        name: 'Placed CV',
+        placements: [
+          { brickId: 'a', sectionType: 'experience', order: 0 },
+          { brickId: 'b', sectionType: 'education', order: 1 }
+        ]
+      })
+
+      expect(fetchMock).toHaveBeenCalledWith('/api/cvs', {
+        method: 'POST',
+        body: {
+          name: 'Placed CV',
+          placements: [
+            { brickId: 'a', sectionType: 'experience', order: 0 },
+            { brickId: 'b', sectionType: 'education', order: 1 }
+          ]
+        }
+      })
+    })
   })
 
   describe('updateCV', () => {

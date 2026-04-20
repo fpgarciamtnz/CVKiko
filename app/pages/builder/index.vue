@@ -1,23 +1,31 @@
 <script setup lang="ts">
 import VueDraggable from 'vuedraggable'
+import type { Brick } from '~/composables/useBricks'
 import { BRICK_TYPE_CONFIG, BRICK_TYPES, type BrickType } from '~/utils/brick-types'
 import { CV_MODE_CONFIG, CV_MODES, type CVMode } from '~/utils/cv-modes'
+
+interface ReorderSectionModel {
+  type: BrickType
+  label: string
+  bricks: Brick[]
+}
 
 const { bricks, bricksByType, fetchBricks } = useBricks()
 const { settings, fetchSettings } = useSettings()
 const {
   selectedBrickIds,
   selectedBricks,
-  selectedBricksByType,
-  flatOrderedBricks,
   sectionTypeOrder,
   contentOverrides,
   layoutMode,
   cvMode,
+  placedSections,
+  nonEmptyPlacedSections,
+  orderedPlacements,
   toggleBrick,
   selectBricks,
   deselectAll,
-  reorderSections,
+  applyPlacedSections,
   setCVMode,
   setLayoutMode
 } = useCVBuilder()
@@ -36,6 +44,7 @@ const showPreview = ref(false)
 const showShare = ref(false)
 const showOrder = ref(false)
 const chatTab = ref<'suggest' | 'optimize'>('suggest')
+const reorderSectionsModel = ref<ReorderSectionModel[]>([])
 
 const tabs = computed(() => [
   { label: 'Todos', value: 'all' as const, icon: undefined as string | undefined, count: bricks.value.length },
@@ -52,52 +61,65 @@ const filteredBricks = computed(() => {
   return bricksByType.value[activeTab.value] || []
 })
 
-// Section reordering data
-const orderedSections = computed(() => {
-  return sectionTypeOrder.value
-    .filter(type => selectedBricksByType.value[type]?.length > 0)
-    .map(type => ({
-      type,
-      label: BRICK_TYPE_CONFIG[type].pluralLabel,
-      count: selectedBricksByType.value[type]?.length || 0
-    }))
-})
+function buildReorderSectionsModel(): ReorderSectionModel[] {
+  return placedSections.value.map(section => ({
+    type: section.type,
+    label: BRICK_TYPE_CONFIG[section.type].pluralLabel,
+    bricks: [...section.bricks]
+  }))
+}
 
-function handleSectionDragEnd() {
-  const newOrder = orderedSections.value.map(s => s.type)
-  // Merge back any section types that have no selected bricks
-  const full = [...newOrder, ...sectionTypeOrder.value.filter(t => !newOrder.includes(t))]
-  reorderSections(full)
+function syncReorderSectionsModel() {
+  reorderSectionsModel.value = buildReorderSectionsModel()
+}
+
+watch(
+  [placedSections, sectionTypeOrder],
+  () => {
+    syncReorderSectionsModel()
+  },
+  { immediate: true, deep: true }
+)
+
+function commitReorderState() {
+  applyPlacedSections(
+    reorderSectionsModel.value.map(section => ({
+      type: section.type,
+      brickIds: section.bricks.map(brick => brick.id)
+    }))
+  )
+}
+
+function handleReorderDragEnd() {
+  commitReorderState()
 }
 
 function moveSectionUp(idx: number) {
   if (idx <= 0) return
-  const current = [...sectionTypeOrder.value]
-  const visibleTypes = orderedSections.value.map(s => s.type)
-  const a = visibleTypes[idx]
-  const b = visibleTypes[idx - 1]
-  if (!a || !b) return
-  const realIdx = current.indexOf(a)
-  const prevRealIdx = current.indexOf(b)
-  const tmp = current[realIdx]!
-  current[realIdx] = current[prevRealIdx]!
-  current[prevRealIdx] = tmp
-  reorderSections(current)
+
+  const model = [...reorderSectionsModel.value]
+  const current = model[idx]
+  const previous = model[idx - 1]
+  if (!current || !previous) return
+
+  model[idx - 1] = current
+  model[idx] = previous
+  reorderSectionsModel.value = model
+  commitReorderState()
 }
 
 function moveSectionDown(idx: number) {
-  if (idx >= orderedSections.value.length - 1) return
-  const current = [...sectionTypeOrder.value]
-  const visibleTypes = orderedSections.value.map(s => s.type)
-  const a = visibleTypes[idx]
-  const b = visibleTypes[idx + 1]
-  if (!a || !b) return
-  const realIdx = current.indexOf(a)
-  const nextRealIdx = current.indexOf(b)
-  const tmp = current[realIdx]!
-  current[realIdx] = current[nextRealIdx]!
-  current[nextRealIdx] = tmp
-  reorderSections(current)
+  if (idx >= reorderSectionsModel.value.length - 1) return
+
+  const model = [...reorderSectionsModel.value]
+  const current = model[idx]
+  const next = model[idx + 1]
+  if (!current || !next) return
+
+  model[idx] = next
+  model[idx + 1] = current
+  reorderSectionsModel.value = model
+  commitReorderState()
 }
 
 function selectAllFiltered() {
@@ -114,17 +136,25 @@ function handlePrint() {
 }
 
 async function handleDownloadPdf() {
-  await exportToPdf(settings.value, selectedBricksByType.value)
+  await exportToPdf(settings.value, nonEmptyPlacedSections.value)
 }
 
 async function handleDownloadMarkdown() {
-  await exportToMarkdown(settings.value, selectedBricksByType.value)
+  await exportToMarkdown(settings.value, nonEmptyPlacedSections.value)
 }
 
 const modeOptions = CV_MODES.map(m => ({
   label: CV_MODE_CONFIG[m].label,
   value: m
 }))
+
+const selectedBricksForInteractive = computed(() => {
+  const placementMap = new Map(orderedPlacements.value.map(placement => [placement.brickId, placement.sectionType]))
+  return selectedBricks.value.map(brick => ({
+    ...brick,
+    cvSectionType: placementMap.get(brick.id) || brick.type
+  }))
+})
 </script>
 
 <template>
@@ -266,7 +296,7 @@ const modeOptions = CV_MODES.map(m => ({
               name="i-lucide-arrow-up-down"
               class="w-4 h-4"
             />
-            Reordenar Categorias
+            Reordenar Categorias y Bloques
           </button>
 
           <div
@@ -274,14 +304,14 @@ const modeOptions = CV_MODES.map(m => ({
             class="mt-3 space-y-3"
           >
             <VueDraggable
-              :model-value="orderedSections"
+              v-model="reorderSectionsModel"
               item-key="type"
               handle=".section-handle"
-              @end="handleSectionDragEnd"
+              @end="handleReorderDragEnd"
             >
               <template #item="{ element: section, index: sIdx }">
                 <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 mb-2">
-                  <div class="flex items-center gap-1">
+                  <div class="flex items-center gap-1 mb-2">
                     <UIcon
                       name="i-lucide-grip-vertical"
                       class="w-4 h-4 text-gray-400 cursor-grab section-handle"
@@ -290,7 +320,7 @@ const modeOptions = CV_MODES.map(m => ({
                       {{ section.label }}
                     </span>
                     <UBadge
-                      :label="String(section.count)"
+                      :label="String(section.bricks.length)"
                       variant="subtle"
                       size="xs"
                     />
@@ -308,10 +338,40 @@ const modeOptions = CV_MODES.map(m => ({
                       variant="ghost"
                       color="neutral"
                       size="xs"
-                      :disabled="Number(sIdx) === orderedSections.length - 1"
+                      :disabled="Number(sIdx) === reorderSectionsModel.length - 1"
                       class="!p-0.5"
                       @click="moveSectionDown(Number(sIdx))"
                     />
+                  </div>
+
+                  <VueDraggable
+                    v-model="section.bricks"
+                    item-key="id"
+                    :group="{ name: 'builder-bricks' }"
+                    handle=".brick-handle"
+                    @end="handleReorderDragEnd"
+                  >
+                    <template #item="{ element: brick }">
+                      <div class="flex items-center gap-2 px-2 py-1.5 rounded border bg-white dark:bg-gray-900 mb-1">
+                        <UIcon
+                          name="i-lucide-grip-vertical"
+                          class="w-3.5 h-3.5 text-gray-400 cursor-grab brick-handle"
+                        />
+                        <UIcon
+                          :name="BRICK_TYPE_CONFIG[brick.type].icon"
+                          class="w-3.5 h-3.5 text-gray-500"
+                        />
+                        <span class="text-xs flex-1 truncate">{{ brick.title }}</span>
+                        <span class="text-[10px] uppercase text-gray-400">{{ BRICK_TYPE_CONFIG[brick.type].label }}</span>
+                      </div>
+                    </template>
+                  </VueDraggable>
+
+                  <div
+                    v-if="section.bricks.length === 0"
+                    class="text-[11px] text-gray-400 border border-dashed rounded px-2 py-2"
+                  >
+                    Arrastra bloques aqui
                   </div>
                 </div>
               </template>
@@ -395,12 +455,11 @@ const modeOptions = CV_MODES.map(m => ({
         <div class="max-w-[800px] mx-auto transform scale-90 origin-top">
           <CvCVPreview
             :settings="settings"
-            :bricks-by-type="selectedBricksByType"
-            :section-order="sectionTypeOrder"
+            :placement-sections="nonEmptyPlacedSections"
+            :ordered-placements="orderedPlacements"
             :content-overrides="contentOverrides"
             :layout-mode="layoutMode"
             :cv-mode="cvMode"
-            :flat-ordered-bricks="flatOrderedBricks"
           />
         </div>
       </div>
@@ -450,14 +509,15 @@ const modeOptions = CV_MODES.map(m => ({
     <!-- Preview Modal -->
     <BuilderPreviewModal
       v-model="showPreview"
-      :bricks="selectedBricks"
+      :bricks="selectedBricksForInteractive"
       :settings="settings"
+      :section-order="sectionTypeOrder"
     />
 
     <!-- Share Modal -->
     <BuilderShareModal
       v-model="showShare"
-      :brick-ids="[...selectedBrickIds]"
+      :placements="orderedPlacements"
     />
   </div>
 </template>

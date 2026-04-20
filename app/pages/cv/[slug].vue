@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Brick } from '~/composables/useBricks'
+import type { BrickType } from '~/utils/brick-types'
 
 definePageMeta({
   layout: 'blank'
@@ -20,6 +21,7 @@ if (error.value) {
 const cvName = computed(() => data.value?.cv?.name || 'CV')
 const cvBricks = computed(() => (data.value?.bricks || []) as Brick[])
 const cvSettings = computed(() => data.value?.settings || null)
+const cvSectionOrder = computed(() => (data.value?.sectionOrder || []) as BrickType[])
 
 useSeoMeta({
   title: `${cvName.value} - CV`,
@@ -35,6 +37,7 @@ useSeoMeta({
       <InteractiveScene
         :bricks="cvBricks"
         :settings="cvSettings"
+        :section-order="cvSectionOrder"
       />
       <template #fallback>
         <div

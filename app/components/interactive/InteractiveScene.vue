@@ -2,11 +2,13 @@
 import type { Brick } from '~/composables/useBricks'
 import type { Settings } from '~/composables/useSettings'
 import type { MapZone } from '~/utils/map-data'
+import type { BrickType } from '~/utils/brick-types'
 import { createCarGraphics, createTree, createStreetLight, createDistrictSign, createSmallBuilding } from '~/utils/pixi-sprites'
 
 const props = defineProps<{
   bricks: Brick[]
   settings: Settings | null
+  sectionOrder?: BrickType[]
 }>()
 
 // --- Refs ---
@@ -20,7 +22,8 @@ const { joystickMode } = useControlMode()
 // --- Map data ---
 const bricksRef = computed(() => props.bricks)
 const settingsRef = computed(() => props.settings)
-const { townMap } = useGameMap(bricksRef, settingsRef)
+const sectionOrderRef = computed(() => props.sectionOrder || [])
+const { townMap } = useGameMap(bricksRef, settingsRef, sectionOrderRef)
 
 // --- Keyboard ---
 const { keys } = useKeyboard2D()

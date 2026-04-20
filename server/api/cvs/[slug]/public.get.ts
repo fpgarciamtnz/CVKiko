@@ -1,5 +1,6 @@
 import { useDb, cvs, cvBricks, bricks, settings } from '../../../database'
 import { eq, inArray } from 'drizzle-orm'
+import type { BrickType } from '~/utils/brick-types'
 
 export default defineEventHandler(async (event) => {
   const db = useDb(event)
@@ -40,6 +41,23 @@ export default defineEventHandler(async (event) => {
     cvBricksList.sort((a, b) => brickIds.indexOf(a.id) - brickIds.indexOf(b.id))
   }
 
+  const brickTypeMap = new Map(cvBricksList.map(brick => [brick.id, brick.type as BrickType]))
+  const placements = brickLinks.map((link) => ({
+    brickId: link.brickId,
+    sectionType: (link.cvSectionType as BrickType | null) || brickTypeMap.get(link.brickId) || 'custom',
+    order: link.sectionOrder
+  }))
+
+  const placementMap = new Map(placements.map(placement => [placement.brickId, placement.sectionType]))
+  const bricksWithPlacement = cvBricksList.map((brick) => ({
+    ...brick,
+    cvSectionType: placementMap.get(brick.id) || brick.type
+  }))
+
+  const sectionOrder = placements
+    .map(placement => placement.sectionType)
+    .filter((type, index, arr) => arr.indexOf(type) === index)
+
   // Fetch settings
   const [userSettings] = await db.select().from(settings).where(eq(settings.id, 'default'))
 
@@ -49,7 +67,9 @@ export default defineEventHandler(async (event) => {
       name: cv.name,
       slug: cv.slug
     },
-    bricks: cvBricksList,
+    bricks: bricksWithPlacement,
+    placements,
+    sectionOrder,
     settings: userSettings || null
   }
 })

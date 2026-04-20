@@ -1,47 +1,75 @@
 <script setup lang="ts">
 import type { Brick } from '~/composables/useBricks'
 import type { Settings } from '~/composables/useSettings'
-import type { LayoutMode } from '~/composables/useCVBuilder'
+import type { CVPlacement, LayoutMode, PlacedSection } from '~/composables/useCVBuilder'
 import { BRICK_TYPE_CONFIG, PUBLICATION_STATUSES, formatBrickDateRange, type BrickType, type PublicationData } from '~/utils/brick-types'
 import type { CVMode } from '~/utils/cv-modes'
 import { renderMarkdown } from '~/utils/render-markdown'
 
+interface FreeformSection {
+  type: BrickType
+  bricks: Brick[]
+}
+
 const props = withDefaults(defineProps<{
   settings: Settings | null
-  bricksByType: Record<BrickType, Brick[]>
-  sectionOrder?: BrickType[]
+  placementSections: PlacedSection[]
+  orderedPlacements: CVPlacement[]
   contentOverrides?: Record<string, string>
   layoutMode?: LayoutMode
   cvMode?: CVMode
-  flatOrderedBricks?: Brick[]
 }>(), {
-  sectionOrder: () => ['experience', 'education', 'project', 'skill', 'publication', 'custom'] as BrickType[],
   contentOverrides: () => ({}),
   layoutMode: 'grouped',
-  cvMode: 'industry',
-  flatOrderedBricks: () => []
+  cvMode: 'industry'
 })
 
 const isAcademic = computed(() => props.cvMode === 'academic')
 const isFreeform = computed(() => props.layoutMode === 'freeform')
 
-const visibleSections = computed(() => {
-  return props.sectionOrder.filter(type => props.bricksByType[type]?.length > 0)
-})
-
-// For freeform mode: compute section breaks
-const freeformSections = computed(() => {
-  if (!isFreeform.value) return []
-  const sections: { type: BrickType, bricks: Brick[] }[] = []
-  let currentType: BrickType | null = null
-  for (const brick of props.flatOrderedBricks) {
-    if (brick.type !== currentType) {
-      currentType = brick.type
-      sections.push({ type: brick.type, bricks: [brick] })
-    } else {
-      sections[sections.length - 1]!.bricks.push(brick)
+const brickById = computed(() => {
+  const map: Record<string, Brick> = {}
+  for (const section of props.placementSections) {
+    for (const brick of section.bricks) {
+      map[brick.id] = brick
     }
   }
+  return map
+})
+
+const orderedPlacementBricks = computed(() => {
+  return props.orderedPlacements
+    .map(placement => {
+      const brick = brickById.value[placement.brickId]
+      if (!brick) return null
+      return {
+        sectionType: placement.sectionType,
+        brick,
+        order: placement.order
+      }
+    })
+    .filter((entry): entry is { sectionType: BrickType, brick: Brick, order: number } => !!entry)
+})
+
+const visibleSections = computed(() => {
+  return props.placementSections.filter(section => section.bricks.length > 0)
+})
+
+const freeformSections = computed<FreeformSection[]>(() => {
+  if (!isFreeform.value) return []
+
+  const sections: FreeformSection[] = []
+  let currentType: BrickType | null = null
+
+  for (const entry of orderedPlacementBricks.value) {
+    if (entry.sectionType !== currentType) {
+      currentType = entry.sectionType
+      sections.push({ type: entry.sectionType, bricks: [entry.brick] })
+    } else {
+      sections[sections.length - 1]!.bricks.push(entry.brick)
+    }
+  }
+
   return sections
 })
 
@@ -63,6 +91,14 @@ function highlightAuthor(authorList: string, highlightName: string): string {
 
 function getDateRange(brick: Brick): string {
   return formatBrickDateRange(brick)
+}
+
+function sectionSkills(bricks: Brick[]): Brick[] {
+  return bricks.filter(brick => brick.type === 'skill')
+}
+
+function sectionNonSkills(bricks: Brick[]): Brick[] {
+  return bricks.filter(brick => brick.type !== 'skill')
 }
 </script>
 
@@ -211,97 +247,30 @@ function getDateRange(brick: Brick): string {
           {{ BRICK_TYPE_CONFIG[section.type].pluralLabel }}
         </h2>
 
-        <template v-if="section.type === 'skill'">
-          <div class="cv-skill-list">
-            <span
-              v-for="brick in section.bricks"
-              :key="brick.id"
-              class="cv-skill-pill"
-            >
-              {{ brick.title }}
-            </span>
-          </div>
-        </template>
-
-        <template v-else>
-          <div
-            v-for="brick in section.bricks"
+        <div
+          v-if="sectionSkills(section.bricks).length > 0"
+          class="cv-skill-list"
+        >
+          <span
+            v-for="brick in sectionSkills(section.bricks)"
             :key="brick.id"
-            class="cv-entry"
+            class="cv-skill-pill"
           >
-            <div class="cv-entry-header">
-              <div>
-                <h3 class="cv-entry-title">
-                  {{ brick.title }}
-                </h3>
-                <p
-                  v-if="brick.frontmatter?.subtitle"
-                  class="cv-entry-subtitle"
-                >
-                  {{ brick.frontmatter.subtitle }}
-                  <span
-                    v-if="brick.frontmatter?.location"
-                    class="cv-entry-location"
-                  >
-                    | {{ brick.frontmatter.location }}
-                  </span>
-                </p>
-              </div>
-              <span
-                v-if="getDateRange(brick)"
-                class="cv-entry-date"
-              >
-                {{ getDateRange(brick) }}
-              </span>
-            </div>
+            {{ brick.title }}
+          </span>
+        </div>
 
-            <div
-              v-if="getBrickContent(brick)"
-              class="cv-entry-content cv-content"
-              v-html="renderMarkdown(getBrickContent(brick))"
-            />
-          </div>
-        </template>
-      </section>
-    </template>
-
-    <!-- Grouped Layout (default) -->
-    <template v-if="!isFreeform">
-      <section
-        v-for="type in visibleSections"
-        :key="type"
-        class="cv-section"
-      >
-        <h2 class="cv-section-title">
-          {{ BRICK_TYPE_CONFIG[type].pluralLabel }}
-        </h2>
-
-        <!-- Skills rendered as tags -->
-        <template v-if="type === 'skill'">
-          <div class="cv-skill-list">
-            <span
-              v-for="brick in bricksByType[type]"
-              :key="brick.id"
-              class="cv-skill-pill"
-            >
-              {{ brick.title }}
-            </span>
-          </div>
-        </template>
-
-        <!-- Publications with academic enhancements -->
-        <template v-else-if="type === 'publication' && isAcademic">
-          <div
-            v-for="brick in bricksByType[type]"
-            :key="brick.id"
-            class="cv-entry"
-          >
+        <div
+          v-for="brick in sectionNonSkills(section.bricks)"
+          :key="brick.id"
+          class="cv-entry"
+        >
+          <template v-if="brick.type === 'publication' && isAcademic">
             <div class="cv-entry-header">
               <div class="cv-entry-main">
                 <h3 class="cv-entry-title">
                   {{ brick.title }}
                 </h3>
-                <!-- Authors with highlighting -->
                 <p
                   v-if="(brick.structuredData as unknown as PublicationData)?.authors?.length"
                   class="cv-publication-authors"
@@ -345,7 +314,6 @@ function getDateRange(brick: Brick): string {
               v-html="renderMarkdown(getBrickContent(brick))"
             />
 
-            <!-- DOI link -->
             <a
               v-if="(brick.structuredData as unknown as PublicationData)?.doi"
               :href="`https://doi.org/${(brick.structuredData as unknown as PublicationData).doi}`"
@@ -354,16 +322,9 @@ function getDateRange(brick: Brick): string {
             >
               DOI: {{ (brick.structuredData as unknown as PublicationData).doi }}
             </a>
-          </div>
-        </template>
+          </template>
 
-        <!-- Other sections with markdown content -->
-        <template v-else>
-          <div
-            v-for="brick in bricksByType[type]"
-            :key="brick.id"
-            class="cv-entry"
-          >
+          <template v-else>
             <div class="cv-entry-header">
               <div>
                 <h3 class="cv-entry-title">
@@ -390,7 +351,131 @@ function getDateRange(brick: Brick): string {
               </span>
             </div>
 
-            <!-- Rendered Markdown Content -->
+            <div
+              v-if="getBrickContent(brick)"
+              class="cv-entry-content cv-content"
+              v-html="renderMarkdown(getBrickContent(brick))"
+            />
+          </template>
+        </div>
+      </section>
+    </template>
+
+    <!-- Grouped Layout (default) -->
+    <template v-if="!isFreeform">
+      <section
+        v-for="section in visibleSections"
+        :key="section.type"
+        class="cv-section"
+      >
+        <h2 class="cv-section-title">
+          {{ BRICK_TYPE_CONFIG[section.type].pluralLabel }}
+        </h2>
+
+        <div
+          v-if="sectionSkills(section.bricks).length > 0"
+          class="cv-skill-list"
+        >
+          <span
+            v-for="brick in sectionSkills(section.bricks)"
+            :key="brick.id"
+            class="cv-skill-pill"
+          >
+            {{ brick.title }}
+          </span>
+        </div>
+
+        <div
+          v-for="brick in sectionNonSkills(section.bricks)"
+          :key="brick.id"
+          class="cv-entry"
+        >
+          <template v-if="brick.type === 'publication' && isAcademic">
+            <div class="cv-entry-header">
+              <div class="cv-entry-main">
+                <h3 class="cv-entry-title">
+                  {{ brick.title }}
+                </h3>
+                <p
+                  v-if="(brick.structuredData as unknown as PublicationData)?.authors?.length"
+                  class="cv-publication-authors"
+                  v-html="highlightAuthor(
+                    (brick.structuredData as unknown as PublicationData).authors.join(', '),
+                    (brick.structuredData as unknown as PublicationData).authorHighlightName || ''
+                  )"
+                />
+                <p
+                  v-if="brick.frontmatter?.subtitle"
+                  class="cv-entry-subtitle"
+                >
+                  {{ brick.frontmatter.subtitle }}
+                </p>
+              </div>
+              <div class="cv-entry-meta">
+                <span
+                  v-if="(brick.structuredData as unknown as PublicationData)?.status"
+                  class="cv-publication-status"
+                  :class="{
+                    'bg-green-100 text-green-700': (brick.structuredData as unknown as PublicationData).status === 'published',
+                    'bg-blue-100 text-blue-700': (brick.structuredData as unknown as PublicationData).status === 'in_press' || (brick.structuredData as unknown as PublicationData).status === 'accepted',
+                    'bg-yellow-100 text-yellow-700': (brick.structuredData as unknown as PublicationData).status === 'under_review' || (brick.structuredData as unknown as PublicationData).status === 'submitted',
+                    'bg-gray-100 text-gray-700': (brick.structuredData as unknown as PublicationData).status === 'preprint'
+                  }"
+                >
+                  {{ getPublicationStatusLabel((brick.structuredData as unknown as PublicationData).status) }}
+                </span>
+                <span
+                  v-if="getDateRange(brick)"
+                  class="cv-entry-date"
+                >
+                  {{ getDateRange(brick) }}
+                </span>
+              </div>
+            </div>
+
+            <div
+              v-if="getBrickContent(brick)"
+              class="cv-entry-content cv-content"
+              v-html="renderMarkdown(getBrickContent(brick))"
+            />
+
+            <a
+              v-if="(brick.structuredData as unknown as PublicationData)?.doi"
+              :href="`https://doi.org/${(brick.structuredData as unknown as PublicationData).doi}`"
+              target="_blank"
+              class="cv-entry-link"
+            >
+              DOI: {{ (brick.structuredData as unknown as PublicationData).doi }}
+            </a>
+          </template>
+
+          <template v-else>
+            <div class="cv-entry-header">
+              <div>
+                <h3 class="cv-entry-title">
+                  {{ brick.title }}
+                </h3>
+                <p
+                  v-if="brick.frontmatter?.subtitle"
+                  class="cv-entry-subtitle"
+                >
+                  {{ brick.frontmatter.subtitle }}
+                  <span
+                    v-if="brick.frontmatter?.location"
+                    class="cv-entry-location"
+                  >
+                    | {{ brick.frontmatter.location }}
+                  </span>
+                </p>
+              </div>
+              <span
+                v-if="getDateRange(brick)"
+                class="cv-entry-date"
+              >
+                {{ getDateRange(brick) }}
+              </span>
+            </div>
+
             <div
               v-if="getBrickContent(brick)"
               class="cv-entry-content cv-content"
@@ -418,8 +503,8 @@ function getDateRange(brick: Brick): string {
             >
               {{ brick.frontmatter.url }}
             </a>
-          </div>
-        </template>
+          </template>
+        </div>
       </section>
     </template>
   </div>
@@ -550,6 +635,7 @@ function getDateRange(brick: Brick): string {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
+  margin-bottom: 0.6rem;
 }
 
 .cv-skill-pill {

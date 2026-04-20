@@ -1,6 +1,6 @@
-import type { Brick } from './useBricks'
 import type { Settings } from './useSettings'
-import { BRICK_TYPE_CONFIG, formatBrickDateRange, type BrickType } from '~/utils/brick-types'
+import type { PlacedSection } from './useCVBuilder'
+import { BRICK_TYPE_CONFIG, formatBrickDateRange } from '~/utils/brick-types'
 
 function normalizeMarkdown(value: string): string {
   return value.replace(/\r\n/g, '\n').trim()
@@ -12,14 +12,36 @@ function createFilename(filename?: string): string {
 }
 
 export function useMarkdownExport() {
-  const { sectionTypeOrder, contentOverrides } = useCVBuilder()
+  const { contentOverrides } = useCVBuilder()
 
   function generateMarkdown(
     settings: Settings | null,
-    bricksByType: Record<BrickType, Brick[]>
+    placementSections: PlacedSection[]
   ): string {
     const lines: string[] = []
     const name = settings?.name || 'Your Name'
+
+    lines.push(
+      '---',
+      'profile: ""',
+      'target_position: ""',
+      'target_keywords: []',
+      'profile_generation_instructions:',
+      '  en: |',
+      '    Generate a tailored professional profile for the target_position.',
+      '    Use only facts present in this CV.',
+      '    Integrate relevant terms from target_keywords and the job description naturally.',
+      '    Keep it concise (3-5 sentences), specific, and impact-oriented.',
+      '    Do not invent achievements, responsibilities, or skills.',
+      '  es: |',
+      '    Genera un perfil profesional adaptado al target_position.',
+      '    Usa solo hechos presentes en este CV.',
+      '    Integra de forma natural terminos relevantes de target_keywords y de la descripcion del puesto.',
+      '    Mantenlo conciso (3-5 frases), especifico y orientado a impacto.',
+      '    No inventes logros, responsabilidades ni habilidades.',
+      '---',
+      ''
+    )
 
     lines.push(`# ${name}`)
 
@@ -53,21 +75,12 @@ export function useMarkdownExport() {
       lines.push(linkParts.join(' | '))
     }
 
-    if (settings?.summary?.trim()) {
-      lines.push('', '## Summary', '', normalizeMarkdown(settings.summary))
-    }
+    for (const section of placementSections) {
+      if (!section.bricks.length) continue
 
-    const sectionOrder: BrickType[] = sectionTypeOrder.value.length > 0
-      ? sectionTypeOrder.value
-      : ['experience', 'education', 'project', 'skill', 'publication', 'custom']
+      lines.push('', `## ${BRICK_TYPE_CONFIG[section.type].pluralLabel}`, '')
 
-    for (const type of sectionOrder) {
-      const sectionBricks = bricksByType[type]
-      if (!sectionBricks?.length) continue
-
-      lines.push('', `## ${BRICK_TYPE_CONFIG[type].pluralLabel}`, '')
-
-      for (const brick of sectionBricks) {
+      for (const brick of section.bricks) {
         const fm = brick.frontmatter || {}
         const content = normalizeMarkdown(contentOverrides.value[brick.id] || brick.content || '')
         const dateRange = formatBrickDateRange(brick)
@@ -108,10 +121,10 @@ export function useMarkdownExport() {
 
   async function exportToMarkdown(
     settings: Settings | null,
-    bricksByType: Record<BrickType, Brick[]>,
+    placementSections: PlacedSection[],
     filename?: string
   ) {
-    const markdown = generateMarkdown(settings, bricksByType)
+    const markdown = generateMarkdown(settings, placementSections)
     const name = createFilename(filename)
 
     if (typeof window === 'undefined' || typeof document === 'undefined') {
