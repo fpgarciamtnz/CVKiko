@@ -115,13 +115,13 @@ watch([experienceData, educationData, projectData, skillData, publicationData, c
     switch (selectedType.value) {
       case 'experience':
         if (experienceData.value.jobTitle && experienceData.value.company) {
-          title.value = `${experienceData.value.jobTitle} at ${experienceData.value.company}`
+          title.value = `${experienceData.value.jobTitle} en ${experienceData.value.company}`
         }
         break
       case 'education':
         if (educationData.value.degree) {
           title.value = educationData.value.field
-            ? `${educationData.value.degree} in ${educationData.value.field}`
+            ? `${educationData.value.degree} en ${educationData.value.field}`
             : educationData.value.degree
         }
         break
@@ -155,7 +155,7 @@ watch([experienceData, educationData, projectData, skillData, publicationData, c
         break
       case 'teaching':
         if (teachingData.value.courseName && teachingData.value.institution) {
-          title.value = `${teachingData.value.role || 'Teaching'} - ${teachingData.value.courseName}`
+          title.value = `${teachingData.value.role || 'Docencia'} - ${teachingData.value.courseName}`
         }
         break
       case 'grant':
@@ -272,7 +272,7 @@ function buildFrontmatter() {
     case 'skill': {
       const skill = data as SkillData
       return {
-        subtitle: `${skill.proficiency} - ${skill.yearsOfExperience} years`
+        subtitle: `${skill.proficiency} - ${skill.yearsOfExperience} anos`
       }
     }
     case 'publication': {
@@ -343,7 +343,7 @@ const validationError = ref('')
 function generateFallbackTitle(): string {
   const typeLabel = BRICK_TYPE_CONFIG[selectedType.value].label
   const now = new Date()
-  const dateStr = now.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+  const dateStr = now.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })
   return `${typeLabel} - ${dateStr}`
 }
 
@@ -388,7 +388,7 @@ defineExpose({ submit })
       class="space-y-3"
     >
       <label class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-        What type of brick do you want to create?
+        Que tipo de bloque quieres crear?
       </label>
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
         <button
@@ -422,7 +422,7 @@ defineExpose({ submit })
         :name="currentConfig.icon"
         class="w-4 h-4"
       />
-      <span>Editing {{ currentConfig.label }}</span>
+      <span>Editando {{ currentConfig.label }}</span>
     </div>
 
     <USeparator />
@@ -479,20 +479,20 @@ defineExpose({ submit })
 
     <!-- Title (can be auto-generated or overridden) -->
     <UFormField
-      label="Display Title"
-      hint="Auto-generated, but you can customize"
+      label="Titulo Visible"
+      hint="Se genera automaticamente, pero puedes personalizarlo"
     >
       <UInput
         v-model="title"
-        placeholder="Will be generated from your input"
+        placeholder="Se generara desde tus datos"
         icon="i-lucide-type"
       />
     </UFormField>
 
     <!-- Tags -->
     <UFormField
-      label="Tags"
-      hint="For filtering and organizing your bricks (internal use, not shown in PDF)"
+      label="Etiquetas"
+      hint="Para filtrar y organizar tus bloques (uso interno, no se muestra en PDF)"
     >
       <div class="space-y-2">
         <div
@@ -501,7 +501,7 @@ defineExpose({ submit })
         >
           <UInput
             v-model="tagInput"
-            placeholder="Add a tag and press Enter"
+            placeholder="Agrega una etiqueta y pulsa Enter"
             class="flex-1"
           />
           <UButton
@@ -509,7 +509,7 @@ defineExpose({ submit })
             variant="soft"
             @click="addTag"
           >
-            Add
+            Agregar
           </UButton>
         </div>
         <div
@@ -546,14 +546,14 @@ defineExpose({ submit })
         color="neutral"
         @click="emit('cancel')"
       >
-        Cancel
+        Cancelar
       </UButton>
       <UButton type="submit">
         <UIcon
           :name="isEditing ? 'i-lucide-save' : 'i-lucide-plus'"
           class="w-4 h-4"
         />
-        {{ isEditing ? 'Update' : 'Create' }} Brick
+        {{ isEditing ? 'Actualizar' : 'Crear' }} Bloque
       </UButton>
     </div>
   </form>

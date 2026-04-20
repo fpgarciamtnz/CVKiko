@@ -17,13 +17,13 @@ const {
   toggleBrick,
   selectBricks,
   deselectAll,
-  reorderBricks,
   reorderSections,
   setCVMode,
   setLayoutMode
 } = useCVBuilder()
 
 const { exportToPdf } = usePdfExport()
+const { exportToMarkdown } = useMarkdownExport()
 
 await Promise.all([
   fetchBricks(),
@@ -38,7 +38,7 @@ const showOrder = ref(false)
 const chatTab = ref<'suggest' | 'optimize'>('suggest')
 
 const tabs = computed(() => [
-  { label: 'All', value: 'all' as const, icon: undefined as string | undefined, count: bricks.value.length },
+  { label: 'Todos', value: 'all' as const, icon: undefined as string | undefined, count: bricks.value.length },
   ...BRICK_TYPES.map(type => ({
     label: BRICK_TYPE_CONFIG[type].label,
     value: type,
@@ -59,19 +59,8 @@ const orderedSections = computed(() => {
     .map(type => ({
       type,
       label: BRICK_TYPE_CONFIG[type].pluralLabel,
-      bricks: selectedBricksByType.value[type] || []
+      count: selectedBricksByType.value[type]?.length || 0
     }))
-})
-
-// Freeform reorder data
-const freeformBrickList = computed(() => {
-  return flatOrderedBricks.value.map(b => ({
-    id: b.id,
-    title: b.title,
-    type: b.type,
-    typeLabel: BRICK_TYPE_CONFIG[b.type].label,
-    icon: BRICK_TYPE_CONFIG[b.type].icon
-  }))
 })
 
 function handleSectionDragEnd() {
@@ -111,67 +100,6 @@ function moveSectionDown(idx: number) {
   reorderSections(current)
 }
 
-function moveBrickUp(sectionIdx: number, brickIdx: number) {
-  if (brickIdx <= 0) return
-  const section = orderedSections.value[sectionIdx]
-  if (!section) return
-  const brickIds = section.bricks.map(b => b.id)
-  const tmp = brickIds[brickIdx]!
-  brickIds[brickIdx] = brickIds[brickIdx - 1]!
-  brickIds[brickIdx - 1] = tmp
-  updateBrickOrderForSection(section.type, brickIds)
-}
-
-function moveBrickDown(sectionIdx: number, brickIdx: number) {
-  const section = orderedSections.value[sectionIdx]
-  if (!section) return
-  if (brickIdx >= section.bricks.length - 1) return
-  const brickIds = section.bricks.map(b => b.id)
-  const tmp = brickIds[brickIdx]!
-  brickIds[brickIdx] = brickIds[brickIdx + 1]!
-  brickIds[brickIdx + 1] = tmp
-  updateBrickOrderForSection(section.type, brickIds)
-}
-
-function updateBrickOrderForSection(type: BrickType, newSectionIds: string[]) {
-  // Rebuild brickOrder, replacing the bricks of this type with the new order
-  const currentOrder = [...selectedBricks.value]
-  // Insert the reordered bricks at the position of the first brick of this type
-  const newOrder: string[] = []
-  let inserted = false
-  for (const b of currentOrder) {
-    if (b.type === type) {
-      if (!inserted) {
-        newOrder.push(...newSectionIds)
-        inserted = true
-      }
-    } else {
-      newOrder.push(b.id)
-    }
-  }
-  if (!inserted) newOrder.push(...newSectionIds)
-  reorderBricks(newOrder)
-}
-
-// Freeform reorder
-function moveFreeformBrickUp(idx: number) {
-  if (idx <= 0) return
-  const newOrder = flatOrderedBricks.value.map(b => b.id)
-  const tmp = newOrder[idx]!
-  newOrder[idx] = newOrder[idx - 1]!
-  newOrder[idx - 1] = tmp
-  reorderBricks(newOrder)
-}
-
-function moveFreeformBrickDown(idx: number) {
-  if (idx >= flatOrderedBricks.value.length - 1) return
-  const newOrder = flatOrderedBricks.value.map(b => b.id)
-  const tmp = newOrder[idx]!
-  newOrder[idx] = newOrder[idx + 1]!
-  newOrder[idx + 1] = tmp
-  reorderBricks(newOrder)
-}
-
 function selectAllFiltered() {
   const ids = filteredBricks.value.map(b => b.id)
   selectBricks(ids)
@@ -189,6 +117,10 @@ async function handleDownloadPdf() {
   await exportToPdf(settings.value, selectedBricksByType.value)
 }
 
+async function handleDownloadMarkdown() {
+  await exportToMarkdown(settings.value, selectedBricksByType.value)
+}
+
 const modeOptions = CV_MODES.map(m => ({
   label: CV_MODE_CONFIG[m].label,
   value: m
@@ -203,10 +135,10 @@ const modeOptions = CV_MODES.map(m => ({
         <div class="flex items-center justify-between mb-3">
           <div>
             <h2 class="text-lg font-semibold">
-              Select Bricks
+              Seleccionar Bloques
             </h2>
             <p class="text-sm text-gray-500">
-              {{ selectedBricks.length }} selected
+              {{ selectedBricks.length }} seleccionados
             </p>
           </div>
           <div class="flex gap-2">
@@ -217,14 +149,14 @@ const modeOptions = CV_MODES.map(m => ({
               size="xs"
               @click="deselectAll"
             >
-              Clear
+              Limpiar
             </UButton>
             <UButton
               variant="soft"
               size="xs"
               @click="selectAllFiltered"
             >
-              Select All
+              Seleccionar Todo
             </UButton>
           </div>
         </div>
@@ -252,14 +184,14 @@ const modeOptions = CV_MODES.map(m => ({
               :color="layoutMode === 'grouped' ? 'primary' : 'neutral'"
               @click="setLayoutMode('grouped')"
             >
-              Grouped
+              Agrupado
             </UButton>
             <UButton
               :variant="layoutMode === 'freeform' ? 'solid' : 'ghost'"
               :color="layoutMode === 'freeform' ? 'primary' : 'neutral'"
               @click="setLayoutMode('freeform')"
             >
-              Free-form
+              Libre
             </UButton>
           </UButtonGroup>
         </div>
@@ -293,13 +225,13 @@ const modeOptions = CV_MODES.map(m => ({
             name="i-lucide-inbox"
             class="w-12 h-12 mx-auto mb-2 opacity-50"
           />
-          <p>No bricks in this category</p>
+          <p>No hay bloques en esta categoria</p>
           <UButton
             to="/bricks"
             variant="link"
             class="mt-2"
           >
-            Add bricks
+            Agregar bloques
           </UButton>
         </div>
 
@@ -334,119 +266,56 @@ const modeOptions = CV_MODES.map(m => ({
               name="i-lucide-arrow-up-down"
               class="w-4 h-4"
             />
-            Reorder Sections & Bricks
+            Reordenar Categorias
           </button>
 
           <div
             v-if="showOrder"
             class="mt-3 space-y-3"
           >
-            <!-- Freeform Reorder -->
-            <template v-if="layoutMode === 'freeform'">
-              <div class="space-y-1">
-                <div
-                  v-for="(item, idx) in freeformBrickList"
-                  :key="item.id"
-                  class="flex items-center gap-1 text-xs py-1 px-2 bg-gray-50 dark:bg-gray-800 rounded"
-                >
-                  <UIcon
-                    :name="item.icon"
-                    class="w-3 h-3 text-gray-400"
-                  />
-                  <span class="flex-1 truncate">{{ item.title }}</span>
-                  <span class="text-gray-400 text-[10px]">{{ item.typeLabel }}</span>
-                  <UButton
-                    icon="i-lucide-chevron-up"
-                    variant="ghost"
-                    color="neutral"
-                    size="xs"
-                    :disabled="idx === 0"
-                    class="!p-0.5"
-                    @click="moveFreeformBrickUp(idx)"
-                  />
-                  <UButton
-                    icon="i-lucide-chevron-down"
-                    variant="ghost"
-                    color="neutral"
-                    size="xs"
-                    :disabled="idx === freeformBrickList.length - 1"
-                    class="!p-0.5"
-                    @click="moveFreeformBrickDown(idx)"
-                  />
-                </div>
-              </div>
-            </template>
-
-            <!-- Grouped Reorder -->
-            <template v-else>
-              <VueDraggable
-                :model-value="orderedSections"
-                item-key="type"
-                handle=".section-handle"
-                @end="handleSectionDragEnd"
-              >
-                <template #item="{ element: section, index: sIdx }">
-                  <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 mb-2">
-                    <!-- Section Header -->
-                    <div class="flex items-center gap-1 mb-1">
-                      <UIcon
-                        name="i-lucide-grip-vertical"
-                        class="w-4 h-4 text-gray-400 cursor-grab section-handle"
-                      />
-                      <span class="text-xs font-semibold uppercase tracking-wide flex-1">
-                        {{ section.label }}
-                      </span>
-                      <UButton
-                        icon="i-lucide-chevron-up"
-                        variant="ghost"
-                        color="neutral"
-                        size="xs"
-                        :disabled="sIdx === 0"
-                        class="!p-0.5"
-                        @click="moveSectionUp(Number(sIdx))"
-                      />
-                      <UButton
-                        icon="i-lucide-chevron-down"
-                        variant="ghost"
-                        color="neutral"
-                        size="xs"
-                        :disabled="Number(sIdx) === orderedSections.length - 1"
-                        class="!p-0.5"
-                        @click="moveSectionDown(Number(sIdx))"
-                      />
-                    </div>
-                    <!-- Bricks in section -->
-                    <div class="space-y-1 pl-5">
-                      <div
-                        v-for="(brick, bIdx) in section.bricks"
-                        :key="brick.id"
-                        class="flex items-center gap-1 text-xs py-0.5"
-                      >
-                        <span class="flex-1 truncate">{{ brick.title }}</span>
-                        <UButton
-                          icon="i-lucide-chevron-up"
-                          variant="ghost"
-                          color="neutral"
-                          size="xs"
-                          :disabled="bIdx === 0"
-                          class="!p-0.5"
-                          @click="moveBrickUp(Number(sIdx), Number(bIdx))"
-                        />
-                        <UButton
-                          icon="i-lucide-chevron-down"
-                          variant="ghost"
-                          color="neutral"
-                          size="xs"
-                          :disabled="bIdx === section.bricks.length - 1"
-                          class="!p-0.5"
-                          @click="moveBrickDown(Number(sIdx), Number(bIdx))"
-                        />
-                      </div>
-                    </div>
+            <VueDraggable
+              :model-value="orderedSections"
+              item-key="type"
+              handle=".section-handle"
+              @end="handleSectionDragEnd"
+            >
+              <template #item="{ element: section, index: sIdx }">
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 mb-2">
+                  <div class="flex items-center gap-1">
+                    <UIcon
+                      name="i-lucide-grip-vertical"
+                      class="w-4 h-4 text-gray-400 cursor-grab section-handle"
+                    />
+                    <span class="text-xs font-semibold uppercase tracking-wide flex-1">
+                      {{ section.label }}
+                    </span>
+                    <UBadge
+                      :label="String(section.count)"
+                      variant="subtle"
+                      size="xs"
+                    />
+                    <UButton
+                      icon="i-lucide-chevron-up"
+                      variant="ghost"
+                      color="neutral"
+                      size="xs"
+                      :disabled="sIdx === 0"
+                      class="!p-0.5"
+                      @click="moveSectionUp(Number(sIdx))"
+                    />
+                    <UButton
+                      icon="i-lucide-chevron-down"
+                      variant="ghost"
+                      color="neutral"
+                      size="xs"
+                      :disabled="Number(sIdx) === orderedSections.length - 1"
+                      class="!p-0.5"
+                      @click="moveSectionDown(Number(sIdx))"
+                    />
                   </div>
-                </template>
-              </VueDraggable>
-            </template>
+                </div>
+              </template>
+            </VueDraggable>
           </div>
         </div>
       </div>
@@ -463,7 +332,7 @@ const modeOptions = CV_MODES.map(m => ({
       <div class="p-4 border-b bg-white dark:bg-gray-900 print:hidden">
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-semibold">
-            CV Preview
+            Vista Previa CV
           </h2>
           <div class="flex gap-2">
             <UButton
@@ -482,13 +351,22 @@ const modeOptions = CV_MODES.map(m => ({
               PDF
             </UButton>
             <UButton
+              icon="i-lucide-file-down"
+              variant="soft"
+              color="neutral"
+              size="sm"
+              @click="handleDownloadMarkdown"
+            >
+              Markdown
+            </UButton>
+            <UButton
               icon="i-lucide-printer"
               variant="ghost"
               color="neutral"
               size="sm"
               @click="handlePrint"
             >
-              Print
+              Imprimir
             </UButton>
             <UButton
               icon="i-lucide-car"
@@ -498,7 +376,7 @@ const modeOptions = CV_MODES.map(m => ({
               :disabled="selectedBricks.length === 0"
               @click="showPreview = true"
             >
-              Interactive Preview
+              Vista Interactiva
             </UButton>
             <UButton
               icon="i-lucide-share-2"
@@ -506,7 +384,7 @@ const modeOptions = CV_MODES.map(m => ({
               :disabled="selectedBricks.length === 0"
               @click="showShare = true"
             >
-              Save & Share
+              Guardar y Compartir
             </UButton>
           </div>
         </div>
@@ -544,7 +422,7 @@ const modeOptions = CV_MODES.map(m => ({
           ]"
           @click="chatTab = 'suggest'"
         >
-          Suggest
+          Sugerir
         </button>
         <button
           :class="[
@@ -555,7 +433,7 @@ const modeOptions = CV_MODES.map(m => ({
           ]"
           @click="chatTab = 'optimize'"
         >
-          Optimize
+          Optimizar
         </button>
       </div>
 

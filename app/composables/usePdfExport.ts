@@ -16,6 +16,7 @@ import {
 import { stripMarkdown } from '~/utils/render-markdown'
 
 type FontStyle = 'normal' | 'bold' | 'italic'
+type ColorTuple = [number, number, number]
 
 function normalizePlainText(value: string): string {
   return stripMarkdown(value).replace(/\s+/g, ' ').trim()
@@ -51,6 +52,44 @@ function includesIgnoreCase(text: string, part: string): boolean {
   return !!needle && source.includes(needle)
 }
 
+const PDF_THEME = {
+  marginX: 16,
+  marginY: 16,
+  colors: {
+    text: [15, 23, 42] as ColorTuple,
+    muted: [71, 85, 105] as ColorTuple,
+    heading: [30, 41, 59] as ColorTuple,
+    divider: [148, 163, 184] as ColorTuple,
+    link: [30, 58, 138] as ColorTuple
+  },
+  fontSize: {
+    name: 22,
+    contact: 8.8,
+    section: 10,
+    title: 10.5,
+    subtitle: 9,
+    body: 8.8,
+    link: 8.5,
+    tag: 8
+  },
+  lineHeight: {
+    compact: 3.6,
+    normal: 4,
+    relaxed: 4.2
+  },
+  spacing: {
+    headerNameBottom: 8.5,
+    headerLineGapTop: 2.2,
+    headerLineGapBottom: 4.5,
+    summaryTop: 1.8,
+    summaryBottom: 2.5,
+    sectionTop: 4.2,
+    sectionHeaderBottom: 1.6,
+    sectionBodyTop: 4.2,
+    entryBottom: 2.3
+  }
+}
+
 export function usePdfExport() {
   const { sectionTypeOrder, contentOverrides } = useCVBuilder()
 
@@ -66,14 +105,18 @@ export function usePdfExport() {
 
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
-    const margin = 20
-    const contentWidth = pageWidth - (margin * 2)
-    let y = margin
+    const marginX = PDF_THEME.marginX
+    const marginY = PDF_THEME.marginY
+    const contentWidth = pageWidth - (marginX * 2)
+    let y = marginY
+
+    doc.setTextColor(...PDF_THEME.colors.text)
 
     const checkPageBreak = (height: number) => {
-      if (y + height > pageHeight - margin) {
+      if (y + height > pageHeight - marginY) {
         doc.addPage()
-        y = margin
+        y = marginY
+        doc.setTextColor(...PDF_THEME.colors.text)
       }
     }
 
@@ -83,9 +126,10 @@ export function usePdfExport() {
         fontSize?: number
         fontStyle?: FontStyle
         lineHeight?: number
-        color?: [number, number, number]
+        color?: ColorTuple
         maxLines?: number
         seen?: Set<string>
+        x?: number
       } = {}
     ) => {
       const normalized = normalizePlainText(text)
@@ -98,21 +142,22 @@ export function usePdfExport() {
         seen.add(key)
       }
 
-      doc.setFontSize(options.fontSize ?? 10)
+      doc.setFontSize(options.fontSize ?? PDF_THEME.fontSize.body)
       doc.setFont('helvetica', options.fontStyle ?? 'normal')
       if (options.color) doc.setTextColor(...options.color)
 
       const lines = doc.splitTextToSize(normalized, contentWidth)
       const limitedLines = options.maxLines ? lines.slice(0, options.maxLines) : lines
-      const lineHeight = options.lineHeight ?? 4
+      const lineHeight = options.lineHeight ?? PDF_THEME.lineHeight.normal
+      const textX = options.x ?? marginX
 
       for (const line of limitedLines) {
         checkPageBreak(lineHeight + 1)
-        doc.text(line, margin, y)
+        doc.text(line, textX, y)
         y += lineHeight
       }
 
-      if (options.color) doc.setTextColor(0, 0, 0)
+      if (options.color) doc.setTextColor(...PDF_THEME.colors.text)
     }
 
     const writeTitleRow = (title: string, dateText?: string, seen?: Set<string>) => {
@@ -126,40 +171,53 @@ export function usePdfExport() {
         dedupeSet.add(key)
       }
 
-      checkPageBreak(7)
-      doc.setFontSize(11)
+      checkPageBreak(6.6)
+      doc.setFontSize(PDF_THEME.fontSize.title)
       doc.setFont('helvetica', 'bold')
-      doc.text(normalizedTitle, margin, y)
+      doc.setTextColor(...PDF_THEME.colors.text)
+      doc.text(normalizedTitle, marginX, y)
 
       if (dateText) {
         const normalizedDate = normalizePlainText(dateText)
         if (normalizedDate) {
+          doc.setFontSize(PDF_THEME.fontSize.subtitle)
           doc.setFont('helvetica', 'normal')
+          doc.setTextColor(...PDF_THEME.colors.muted)
           const dateWidth = doc.getTextWidth(normalizedDate)
-          doc.text(normalizedDate, pageWidth - margin - dateWidth, y)
+          doc.text(normalizedDate, pageWidth - marginX - dateWidth, y)
+          doc.setTextColor(...PDF_THEME.colors.text)
         }
       }
 
-      y += 5
+      y += PDF_THEME.lineHeight.normal
+    }
+
+    const drawSectionDivider = () => {
+      doc.setDrawColor(...PDF_THEME.colors.divider)
+      doc.setLineWidth(0.35)
+      doc.line(marginX, y, pageWidth - marginX, y)
+      doc.setDrawColor(0, 0, 0)
     }
 
     // Header
-    doc.setFontSize(24)
+    doc.setFontSize(PDF_THEME.fontSize.name)
     doc.setFont('helvetica', 'bold')
-    doc.text(settings?.name || 'Your Name', margin, y)
-    y += 10
+    doc.setTextColor(...PDF_THEME.colors.text)
+    doc.text(settings?.name || 'Your Name', marginX, y)
+    y += PDF_THEME.spacing.headerNameBottom
 
     // Contact info
-    doc.setFontSize(10)
+    doc.setFontSize(PDF_THEME.fontSize.contact)
     doc.setFont('helvetica', 'normal')
+    doc.setTextColor(...PDF_THEME.colors.muted)
     const contactParts: string[] = []
     if (settings?.email) contactParts.push(settings.email)
     if (settings?.phone) contactParts.push(settings.phone)
     if (settings?.location) contactParts.push(settings.location)
 
     if (contactParts.length > 0) {
-      doc.text(contactParts.join('  |  '), margin, y)
-      y += 5
+      doc.text(contactParts.join('  |  '), marginX, y)
+      y += PDF_THEME.lineHeight.normal
     }
 
     // Links
@@ -169,17 +227,26 @@ export function usePdfExport() {
     if (settings?.website) linkParts.push(settings.website)
 
     if (linkParts.length > 0) {
-      doc.setTextColor(0, 0, 238)
-      doc.text(linkParts.join('  |  '), margin, y)
-      doc.setTextColor(0, 0, 0)
-      y += 8
+      doc.setTextColor(...PDF_THEME.colors.link)
+      doc.text(linkParts.join('  |  '), marginX, y)
+      doc.setTextColor(...PDF_THEME.colors.text)
+      y += PDF_THEME.lineHeight.normal
     }
+
+    y += PDF_THEME.spacing.headerLineGapTop
+    drawSectionDivider()
+    y += PDF_THEME.spacing.headerLineGapBottom
 
     // Summary
     if (settings?.summary) {
-      y += 2
-      writeWrapped(settings.summary, { fontSize: 10, fontStyle: 'normal', lineHeight: 4 })
-      y += 3
+      y += PDF_THEME.spacing.summaryTop
+      writeWrapped(settings.summary, {
+        fontSize: PDF_THEME.fontSize.subtitle,
+        fontStyle: 'normal',
+        lineHeight: PDF_THEME.lineHeight.relaxed,
+        color: PDF_THEME.colors.muted
+      })
+      y += PDF_THEME.spacing.summaryBottom
     }
 
     const sectionOrder: BrickType[] = sectionTypeOrder.value.length > 0
@@ -190,29 +257,30 @@ export function usePdfExport() {
       const typeBricks = bricksByType[type]
       if (!typeBricks?.length) continue
 
-      checkPageBreak(20)
+      checkPageBreak(16)
 
-      y += 5
-      doc.setFontSize(12)
+      y += PDF_THEME.spacing.sectionTop
+      doc.setFontSize(PDF_THEME.fontSize.section)
       doc.setFont('helvetica', 'bold')
-      doc.text(BRICK_TYPE_CONFIG[type].pluralLabel.toUpperCase(), margin, y)
-      y += 1
-      doc.setLineWidth(0.5)
-      doc.line(margin, y, pageWidth - margin, y)
-      y += 6
+      doc.setTextColor(...PDF_THEME.colors.heading)
+      doc.text(BRICK_TYPE_CONFIG[type].pluralLabel.toUpperCase(), marginX, y)
+      y += PDF_THEME.spacing.sectionHeaderBottom
+      drawSectionDivider()
+      y += PDF_THEME.spacing.sectionBodyTop
+      doc.setTextColor(...PDF_THEME.colors.text)
 
       if (type === 'skill') {
-        doc.setFontSize(10)
+        doc.setFontSize(PDF_THEME.fontSize.body)
         doc.setFont('helvetica', 'normal')
-        const skills = typeBricks.map(b => b.title).filter(Boolean).join('  -  ')
+        const skills = typeBricks.map(b => b.title).filter(Boolean).join('  |  ')
         const skillLines = doc.splitTextToSize(skills, contentWidth)
-        doc.text(skillLines, margin, y)
-        y += skillLines.length * 4 + 4
+        doc.text(skillLines, marginX, y)
+        y += skillLines.length * PDF_THEME.lineHeight.normal + PDF_THEME.spacing.entryBottom
         continue
       }
 
       for (const brick of typeBricks) {
-        checkPageBreak(25)
+        checkPageBreak(22)
 
         const fm = brick.frontmatter
         const brickContent = contentOverrides.value[brick.id] || brick.content
@@ -234,7 +302,7 @@ export function usePdfExport() {
           ]).join(' | ')
 
           writeTitleRow(compactEducationLine, graduation, seen)
-          y += 3
+          y += PDF_THEME.spacing.entryBottom
           continue
         }
 
@@ -247,17 +315,22 @@ export function usePdfExport() {
             ? PUBLICATION_STATUSES.find(s => s.value === pub.status)?.label || pub.status
             : ''
           const venueLine = uniqueNonEmpty([pub.publicationName || String(fm.subtitle || ''), status]).join(' | ')
-          writeWrapped(venueLine, { fontSize: 10, fontStyle: 'italic', seen })
-
-          const publicationUrl = toDoiUrl(pub.url || pub.doi || String(fm.url || ''))
-          writeWrapped(publicationUrl, {
-            fontSize: 9,
-            fontStyle: 'normal',
-            color: [0, 0, 238],
+          writeWrapped(venueLine, {
+            fontSize: PDF_THEME.fontSize.subtitle,
+            fontStyle: 'italic',
+            color: PDF_THEME.colors.muted,
             seen
           })
 
-          y += 3
+          const publicationUrl = toDoiUrl(pub.url || pub.doi || String(fm.url || ''))
+          writeWrapped(publicationUrl, {
+            fontSize: PDF_THEME.fontSize.link,
+            fontStyle: 'normal',
+            color: PDF_THEME.colors.link,
+            seen
+          })
+
+          y += PDF_THEME.spacing.entryBottom
           continue
         }
 
@@ -265,37 +338,43 @@ export function usePdfExport() {
           const proj = (brick.structuredData || {}) as Partial<ProjectData>
           writeTitleRow(proj.name || brick.title, undefined, seen)
 
-          writeWrapped(proj.role || String(fm.subtitle || ''), { fontSize: 10, fontStyle: 'italic', seen })
+          writeWrapped(proj.role || String(fm.subtitle || ''), {
+            fontSize: PDF_THEME.fontSize.subtitle,
+            fontStyle: 'italic',
+            color: PDF_THEME.colors.muted,
+            seen
+          })
           writeWrapped(`Goal: ${proj.problem || proj.description || ''}`, {
-            fontSize: 9,
+            fontSize: PDF_THEME.fontSize.body,
             fontStyle: 'normal',
             maxLines: 2,
             seen
           })
           writeWrapped(`Outcome: ${proj.outcome || ''}`, {
-            fontSize: 9,
+            fontSize: PDF_THEME.fontSize.body,
             fontStyle: 'normal',
             maxLines: 2,
             seen
           })
           if (proj.technologies?.length) {
             writeWrapped(`Tech stack: ${uniqueNonEmpty(proj.technologies).join(', ')}`, {
-              fontSize: 9,
+              fontSize: PDF_THEME.fontSize.tag,
               fontStyle: 'normal',
               maxLines: 2,
+              color: PDF_THEME.colors.muted,
               seen
             })
           }
 
           const projectUrl = proj.links?.find(link => link?.url)?.url || String(fm.url || '')
           writeWrapped(projectUrl, {
-            fontSize: 9,
+            fontSize: PDF_THEME.fontSize.link,
             fontStyle: 'normal',
-            color: [0, 0, 238],
+            color: PDF_THEME.colors.link,
             seen
           })
 
-          y += 3
+          y += PDF_THEME.spacing.entryBottom
           continue
         }
 
@@ -313,7 +392,12 @@ export function usePdfExport() {
             company,
             locationValue
           ]).join(' | ')
-          writeWrapped(subtitleLine, { fontSize: 10, fontStyle: 'italic', seen })
+          writeWrapped(subtitleLine, {
+            fontSize: PDF_THEME.fontSize.subtitle,
+            fontStyle: 'italic',
+            color: PDF_THEME.colors.muted,
+            seen
+          })
 
           const structuredHighlights = uniqueNonEmpty([
             ...(exp.responsibilities || []),
@@ -324,19 +408,25 @@ export function usePdfExport() {
           const highlights = (structuredHighlights.length > 0 ? structuredHighlights : fallbackHighlights).slice(0, 3)
 
           highlights.forEach((item) => {
-            writeWrapped(`- ${item}`, { fontSize: 9, fontStyle: 'normal', maxLines: 2, seen })
-          })
-
-          if (exp.technologies?.length) {
-            writeWrapped(`Tech stack: ${uniqueNonEmpty(exp.technologies).join(', ')}`, {
-              fontSize: 9,
+            writeWrapped(`- ${item}`, {
+              fontSize: PDF_THEME.fontSize.body,
               fontStyle: 'normal',
               maxLines: 2,
               seen
             })
+          })
+
+          if (exp.technologies?.length) {
+            writeWrapped(`Tech stack: ${uniqueNonEmpty(exp.technologies).join(', ')}`, {
+              fontSize: PDF_THEME.fontSize.tag,
+              fontStyle: 'normal',
+              maxLines: 2,
+              color: PDF_THEME.colors.muted,
+              seen
+            })
           }
 
-          y += 3
+          y += PDF_THEME.spacing.entryBottom
           continue
         }
 
@@ -349,12 +439,12 @@ export function usePdfExport() {
           )
           writeTitleRow(brick.title, dateStr, seen)
           writeWrapped(custom.content || brickContent, {
-            fontSize: 10,
+            fontSize: PDF_THEME.fontSize.body,
             fontStyle: 'normal',
             maxLines: 4,
             seen
           })
-          y += 3
+          y += PDF_THEME.spacing.entryBottom
           continue
         }
 
@@ -366,10 +456,15 @@ export function usePdfExport() {
         writeTitleRow(brick.title, dateStr, seen)
 
         const subtitleParts = uniqueNonEmpty([String(fm.subtitle || ''), String(fm.location || '')]).join(' | ')
-        writeWrapped(subtitleParts, { fontSize: 10, fontStyle: 'italic', seen })
+        writeWrapped(subtitleParts, {
+          fontSize: PDF_THEME.fontSize.subtitle,
+          fontStyle: 'italic',
+          color: PDF_THEME.colors.muted,
+          seen
+        })
 
         writeWrapped(brickContent, {
-          fontSize: 10,
+          fontSize: PDF_THEME.fontSize.body,
           fontStyle: 'normal',
           maxLines: 4,
           seen
@@ -377,13 +472,13 @@ export function usePdfExport() {
 
         const url = String(fm.url || '')
         writeWrapped(url, {
-          fontSize: 9,
+          fontSize: PDF_THEME.fontSize.link,
           fontStyle: 'normal',
-          color: [0, 0, 238],
+          color: PDF_THEME.colors.link,
           seen
         })
 
-        y += 3
+        y += PDF_THEME.spacing.entryBottom
       }
     }
 

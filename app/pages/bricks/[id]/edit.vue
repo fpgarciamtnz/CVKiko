@@ -22,7 +22,7 @@ const { data: brick, status } = await useFetch<Brick>(`/api/bricks/${brickId.val
 if (!brick.value && status.value !== 'pending') {
   throw createError({
     statusCode: 404,
-    statusMessage: 'Brick not found'
+    statusMessage: 'Bloque no encontrado'
   })
 }
 
@@ -36,16 +36,16 @@ async function handleSubmit(data: Partial<Brick>) {
   try {
     await updateBrick(brickId.value, data)
     toast.add({
-      title: 'Brick updated successfully!',
-      description: 'Your changes have been saved.',
+      title: 'Bloque actualizado correctamente',
+      description: 'Tus cambios se han guardado.',
       color: 'success',
       icon: 'i-lucide-check-circle'
     })
     router.push('/bricks')
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : (e as { data?: { message?: string } })?.data?.message || 'Unknown error'
+    const message = e instanceof Error ? e.message : (e as { data?: { message?: string } })?.data?.message || 'Error desconocido'
     toast.add({
-      title: 'Failed to update brick',
+      title: 'No se pudo actualizar el bloque',
       description: message,
       color: 'error',
       icon: 'i-lucide-alert-circle'
@@ -103,7 +103,7 @@ function submitForm() {
               </div>
               <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                  Edit {{ brickConfig?.label || 'Brick' }}
+                  Editar {{ brickConfig?.label || 'Bloque' }}
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400 truncate max-w-md">
                   {{ brick.title }}
@@ -117,7 +117,7 @@ function submitForm() {
               color="neutral"
               @click="handleCancel"
             >
-              Cancel
+              Cancelar
             </UButton>
             <UButton
               :loading="isSubmitting"
@@ -127,7 +127,7 @@ function submitForm() {
                 name="i-lucide-save"
                 class="w-4 h-4 mr-2"
               />
-              Save Changes
+              Guardar Cambios
             </UButton>
           </div>
         </div>
@@ -155,14 +155,14 @@ function submitForm() {
             class="flex-1"
             @click="handleCancel"
           >
-            Cancel
+            Cancelar
           </UButton>
           <UButton
             :loading="isSubmitting"
             class="flex-1"
             @click="submitForm"
           >
-            Save Changes
+            Guardar Cambios
           </UButton>
         </div>
       </div>
@@ -180,7 +180,7 @@ function submitForm() {
         class="w-12 h-12 animate-spin text-primary mx-auto mb-4"
       />
       <p class="text-gray-500">
-        Loading brick...
+        Cargando bloque...
       </p>
     </div>
   </div>

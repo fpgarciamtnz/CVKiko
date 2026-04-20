@@ -19,9 +19,7 @@ export function useOptimize() {
     sectionTypeOrder,
     selectedBricks,
     reorderSections,
-    reorderBricks,
     applyContentOverride,
-    brickOrder,
     cvMode
   } = useCVBuilder()
 
@@ -90,34 +88,8 @@ export function useOptimize() {
     }
   }
 
-  function acceptWithinSectionOrder() {
-    const result = optimizationResult.value
-    if (!result?.withinSectionOrder) return
-
-    const sectionOrder = result.sectionOrder?.filter((s): s is BrickType => !!s) || sectionTypeOrder.value
-    const newOrder: string[] = []
-    for (const type of sectionOrder) {
-      const sectionBrickIds = result.withinSectionOrder[type]
-      if (sectionBrickIds) {
-        const selectedIds = new Set(brickOrder.value)
-        for (const id of sectionBrickIds) {
-          if (id && selectedIds.has(id)) {
-            newOrder.push(id)
-          }
-        }
-      }
-      const remaining = selectedBricks.value
-        .filter(b => b.type === type && !newOrder.includes(b.id))
-      for (const b of remaining) {
-        newOrder.push(b.id)
-      }
-    }
-    reorderBricks(newOrder)
-  }
-
   function acceptAllChanges() {
     acceptSectionOrder()
-    acceptWithinSectionOrder()
     const result = optimizationResult.value
     if (result?.brickAdjustments) {
       for (const adj of result.brickAdjustments) {
@@ -136,7 +108,6 @@ export function useOptimize() {
     stop,
     acceptSectionOrder,
     acceptBrickContent,
-    acceptWithinSectionOrder,
     acceptAllChanges
   }
 }

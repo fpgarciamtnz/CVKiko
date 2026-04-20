@@ -20,7 +20,7 @@ const deleteConfirmBrick = ref<Brick | null>(null)
 const isSubmitting = ref(false)
 
 const tabs = computed(() => [
-  { label: 'All', value: 'all' as const, icon: undefined as string | undefined, count: bricks.value.length },
+  { label: 'Todos', value: 'all' as const, icon: undefined as string | undefined, count: bricks.value.length },
   ...BRICK_TYPES.map(type => ({
     label: BRICK_TYPE_CONFIG[type].label,
     value: type,
@@ -53,16 +53,16 @@ async function handleSubmit(data: Partial<Brick>) {
   try {
     if (editingBrick.value) {
       await updateBrick(editingBrick.value.id, data)
-      toast.add({ title: 'Brick updated successfully', color: 'success', icon: 'i-lucide-check-circle' })
+      toast.add({ title: 'Bloque actualizado correctamente', color: 'success', icon: 'i-lucide-check-circle' })
     } else {
       await createBrick(data)
-      toast.add({ title: 'Brick created successfully', color: 'success', icon: 'i-lucide-check-circle' })
+      toast.add({ title: 'Bloque creado correctamente', color: 'success', icon: 'i-lucide-check-circle' })
     }
     drawerOpen.value = false
     editingBrick.value = null
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : (e as { data?: { message?: string } })?.data?.message || 'Unknown error'
-    toast.add({ title: 'Failed to save brick', description: message, color: 'error', icon: 'i-lucide-alert-circle' })
+    const message = e instanceof Error ? e.message : (e as { data?: { message?: string } })?.data?.message || 'Error desconocido'
+    toast.add({ title: 'No se pudo guardar el bloque', description: message, color: 'error', icon: 'i-lucide-alert-circle' })
   } finally {
     isSubmitting.value = false
   }
@@ -73,10 +73,10 @@ async function handleDelete() {
 
   try {
     await deleteBrick(deleteConfirmBrick.value.id)
-    toast.add({ title: 'Brick deleted', color: 'success', icon: 'i-lucide-check-circle' })
+    toast.add({ title: 'Bloque eliminado', color: 'success', icon: 'i-lucide-check-circle' })
     deleteConfirmBrick.value = null
   } catch {
-    toast.add({ title: 'Failed to delete brick', color: 'error', icon: 'i-lucide-alert-circle' })
+    toast.add({ title: 'No se pudo eliminar el bloque', color: 'error', icon: 'i-lucide-alert-circle' })
   }
 }
 
@@ -94,10 +94,10 @@ function submitForm() {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
       <div>
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-          Bricks
+          Bloques
         </h1>
         <p class="mt-1 text-gray-600 dark:text-gray-400">
-          Manage your experiences, education, projects, and skills
+          Gestiona experiencias, educacion, proyectos y habilidades
         </p>
       </div>
       <UButton
@@ -105,7 +105,7 @@ function submitForm() {
         size="lg"
         @click="openCreateDrawer"
       >
-        Add Brick
+        Agregar Bloque
       </UButton>
     </div>
 
@@ -201,12 +201,12 @@ function submitForm() {
           <UDropdownMenu
             :items="[
               [{
-                label: 'Edit',
+                label: 'Editar',
                 icon: 'i-lucide-pencil',
                 onSelect: () => openEditDrawer(brick)
               }],
               [{
-                label: 'Delete',
+                label: 'Eliminar',
                 icon: 'i-lucide-trash-2',
                 color: 'error' as const,
                 onSelect: () => confirmDelete(brick)
@@ -235,17 +235,17 @@ function submitForm() {
         class="w-20 h-20 mx-auto mb-4 text-gray-300 dark:text-gray-600"
       />
       <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-        No {{ activeTab === 'all' ? 'bricks' : BRICK_TYPE_CONFIG[activeTab as BrickType].pluralLabel.toLowerCase() }} yet
+        Aun no hay {{ activeTab === 'all' ? 'bloques' : BRICK_TYPE_CONFIG[activeTab as BrickType].pluralLabel.toLowerCase() }}
       </h3>
       <p class="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
-        Add your first {{ activeTab === 'all' ? 'brick' : BRICK_TYPE_CONFIG[activeTab as BrickType].label.toLowerCase() }} to start building your CV.
+        Agrega tu primer {{ activeTab === 'all' ? 'bloque' : BRICK_TYPE_CONFIG[activeTab as BrickType].label.toLowerCase() }} para empezar tu CV.
       </p>
       <UButton
         icon="i-lucide-plus"
         size="lg"
         @click="openCreateDrawer"
       >
-        Add {{ activeTab === 'all' ? 'Brick' : BRICK_TYPE_CONFIG[activeTab as BrickType].label }}
+        Agregar {{ activeTab === 'all' ? 'Bloque' : BRICK_TYPE_CONFIG[activeTab as BrickType].label }}
       </UButton>
     </UCard>
 
@@ -263,10 +263,10 @@ function submitForm() {
             <div class="flex items-center justify-between">
               <div>
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-                  {{ editingBrick ? 'Edit Brick' : 'Create New Brick' }}
+                  {{ editingBrick ? 'Editar Bloque' : 'Crear Bloque Nuevo' }}
                 </h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  {{ editingBrick ? 'Update your brick information' : 'Fill in the details for your new brick' }}
+                  {{ editingBrick ? 'Actualiza la informacion del bloque' : 'Completa los detalles del nuevo bloque' }}
                 </p>
               </div>
               <UButton
@@ -297,7 +297,7 @@ function submitForm() {
                 color="neutral"
                 @click="drawerOpen = false"
               >
-                Cancel
+                Cancelar
               </UButton>
               <UButton
                 :loading="isSubmitting"
@@ -307,7 +307,7 @@ function submitForm() {
                   :name="editingBrick ? 'i-lucide-save' : 'i-lucide-plus'"
                   class="w-4 h-4 mr-2"
                 />
-                {{ editingBrick ? 'Save Changes' : 'Create Brick' }}
+                {{ editingBrick ? 'Guardar Cambios' : 'Crear Bloque' }}
               </UButton>
             </div>
           </div>
@@ -331,13 +331,13 @@ function submitForm() {
                 />
               </div>
               <h2 class="text-lg font-semibold">
-                Delete Brick
+                Eliminar Bloque
               </h2>
             </div>
           </template>
           <p class="text-gray-600 dark:text-gray-400">
-            Are you sure you want to delete "<strong class="text-gray-900 dark:text-white">{{ deleteConfirmBrick?.title }}</strong>"?
-            This action cannot be undone.
+            Seguro que quieres eliminar "<strong class="text-gray-900 dark:text-white">{{ deleteConfirmBrick?.title }}</strong>"?
+            Esta accion no se puede deshacer.
           </p>
           <template #footer>
             <div class="flex justify-end gap-3">
@@ -346,7 +346,7 @@ function submitForm() {
                 color="neutral"
                 @click="deleteConfirmBrick = null"
               >
-                Cancel
+                Cancelar
               </UButton>
               <UButton
                 color="error"
@@ -356,7 +356,7 @@ function submitForm() {
                   name="i-lucide-trash-2"
                   class="w-4 h-4 mr-2"
                 />
-                Delete
+                Eliminar
               </UButton>
             </div>
           </template>

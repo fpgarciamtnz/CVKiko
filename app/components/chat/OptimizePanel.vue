@@ -10,7 +10,6 @@ const {
   stop,
   acceptSectionOrder,
   acceptBrickContent,
-  acceptWithinSectionOrder,
   acceptAllChanges
 } = useOptimize()
 
@@ -24,7 +23,7 @@ async function handleOptimize() {
 }
 
 function getBrickTitle(brickId: string | undefined): string {
-  if (!brickId) return 'Unknown'
+  if (!brickId) return 'Desconocido'
   return selectedBricks.value.find(b => b.id === brickId)?.title || brickId
 }
 
@@ -71,18 +70,18 @@ const validTips = computed(() => {
         CV Optimizer
       </h3>
       <p class="text-sm text-gray-500 mt-1">
-        Optimize your CV content and order for a specific job
+        Optimiza el contenido y el orden de tu CV para una vacante especifica
       </p>
     </div>
 
     <div class="flex-1 overflow-y-auto p-4">
       <!-- Job Description Input -->
       <div class="mb-4">
-        <label class="block text-sm font-medium mb-2">Job Description</label>
+        <label class="block text-sm font-medium mb-2">Descripcion del Puesto</label>
         <UTextarea
           v-model="jobDescription"
           :rows="6"
-          placeholder="Paste the job description here..."
+          placeholder="Pega aqui la descripcion del puesto..."
           :disabled="isOptimizing"
         />
       </div>
@@ -99,7 +98,7 @@ const validTips = computed(() => {
             name="i-lucide-wand-sparkles"
             class="w-4 h-4 mr-2"
           />
-          Optimize CV
+          Optimizar CV
         </UButton>
         <UButton
           v-if="isOptimizing"
@@ -107,7 +106,7 @@ const validTips = computed(() => {
           color="neutral"
           @click="stop"
         >
-          Stop
+          Detener
         </UButton>
       </div>
 
@@ -115,7 +114,7 @@ const validTips = computed(() => {
         v-if="selectedBricks.length === 0"
         class="text-xs text-gray-400 mt-2"
       >
-        Select bricks first to optimize your CV
+        Selecciona bloques primero para optimizar tu CV
       </p>
 
       <!-- Error -->
@@ -124,7 +123,7 @@ const validTips = computed(() => {
         color="error"
         icon="i-lucide-alert-circle"
         class="mt-4"
-        :title="error.message || 'Optimization failed'"
+        :title="error.message || 'La optimizacion fallo'"
       />
 
       <!-- Results -->
@@ -139,7 +138,7 @@ const validTips = computed(() => {
             :disabled="isOptimizing"
             @click="acceptAllChanges"
           >
-            Accept All Changes
+            Aplicar Todos los Cambios
           </UButton>
         </div>
 
@@ -150,15 +149,15 @@ const validTips = computed(() => {
         >
           <div class="flex items-center justify-between mb-2">
             <h4 class="font-medium text-sm">
-              Recommended Section Order
+              Orden de Categorias Recomendado
             </h4>
             <UButton
               size="xs"
               variant="soft"
               :disabled="isOptimizing"
-              @click="acceptSectionOrder(); acceptWithinSectionOrder()"
+              @click="acceptSectionOrder()"
             >
-              Apply Order
+              Aplicar Orden
             </UButton>
           </div>
           <ol class="text-sm space-y-1">
@@ -179,7 +178,7 @@ const validTips = computed(() => {
           class="space-y-3"
         >
           <h4 class="font-medium text-sm">
-            Content Adjustments
+            Ajustes de Contenido
           </h4>
           <div
             v-for="adj in validAdjustments"
@@ -203,7 +202,7 @@ const validTips = computed(() => {
                 :disabled="isOptimizing"
                 @click="acceptBrickContent(adj.brickId!)"
               >
-                Accept
+                Aplicar
               </UButton>
             </div>
             <p
@@ -229,7 +228,7 @@ const validTips = computed(() => {
           class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3"
         >
           <h4 class="font-medium text-sm mb-2">
-            Tips
+            Consejos
           </h4>
           <ul class="text-sm space-y-1">
             <li
@@ -254,7 +253,7 @@ const validTips = computed(() => {
             name="i-lucide-loader-2"
             class="w-4 h-4 animate-spin"
           />
-          <span>Optimizing your CV...</span>
+          <span>Optimizando tu CV...</span>
         </div>
       </div>
     </div>

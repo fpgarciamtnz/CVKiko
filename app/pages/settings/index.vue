@@ -42,9 +42,9 @@ watch(settings, (newSettings) => {
 async function handleSubmit() {
   try {
     await updateSettings(form)
-    toast.add({ title: 'Settings saved', color: 'success' })
+    toast.add({ title: 'Configuracion guardada', color: 'success' })
   } catch {
-    toast.add({ title: 'Failed to save settings', color: 'error' })
+    toast.add({ title: 'No se pudo guardar la configuracion', color: 'error' })
   }
 }
 </script>
@@ -53,10 +53,10 @@ async function handleSubmit() {
   <UContainer class="py-8 max-w-2xl">
     <div class="mb-6">
       <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-        Settings
+        Configuracion
       </h1>
       <p class="text-gray-600 dark:text-gray-400">
-        Your personal information for CV headers
+        Tu informacion personal para los encabezados del CV
       </p>
     </div>
 
@@ -68,11 +68,11 @@ async function handleSubmit() {
         <!-- Personal Info -->
         <div>
           <h3 class="text-lg font-semibold mb-4">
-            Personal Information
+            Informacion Personal
           </h3>
           <div class="space-y-4">
             <UFormField
-              label="Full Name"
+              label="Nombre Completo"
               required
             >
               <UInput
@@ -82,22 +82,22 @@ async function handleSubmit() {
               />
             </UFormField>
 
-            <UFormField label="Pronouns">
+            <UFormField label="Pronombres">
               <UInput
                 v-model="form.pronouns"
-                placeholder="e.g., he/him, she/her, they/them"
+                placeholder="ej. el, ella, elle"
               />
             </UFormField>
 
             <div class="grid md:grid-cols-2 gap-4">
-              <UFormField label="Email">
+              <UFormField label="Correo">
                 <UInput
                   v-model="form.email"
                   type="email"
                   placeholder="john@example.com"
                 />
               </UFormField>
-              <UFormField label="Phone">
+              <UFormField label="Telefono">
                 <UInput
                   v-model="form.phone"
                   type="tel"
@@ -106,10 +106,10 @@ async function handleSubmit() {
               </UFormField>
             </div>
 
-            <UFormField label="Location">
+            <UFormField label="Ubicacion">
               <UInput
                 v-model="form.location"
-                placeholder="San Francisco, CA"
+                placeholder="Madrid, Espana"
               />
             </UFormField>
           </div>
@@ -118,13 +118,13 @@ async function handleSubmit() {
         <!-- Summary -->
         <div>
           <h3 class="text-lg font-semibold mb-4">
-            Professional Summary
+            Resumen Profesional
           </h3>
-          <UFormField label="Summary">
+          <UFormField label="Resumen">
             <UTextarea
               v-model="form.summary"
               :rows="4"
-              placeholder="A brief summary of your professional background and career goals..."
+              placeholder="Un breve resumen de tu trayectoria profesional y objetivos..."
             />
           </UFormField>
         </div>
@@ -132,45 +132,45 @@ async function handleSubmit() {
         <!-- Academic Profile -->
         <div>
           <h3 class="text-lg font-semibold mb-4">
-            Academic Profile
+            Perfil Academico
           </h3>
           <p class="text-sm text-gray-500 mb-4">
-            These fields are shown when using Academic CV mode
+            Estos campos se muestran al usar el modo Academico
           </p>
           <div class="space-y-4">
             <UFormField
-              label="Academic Title"
-              hint="e.g., Associate Professor, Postdoctoral Researcher"
+              label="Titulo Academico"
+              hint="ej. Profesor Asociado, Investigador Postdoctoral"
             >
               <UInput
                 v-model="form.academicTitle"
-                placeholder="e.g., Assistant Professor"
+                placeholder="ej. Profesor Asistente"
                 icon="i-lucide-graduation-cap"
               />
             </UFormField>
 
             <div class="grid md:grid-cols-2 gap-4">
-              <UFormField label="Department">
+              <UFormField label="Departamento">
                 <UInput
                   v-model="form.department"
-                  placeholder="e.g., Computer Science"
+                  placeholder="ej. Ingenieria Informatica"
                 />
               </UFormField>
-              <UFormField label="Institution">
+              <UFormField label="Institucion">
                 <UInput
                   v-model="form.institution"
-                  placeholder="e.g., Stanford University"
+                  placeholder="ej. Universidad de Barcelona"
                 />
               </UFormField>
             </div>
 
             <UFormField
               label="ORCID"
-              hint="Your ORCID identifier (numbers only)"
+              hint="Tu identificador ORCID (solo numeros)"
             >
               <UInput
                 v-model="form.orcid"
-                placeholder="e.g., 0000-0002-1234-5678"
+                placeholder="ej. 0000-0002-1234-5678"
                 icon="i-lucide-fingerprint"
               />
             </UFormField>
@@ -180,7 +180,7 @@ async function handleSubmit() {
         <!-- Social Links -->
         <div>
           <h3 class="text-lg font-semibold mb-4">
-            Social Links
+            Enlaces Sociales
           </h3>
           <div class="space-y-4">
             <UFormField label="LinkedIn">
@@ -213,7 +213,7 @@ async function handleSubmit() {
               </UInput>
             </UFormField>
 
-            <UFormField label="Website">
+            <UFormField label="Sitio Web">
               <UInput
                 v-model="form.website"
                 type="url"
@@ -235,7 +235,7 @@ async function handleSubmit() {
             type="submit"
             :loading="loading"
           >
-            Save Settings
+            Guardar Configuracion
           </UButton>
         </div>
       </form>

@@ -9,14 +9,14 @@ export const CV_MODE_CONFIG: Record<CVMode, {
   headerTitle: string
 }> = {
   industry: {
-    label: 'Industry',
-    description: 'Optimized for corporate and startup roles',
+    label: 'Industria',
+    description: 'Optimizado para puestos corporativos y de startups',
     defaultSectionOrder: ['experience', 'education', 'project', 'skill', 'publication', 'custom'],
-    headerTitle: 'Resume'
+    headerTitle: 'Curriculum'
   },
   academic: {
-    label: 'Academic',
-    description: 'Comprehensive CV for academic positions',
+    label: 'Academico',
+    description: 'CV completo para posiciones academicas',
     defaultSectionOrder: ['education', 'experience', 'publication', 'teaching', 'grant', 'presentation', 'award', 'service', 'project', 'skill', 'custom'],
     headerTitle: 'Curriculum Vitae'
   }

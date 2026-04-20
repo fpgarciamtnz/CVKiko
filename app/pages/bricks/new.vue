@@ -18,16 +18,16 @@ async function handleSubmit(data: Partial<Brick>) {
   try {
     await createBrick(data)
     toast.add({
-      title: 'Brick created successfully!',
-      description: 'Your new brick has been added.',
+      title: 'Bloque creado correctamente',
+      description: 'Tu nuevo bloque se agrego.',
       color: 'success',
       icon: 'i-lucide-check-circle'
     })
     router.push('/bricks')
   } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : (e as { data?: { message?: string } })?.data?.message || 'Unknown error'
+    const message = e instanceof Error ? e.message : (e as { data?: { message?: string } })?.data?.message || 'Error desconocido'
     toast.add({
-      title: 'Failed to create brick',
+      title: 'No se pudo crear el bloque',
       description: message,
       color: 'error',
       icon: 'i-lucide-alert-circle'
@@ -63,10 +63,10 @@ function submitForm() {
             />
             <div>
               <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
-                Create New Brick
+                Crear Bloque Nuevo
               </h1>
               <p class="text-sm text-gray-500 dark:text-gray-400">
-                Add a new experience, education, project, or skill
+                Agrega una nueva experiencia, educacion, proyecto o habilidad
               </p>
             </div>
           </div>
@@ -76,7 +76,7 @@ function submitForm() {
               color="neutral"
               @click="handleCancel"
             >
-              Cancel
+              Cancelar
             </UButton>
             <UButton
               :loading="isSubmitting"
@@ -86,7 +86,7 @@ function submitForm() {
                 name="i-lucide-plus"
                 class="w-4 h-4 mr-2"
               />
-              Create Brick
+              Crear Bloque
             </UButton>
           </div>
         </div>
@@ -113,14 +113,14 @@ function submitForm() {
             class="flex-1"
             @click="handleCancel"
           >
-            Cancel
+            Cancelar
           </UButton>
           <UButton
             :loading="isSubmitting"
             class="flex-1"
             @click="submitForm"
           >
-            Create Brick
+            Crear Bloque
           </UButton>
         </div>
       </div>

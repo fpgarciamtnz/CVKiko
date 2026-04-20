@@ -7,12 +7,12 @@ useHead({
     { rel: 'icon', href: '/favicon.ico' }
   ],
   htmlAttrs: {
-    lang: 'en'
+    lang: 'es'
   }
 })
 
-const title = 'CVKiko - Modular CV Builder'
-const description = 'Build customized CVs with AI-powered brick selection. Add your experiences as bricks and let AI help you choose the best ones for each job.'
+const title = 'CVKiko - Constructor Modular de CV'
+const description = 'Crea CVs personalizados con seleccion de bloques asistida por IA. Agrega tus experiencias como bloques y deja que la IA te ayude a elegir las mejores para cada empleo.'
 
 useSeoMeta({
   title,

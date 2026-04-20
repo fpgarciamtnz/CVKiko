@@ -177,11 +177,11 @@ export interface BrickTypeConfig {
 
 export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
   experience: {
-    label: 'Experience',
-    pluralLabel: 'Professional Experience',
+    label: 'Experiencia',
+    pluralLabel: 'Experiencia Profesional',
     icon: 'i-lucide-briefcase',
     color: 'blue',
-    description: 'Work history, jobs, and professional roles',
+    description: 'Historial laboral, empleos y roles profesionales',
     defaultData: (): ExperienceData => ({
       jobTitle: '',
       company: '',
@@ -196,11 +196,11 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   education: {
-    label: 'Education',
-    pluralLabel: 'Education',
+    label: 'Educacion',
+    pluralLabel: 'Educacion',
     icon: 'i-lucide-graduation-cap',
     color: 'purple',
-    description: 'Degrees, certifications, and courses',
+    description: 'Titulos, certificaciones y cursos',
     defaultData: (): EducationData => ({
       degree: '',
       field: '',
@@ -216,11 +216,11 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   project: {
-    label: 'Project',
-    pluralLabel: 'Projects',
+    label: 'Proyecto',
+    pluralLabel: 'Proyectos',
     icon: 'i-lucide-code',
     color: 'green',
-    description: 'Personal and professional projects',
+    description: 'Proyectos personales y profesionales',
     defaultData: (): ProjectData => ({
       name: '',
       role: '',
@@ -235,11 +235,11 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   skill: {
-    label: 'Skill',
-    pluralLabel: 'Skills',
+    label: 'Habilidad',
+    pluralLabel: 'Habilidades',
     icon: 'i-lucide-wrench',
     color: 'amber',
-    description: 'Technical skills, languages, and tools',
+    description: 'Habilidades tecnicas, idiomas y herramientas',
     defaultData: (): SkillData => ({
       name: '',
       category: 'technical',
@@ -250,11 +250,11 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   publication: {
-    label: 'Publication',
-    pluralLabel: 'Publications',
+    label: 'Publicacion',
+    pluralLabel: 'Publicaciones',
     icon: 'i-lucide-file-text',
     color: 'rose',
-    description: 'Papers, articles, books, and patents',
+    description: 'Articulos, papers, libros y patentes',
     defaultData: (): PublicationData => ({
       title: '',
       authors: [''],
@@ -271,11 +271,11 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   custom: {
-    label: 'Other',
-    pluralLabel: 'Others',
+    label: 'Otro',
+    pluralLabel: 'Otros',
     icon: 'i-lucide-puzzle',
     color: 'gray',
-    description: 'Any custom content block',
+    description: 'Cualquier bloque de contenido personalizado',
     defaultData: (): CustomData => ({
       content: '',
       startDate: '',
@@ -284,11 +284,11 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   teaching: {
-    label: 'Teaching',
-    pluralLabel: 'Teaching Experience',
+    label: 'Docencia',
+    pluralLabel: 'Experiencia Docente',
     icon: 'i-lucide-presentation',
     color: 'teal',
-    description: 'Courses taught, TA positions, and mentoring',
+    description: 'Cursos impartidos, ayudantias y mentoria',
     defaultData: (): TeachingData => ({
       role: '',
       courseName: '',
@@ -303,11 +303,11 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   grant: {
-    label: 'Grant',
-    pluralLabel: 'Grants & Funding',
+    label: 'Beca',
+    pluralLabel: 'Becas y Financiacion',
     icon: 'i-lucide-banknote',
     color: 'emerald',
-    description: 'Research grants and funding awards',
+    description: 'Becas y fondos de investigacion',
     defaultData: (): GrantData => ({
       title: '',
       fundingAgency: '',
@@ -321,11 +321,11 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   presentation: {
-    label: 'Presentation',
-    pluralLabel: 'Presentations',
+    label: 'Presentacion',
+    pluralLabel: 'Presentaciones',
     icon: 'i-lucide-mic',
     color: 'violet',
-    description: 'Talks, posters, and conference presentations',
+    description: 'Charlas, posters y presentaciones en conferencias',
     defaultData: (): PresentationData => ({
       title: '',
       presentationType: 'talk',
@@ -339,11 +339,11 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   award: {
-    label: 'Award',
-    pluralLabel: 'Awards & Honors',
+    label: 'Premio',
+    pluralLabel: 'Premios y Honores',
     icon: 'i-lucide-trophy',
     color: 'yellow',
-    description: 'Awards, honors, fellowships, and scholarships',
+    description: 'Premios, honores, fellowships y becas',
     defaultData: (): AwardData => ({
       name: '',
       organization: '',
@@ -354,11 +354,11 @@ export const BRICK_TYPE_CONFIG: Record<BrickType, BrickTypeConfig> = {
     })
   },
   service: {
-    label: 'Service',
-    pluralLabel: 'Professional Service',
+    label: 'Servicio',
+    pluralLabel: 'Servicio Profesional',
     icon: 'i-lucide-handshake',
     color: 'sky',
-    description: 'Editorial, review, committee, and mentoring roles',
+    description: 'Roles editoriales, revision, comites y mentoria',
     defaultData: (): ServiceData => ({
       role: '',
       organization: '',
@@ -381,96 +381,96 @@ export function getBrickTypeConfig(type: BrickType): BrickTypeConfig {
 // ============================================
 
 export const SKILL_CATEGORIES = [
-  { value: 'technical', label: 'Technical', description: 'Programming languages, frameworks' },
-  { value: 'language', label: 'Language', description: 'Spoken/written languages' },
-  { value: 'tool', label: 'Tool', description: 'Software, platforms, tools' },
-  { value: 'soft', label: 'Soft Skill', description: 'Leadership, communication, etc.' },
-  { value: 'other', label: 'Other', description: 'Other skills' }
+  { value: 'technical', label: 'Tecnica', description: 'Lenguajes de programacion y frameworks' },
+  { value: 'language', label: 'Idioma', description: 'Idiomas hablados y escritos' },
+  { value: 'tool', label: 'Herramienta', description: 'Software, plataformas y herramientas' },
+  { value: 'soft', label: 'Habilidad Blanda', description: 'Liderazgo, comunicacion, etc.' },
+  { value: 'other', label: 'Otra', description: 'Otras habilidades' }
 ] as const
 
 export const PROFICIENCY_LEVELS = [
-  { value: 'beginner', label: 'Beginner', description: 'Learning/basic understanding' },
-  { value: 'intermediate', label: 'Intermediate', description: 'Can work independently' },
-  { value: 'advanced', label: 'Advanced', description: 'Deep knowledge, can mentor others' },
-  { value: 'expert', label: 'Expert', description: 'Industry-recognized expertise' }
+  { value: 'beginner', label: 'Principiante', description: 'Aprendiendo / comprension basica' },
+  { value: 'intermediate', label: 'Intermedio', description: 'Puede trabajar de forma independiente' },
+  { value: 'advanced', label: 'Avanzado', description: 'Conocimiento profundo, puede guiar a otros' },
+  { value: 'expert', label: 'Experto', description: 'Experiencia reconocida en la industria' }
 ] as const
 
 export const LOCATION_TYPES = [
-  { value: '', label: 'Not specified' },
-  { value: 'onsite', label: 'On-site' },
-  { value: 'remote', label: 'Remote' },
-  { value: 'hybrid', label: 'Hybrid' }
+  { value: '', label: 'No especificado' },
+  { value: 'onsite', label: 'Presencial' },
+  { value: 'remote', label: 'Remoto' },
+  { value: 'hybrid', label: 'Hibrido' }
 ] as const
 
 export const PUBLICATION_TYPES = [
-  { value: 'journal', label: 'Journal Article' },
-  { value: 'conference', label: 'Conference Paper' },
-  { value: 'article', label: 'Article/Blog' },
-  { value: 'book', label: 'Book/Chapter' },
-  { value: 'patent', label: 'Patent' },
-  { value: 'other', label: 'Other' }
+  { value: 'journal', label: 'Articulo de Revista' },
+  { value: 'conference', label: 'Paper de Conferencia' },
+  { value: 'article', label: 'Articulo / Blog' },
+  { value: 'book', label: 'Libro / Capitulo' },
+  { value: 'patent', label: 'Patente' },
+  { value: 'other', label: 'Otro' }
 ] as const
 
 export const PUBLICATION_STATUSES = [
-  { value: '', label: 'Not specified' },
-  { value: 'published', label: 'Published' },
-  { value: 'in_press', label: 'In Press' },
-  { value: 'accepted', label: 'Accepted' },
-  { value: 'under_review', label: 'Under Review' },
-  { value: 'submitted', label: 'Submitted' },
+  { value: '', label: 'No especificado' },
+  { value: 'published', label: 'Publicado' },
+  { value: 'in_press', label: 'En Prensa' },
+  { value: 'accepted', label: 'Aceptado' },
+  { value: 'under_review', label: 'En Revision' },
+  { value: 'submitted', label: 'Enviado' },
   { value: 'preprint', label: 'Preprint' }
 ] as const
 
 export const PRESENTATION_TYPES = [
-  { value: 'talk', label: 'Talk' },
+  { value: 'talk', label: 'Charla' },
   { value: 'poster', label: 'Poster' },
   { value: 'keynote', label: 'Keynote' },
-  { value: 'invited', label: 'Invited Talk' },
+  { value: 'invited', label: 'Charla Invitada' },
   { value: 'panel', label: 'Panel' },
-  { value: 'workshop', label: 'Workshop' },
-  { value: 'other', label: 'Other' }
+  { value: 'workshop', label: 'Taller' },
+  { value: 'other', label: 'Otro' }
 ] as const
 
 export const GRANT_STATUSES = [
-  { value: '', label: 'Not specified' },
-  { value: 'awarded', label: 'Awarded' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'declined', label: 'Declined' }
+  { value: '', label: 'No especificado' },
+  { value: 'awarded', label: 'Otorgado' },
+  { value: 'pending', label: 'Pendiente' },
+  { value: 'completed', label: 'Completado' },
+  { value: 'declined', label: 'Rechazado' }
 ] as const
 
 export const GRANT_ROLES = [
-  { value: '', label: 'Not specified' },
-  { value: 'PI', label: 'Principal Investigator (PI)' },
-  { value: 'Co-PI', label: 'Co-Principal Investigator' },
-  { value: 'Co-I', label: 'Co-Investigator' },
-  { value: 'Senior Personnel', label: 'Senior Personnel' },
-  { value: 'Consultant', label: 'Consultant' }
+  { value: '', label: 'No especificado' },
+  { value: 'PI', label: 'Investigador Principal (PI)' },
+  { value: 'Co-PI', label: 'Co-Investigador Principal' },
+  { value: 'Co-I', label: 'Co-Investigador' },
+  { value: 'Senior Personnel', label: 'Personal Senior' },
+  { value: 'Consultant', label: 'Consultor' }
 ] as const
 
 export const SERVICE_TYPES = [
-  { value: 'editorial', label: 'Editorial Board' },
-  { value: 'review', label: 'Peer Review' },
-  { value: 'committee', label: 'Committee' },
-  { value: 'mentoring', label: 'Mentoring' },
-  { value: 'organizing', label: 'Event Organizing' },
-  { value: 'other', label: 'Other' }
+  { value: 'editorial', label: 'Comite Editorial' },
+  { value: 'review', label: 'Revision por Pares' },
+  { value: 'committee', label: 'Comite' },
+  { value: 'mentoring', label: 'Mentoria' },
+  { value: 'organizing', label: 'Organizacion de Eventos' },
+  { value: 'other', label: 'Otro' }
 ] as const
 
 export const AWARD_CATEGORIES = [
-  { value: 'award', label: 'Award' },
+  { value: 'award', label: 'Premio' },
   { value: 'honor', label: 'Honor' },
   { value: 'fellowship', label: 'Fellowship' },
-  { value: 'scholarship', label: 'Scholarship' },
-  { value: 'other', label: 'Other' }
+  { value: 'scholarship', label: 'Beca' },
+  { value: 'other', label: 'Otro' }
 ] as const
 
 export const TEACHING_STUDENT_LEVELS = [
-  { value: '', label: 'Not specified' },
-  { value: 'undergraduate', label: 'Undergraduate' },
-  { value: 'graduate', label: 'Graduate' },
+  { value: '', label: 'No especificado' },
+  { value: 'undergraduate', label: 'Grado' },
+  { value: 'graduate', label: 'Posgrado' },
   { value: 'doctoral', label: 'Doctoral' },
-  { value: 'mixed', label: 'Mixed' }
+  { value: 'mixed', label: 'Mixto' }
 ] as const
 
 export const DOI_REGEX = /^10\.\d{4,9}\/[^\s]+$/
@@ -495,17 +495,17 @@ export function parseGitHubUrl(input: string): { owner: string, repo: string } |
 }
 
 export const DEGREE_OPTIONS = [
-  'High School Diploma',
-  'Associate Degree',
-  'Bachelor of Science (BS)',
-  'Bachelor of Arts (BA)',
-  'Master of Science (MS)',
-  'Master of Arts (MA)',
-  'Master of Business Administration (MBA)',
-  'Doctor of Philosophy (PhD)',
-  'Professional Certificate',
-  'Bootcamp Certificate',
-  'Other'
+  'Diploma de Secundaria',
+  'Titulo de Tecnico Superior',
+  'Grado en Ciencias (BS)',
+  'Grado en Artes (BA)',
+  'Master en Ciencias (MS)',
+  'Master en Artes (MA)',
+  'Master en Administracion (MBA)',
+  'Doctorado (PhD)',
+  'Certificado Profesional',
+  'Certificado de Bootcamp',
+  'Otro'
 ]
 
 // ============================================
@@ -518,16 +518,16 @@ export function formatDateRange(startDate?: string | null, endDate?: string | nu
   if (brickType === 'education') {
     const source = endDate || startDate
     const year = new Date(source).getFullYear()
-    return endDate ? `${year}` : `Expected ${year}`
+    return endDate ? `${year}` : `Esperado ${year}`
   }
 
   const formatDate = (date: string) => {
     const d = new Date(date)
-    return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    return d.toLocaleDateString('es-ES', { month: 'short', year: 'numeric' })
   }
 
   const start = formatDate(startDate)
-  const end = endDate ? formatDate(endDate) : 'Present'
+  const end = endDate ? formatDate(endDate) : 'Actualidad'
 
   return `${start} - ${end}`
 }
@@ -568,7 +568,7 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       const exp = data as ExperienceData
       let md = ''
       if (exp.isInternship) {
-        md += '**Internship**\n\n'
+        md += '**Practicas**\n\n'
       }
       const responsibilities = exp.responsibilities.filter(r => r.trim())
       const achievements = exp.achievements.filter(a => a.trim())
@@ -582,7 +582,7 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
         md += '\n'
       }
       if (exp.technologies.length > 0) {
-        md += `**Technologies:** ${exp.technologies.join(', ')}\n`
+        md += `**Tecnologias:** ${exp.technologies.join(', ')}\n`
       }
       return md
     }
@@ -590,23 +590,23 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       const edu = data as EducationData
       let md = ''
       if (edu.coursework.length > 0) {
-        md += '## Relevant Coursework\n\n'
+        md += '## Cursos Relevantes\n\n'
         edu.coursework.forEach((c) => {
           md += `- ${c}\n`
         })
         md += '\n'
       }
       if (edu.honors.length > 0) {
-        md += `**Honors:** ${edu.honors.join(', ')}\n\n`
+        md += `**Honores:** ${edu.honors.join(', ')}\n\n`
       }
       if (edu.activities.length > 0) {
-        md += '## Activities\n\n'
+        md += '## Actividades\n\n'
         edu.activities.forEach((a) => {
           md += `- ${a}\n`
         })
       }
       if (edu.thesis) {
-        md += `\n**Thesis:** ${edu.thesis}\n`
+        md += `\n**Tesis:** ${edu.thesis}\n`
       }
       return md
     }
@@ -617,25 +617,25 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
         md += `${proj.description}\n`
       }
       if (proj.problem) {
-        md += `${md ? '\n' : ''}**Goal:** ${proj.problem}\n`
+        md += `${md ? '\n' : ''}**Objetivo:** ${proj.problem}\n`
       }
       const features = proj.features.filter(f => f.trim())
       if (features.length > 0) {
-        md += `${md ? '\n' : ''}**Highlights:** ${features.join('; ')}\n`
+        md += `${md ? '\n' : ''}**Puntos Clave:** ${features.join('; ')}\n`
       }
       if (proj.technologies.length > 0) {
-        md += `${md ? '\n' : ''}**Tech Stack:** ${proj.technologies.join(', ')}\n`
+        md += `${md ? '\n' : ''}**Stack Tecnologico:** ${proj.technologies.join(', ')}\n`
       }
       if (proj.outcome) {
-        md += `${md ? '\n' : ''}**Outcome:** ${proj.outcome}\n`
+        md += `${md ? '\n' : ''}**Resultado:** ${proj.outcome}\n`
       }
       return md
     }
     case 'skill': {
       const skill = data as SkillData
-      let md = `**Proficiency:** ${skill.proficiency}\n\n`
+      let md = `**Nivel:** ${skill.proficiency}\n\n`
       if (skill.yearsOfExperience > 0) {
-        md += `**Experience:** ${skill.yearsOfExperience} year${skill.yearsOfExperience > 1 ? 's' : ''}\n\n`
+        md += `**Experiencia:** ${skill.yearsOfExperience} ano${skill.yearsOfExperience > 1 ? 's' : ''}\n\n`
       }
       if (skill.context) {
         md += `${skill.context}\n`
@@ -646,15 +646,15 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       const pub = data as PublicationData
       let md = ''
       if (pub.authors.length > 0) {
-        md += `**Authors:** ${pub.authors.join(', ')}\n`
+        md += `**Autores:** ${pub.authors.join(', ')}\n`
       }
       if (pub.status) {
         const statusLabel = PUBLICATION_STATUSES.find(s => s.value === pub.status)?.label || pub.status
-        md += `${md ? '\n' : ''}**Status:** ${statusLabel}\n`
+        md += `${md ? '\n' : ''}**Estado:** ${statusLabel}\n`
       }
       const contributions = pub.contributions.filter(c => c.trim())
       if (contributions.length > 0) {
-        md += `${md ? '\n' : ''}**Contributions:** ${contributions.join('; ')}\n`
+        md += `${md ? '\n' : ''}**Contribuciones:** ${contributions.join('; ')}\n`
       }
       return md
     }
@@ -666,21 +666,21 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       const t = data as TeachingData
       let md = ''
       if (t.courseCode) {
-        md += `**Course:** ${t.courseCode} - ${t.courseName}\n\n`
+        md += `**Curso:** ${t.courseCode} - ${t.courseName}\n\n`
       }
       if (t.department) {
-        md += `**Department:** ${t.department}\n\n`
+        md += `**Departamento:** ${t.department}\n\n`
       }
       if (t.studentLevel) {
         const levelLabel = TEACHING_STUDENT_LEVELS.find(l => l.value === t.studentLevel)?.label || t.studentLevel
-        md += `**Level:** ${levelLabel}`
+        md += `**Nivel:** ${levelLabel}`
         if (t.enrollmentSize > 0) {
-          md += ` (${t.enrollmentSize} students)`
+          md += ` (${t.enrollmentSize} estudiantes)`
         }
         md += '\n\n'
       }
       if (t.responsibilities.filter(r => r.trim()).length > 0) {
-        md += '## Responsibilities\n\n'
+        md += '## Responsabilidades\n\n'
         t.responsibilities.filter(r => r.trim()).forEach((r) => {
           md += `- ${r}\n`
         })
@@ -691,20 +691,20 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       const g = data as GrantData
       let md = ''
       if (g.fundingAgency) {
-        md += `**Funding Agency:** ${g.fundingAgency}\n\n`
+        md += `**Entidad Financiadora:** ${g.fundingAgency}\n\n`
       }
       if (g.role) {
-        md += `**Role:** ${g.role}\n\n`
+        md += `**Rol:** ${g.role}\n\n`
       }
       if (g.amount) {
-        md += `**Amount:** ${g.amount}\n\n`
+        md += `**Monto:** ${g.amount}\n\n`
       }
       if (g.status) {
         const statusLabel = GRANT_STATUSES.find(s => s.value === g.status)?.label || g.status
-        md += `**Status:** ${statusLabel}\n\n`
+        md += `**Estado:** ${statusLabel}\n\n`
       }
       if (g.grantNumber) {
-        md += `**Grant #:** ${g.grantNumber}\n\n`
+        md += `**Beca #:** ${g.grantNumber}\n\n`
       }
       if (g.description) {
         md += `${g.description}\n`
@@ -715,16 +715,16 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       const p = data as PresentationData
       let md = ''
       const typeLabel = PRESENTATION_TYPES.find(t => t.value === p.presentationType)?.label || p.presentationType
-      md += `**Type:** ${typeLabel}`
+      md += `**Tipo:** ${typeLabel}`
       if (p.isInvited) {
-        md += ' (Invited)'
+        md += ' (Invitada)'
       }
       md += '\n\n'
       if (p.event) {
-        md += `**Event:** ${p.event}\n\n`
+        md += `**Evento:** ${p.event}\n\n`
       }
       if (p.coAuthors.length > 0) {
-        md += `**Co-Authors:** ${p.coAuthors.join(', ')}\n\n`
+        md += `**Coautores:** ${p.coAuthors.join(', ')}\n\n`
       }
       if (p.abstract) {
         md += `${p.abstract}\n`
@@ -735,10 +735,10 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       const a = data as AwardData
       let md = ''
       if (a.organization) {
-        md += `**Awarded by:** ${a.organization}\n\n`
+        md += `**Otorgado por:** ${a.organization}\n\n`
       }
       if (a.amount) {
-        md += `**Amount:** ${a.amount}\n\n`
+        md += `**Monto:** ${a.amount}\n\n`
       }
       if (a.description) {
         md += `${a.description}\n`
@@ -749,9 +749,9 @@ export function structuredDataToMarkdown(type: BrickType, data: unknown): string
       const s = data as ServiceData
       let md = ''
       const typeLabel = SERVICE_TYPES.find(t => t.value === s.serviceType)?.label || s.serviceType
-      md += `**Type:** ${typeLabel}\n\n`
+      md += `**Tipo:** ${typeLabel}\n\n`
       if (s.organization) {
-        md += `**Organization:** ${s.organization}\n\n`
+        md += `**Organizacion:** ${s.organization}\n\n`
       }
       if (s.description) {
         md += `${s.description}\n`

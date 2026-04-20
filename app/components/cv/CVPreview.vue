@@ -67,26 +67,26 @@ function getDateRange(brick: Brick): string {
 </script>
 
 <template>
-  <div class="cv-preview bg-white text-gray-900 p-8 min-h-[800px] shadow-lg">
+  <div class="cv-preview">
     <!-- Header -->
-    <header class="mb-6 pb-4 border-b-2 border-gray-200">
+    <header class="cv-header">
       <p
         v-if="isAcademic"
-        class="text-xs uppercase tracking-widest text-gray-500 mb-1"
+        class="cv-kicker"
       >
         Curriculum Vitae
       </p>
-      <h1 class="text-3xl font-bold text-gray-900">
-        {{ settings?.name || 'Your Name' }}
+      <h1 class="cv-name">
+        {{ settings?.name || 'Tu Nombre' }}
         <span
           v-if="settings?.pronouns"
-          class="text-base font-normal text-gray-500"
+          class="cv-pronouns"
         >({{ settings.pronouns }})</span>
       </h1>
       <!-- Academic subtitle -->
       <div
         v-if="isAcademic && (settings?.academicTitle || settings?.department || settings?.institution)"
-        class="mt-1 text-sm text-gray-600"
+        class="cv-academic-subtitle"
       >
         <span v-if="settings?.academicTitle">{{ settings.academicTitle }}</span>
         <span v-if="settings?.academicTitle && settings?.department">, </span>
@@ -94,34 +94,34 @@ function getDateRange(brick: Brick): string {
         <span v-if="(settings?.academicTitle || settings?.department) && settings?.institution">, </span>
         <span v-if="settings?.institution">{{ settings.institution }}</span>
       </div>
-      <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-600">
+      <div class="cv-contact">
         <span
           v-if="settings?.email"
-          class="flex items-center gap-1"
+          class="cv-contact-item"
         >
           <UIcon
             name="i-lucide-mail"
-            class="w-4 h-4"
+            class="cv-contact-icon"
           />
           {{ settings.email }}
         </span>
         <span
           v-if="settings?.phone"
-          class="flex items-center gap-1"
+          class="cv-contact-item"
         >
           <UIcon
             name="i-lucide-phone"
-            class="w-4 h-4"
+            class="cv-contact-icon"
           />
           {{ settings.phone }}
         </span>
         <span
           v-if="settings?.location"
-          class="flex items-center gap-1"
+          class="cv-contact-item"
         >
           <UIcon
             name="i-lucide-map-pin"
-            class="w-4 h-4"
+            class="cv-contact-icon"
           />
           {{ settings.location }}
         </span>
@@ -129,11 +129,11 @@ function getDateRange(brick: Brick): string {
           v-if="settings?.linkedIn"
           :href="settings.linkedIn"
           target="_blank"
-          class="flex items-center gap-1 text-blue-600 hover:underline"
+          class="cv-contact-link"
         >
           <UIcon
             name="i-simple-icons-linkedin"
-            class="w-4 h-4"
+            class="cv-contact-icon"
           />
           LinkedIn
         </a>
@@ -141,11 +141,11 @@ function getDateRange(brick: Brick): string {
           v-if="settings?.github"
           :href="settings.github"
           target="_blank"
-          class="flex items-center gap-1 text-gray-700 hover:underline"
+          class="cv-contact-link"
         >
           <UIcon
             name="i-simple-icons-github"
-            class="w-4 h-4"
+            class="cv-contact-icon"
           />
           GitHub
         </a>
@@ -153,23 +153,23 @@ function getDateRange(brick: Brick): string {
           v-if="settings?.website"
           :href="settings.website"
           target="_blank"
-          class="flex items-center gap-1 text-blue-600 hover:underline"
+          class="cv-contact-link"
         >
           <UIcon
             name="i-lucide-globe"
-            class="w-4 h-4"
+            class="cv-contact-icon"
           />
-          Website
+          Sitio Web
         </a>
         <a
           v-if="isAcademic && settings?.orcid"
           :href="`https://orcid.org/${settings.orcid}`"
           target="_blank"
-          class="flex items-center gap-1 text-green-600 hover:underline"
+          class="cv-contact-link"
         >
           <UIcon
             name="i-lucide-fingerprint"
-            class="w-4 h-4"
+            class="cv-contact-icon"
           />
           ORCID
         </a>
@@ -179,9 +179,9 @@ function getDateRange(brick: Brick): string {
     <!-- Summary -->
     <section
       v-if="settings?.summary"
-      class="mb-6"
+      class="cv-summary"
     >
-      <p class="text-gray-700 leading-relaxed">
+      <p class="cv-summary-text">
         {{ settings.summary }}
       </p>
     </section>
@@ -189,14 +189,14 @@ function getDateRange(brick: Brick): string {
     <!-- Empty State -->
     <div
       v-if="visibleSections.length === 0 && freeformSections.length === 0"
-      class="flex flex-col items-center justify-center py-20 text-gray-400"
+      class="cv-empty-state"
     >
       <UIcon
         name="i-lucide-file-text"
-        class="w-16 h-16 mb-4"
+        class="cv-empty-icon"
       />
-      <p class="text-lg">
-        Select bricks to build your CV
+      <p class="cv-empty-text">
+        Selecciona bloques para construir tu CV
       </p>
     </div>
 
@@ -205,18 +205,18 @@ function getDateRange(brick: Brick): string {
       <section
         v-for="(section, sIdx) in freeformSections"
         :key="`ff-${sIdx}`"
-        class="mb-6"
+        class="cv-section"
       >
-        <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wide border-b border-gray-300 pb-1 mb-3">
+        <h2 class="cv-section-title">
           {{ BRICK_TYPE_CONFIG[section.type].pluralLabel }}
         </h2>
 
         <template v-if="section.type === 'skill'">
-          <div class="flex flex-wrap gap-2">
+          <div class="cv-skill-list">
             <span
               v-for="brick in section.bricks"
               :key="brick.id"
-              class="px-2 py-1 bg-gray-100 rounded text-sm"
+              class="cv-skill-pill"
             >
               {{ brick.title }}
             </span>
@@ -227,21 +227,21 @@ function getDateRange(brick: Brick): string {
           <div
             v-for="brick in section.bricks"
             :key="brick.id"
-            class="mb-4 last:mb-0"
+            class="cv-entry"
           >
-            <div class="flex justify-between items-start">
+            <div class="cv-entry-header">
               <div>
-                <h3 class="font-semibold text-gray-900">
+                <h3 class="cv-entry-title">
                   {{ brick.title }}
                 </h3>
                 <p
                   v-if="brick.frontmatter?.subtitle"
-                  class="text-gray-600 italic"
+                  class="cv-entry-subtitle"
                 >
                   {{ brick.frontmatter.subtitle }}
                   <span
                     v-if="brick.frontmatter?.location"
-                    class="text-gray-500"
+                    class="cv-entry-location"
                   >
                     | {{ brick.frontmatter.location }}
                   </span>
@@ -249,7 +249,7 @@ function getDateRange(brick: Brick): string {
               </div>
               <span
                 v-if="getDateRange(brick)"
-                class="text-sm text-gray-500 whitespace-nowrap ml-4"
+                class="cv-entry-date"
               >
                 {{ getDateRange(brick) }}
               </span>
@@ -257,7 +257,7 @@ function getDateRange(brick: Brick): string {
 
             <div
               v-if="getBrickContent(brick)"
-              class="mt-2 text-gray-700 text-sm leading-relaxed cv-content"
+              class="cv-entry-content cv-content"
               v-html="renderMarkdown(getBrickContent(brick))"
             />
           </div>
@@ -270,19 +270,19 @@ function getDateRange(brick: Brick): string {
       <section
         v-for="type in visibleSections"
         :key="type"
-        class="mb-6"
+        class="cv-section"
       >
-        <h2 class="text-lg font-bold text-gray-900 uppercase tracking-wide border-b border-gray-300 pb-1 mb-3">
+        <h2 class="cv-section-title">
           {{ BRICK_TYPE_CONFIG[type].pluralLabel }}
         </h2>
 
         <!-- Skills rendered as tags -->
         <template v-if="type === 'skill'">
-          <div class="flex flex-wrap gap-2">
+          <div class="cv-skill-list">
             <span
               v-for="brick in bricksByType[type]"
               :key="brick.id"
-              class="px-2 py-1 bg-gray-100 rounded text-sm"
+              class="cv-skill-pill"
             >
               {{ brick.title }}
             </span>
@@ -294,17 +294,17 @@ function getDateRange(brick: Brick): string {
           <div
             v-for="brick in bricksByType[type]"
             :key="brick.id"
-            class="mb-4 last:mb-0"
+            class="cv-entry"
           >
-            <div class="flex justify-between items-start">
-              <div class="flex-1">
-                <h3 class="font-semibold text-gray-900">
+            <div class="cv-entry-header">
+              <div class="cv-entry-main">
+                <h3 class="cv-entry-title">
                   {{ brick.title }}
                 </h3>
                 <!-- Authors with highlighting -->
                 <p
                   v-if="(brick.structuredData as unknown as PublicationData)?.authors?.length"
-                  class="text-gray-600 text-sm"
+                  class="cv-publication-authors"
                   v-html="highlightAuthor(
                     (brick.structuredData as unknown as PublicationData).authors.join(', '),
                     (brick.structuredData as unknown as PublicationData).authorHighlightName || ''
@@ -312,15 +312,15 @@ function getDateRange(brick: Brick): string {
                 />
                 <p
                   v-if="brick.frontmatter?.subtitle"
-                  class="text-gray-600 italic text-sm"
+                  class="cv-entry-subtitle"
                 >
                   {{ brick.frontmatter.subtitle }}
                 </p>
               </div>
-              <div class="flex items-center gap-2 ml-4">
+              <div class="cv-entry-meta">
                 <span
                   v-if="(brick.structuredData as unknown as PublicationData)?.status"
-                  class="text-xs px-2 py-0.5 rounded-full"
+                  class="cv-publication-status"
                   :class="{
                     'bg-green-100 text-green-700': (brick.structuredData as unknown as PublicationData).status === 'published',
                     'bg-blue-100 text-blue-700': (brick.structuredData as unknown as PublicationData).status === 'in_press' || (brick.structuredData as unknown as PublicationData).status === 'accepted',
@@ -332,7 +332,7 @@ function getDateRange(brick: Brick): string {
                 </span>
                 <span
                   v-if="getDateRange(brick)"
-                  class="text-sm text-gray-500 whitespace-nowrap"
+                  class="cv-entry-date"
                 >
                   {{ getDateRange(brick) }}
                 </span>
@@ -341,7 +341,7 @@ function getDateRange(brick: Brick): string {
 
             <div
               v-if="getBrickContent(brick)"
-              class="mt-2 text-gray-700 text-sm leading-relaxed cv-content"
+              class="cv-entry-content cv-content"
               v-html="renderMarkdown(getBrickContent(brick))"
             />
 
@@ -350,7 +350,7 @@ function getDateRange(brick: Brick): string {
               v-if="(brick.structuredData as unknown as PublicationData)?.doi"
               :href="`https://doi.org/${(brick.structuredData as unknown as PublicationData).doi}`"
               target="_blank"
-              class="text-sm text-blue-600 hover:underline mt-1 inline-block"
+              class="cv-entry-link"
             >
               DOI: {{ (brick.structuredData as unknown as PublicationData).doi }}
             </a>
@@ -362,21 +362,21 @@ function getDateRange(brick: Brick): string {
           <div
             v-for="brick in bricksByType[type]"
             :key="brick.id"
-            class="mb-4 last:mb-0"
+            class="cv-entry"
           >
-            <div class="flex justify-between items-start">
+            <div class="cv-entry-header">
               <div>
-                <h3 class="font-semibold text-gray-900">
+                <h3 class="cv-entry-title">
                   {{ brick.title }}
                 </h3>
                 <p
                   v-if="brick.frontmatter?.subtitle"
-                  class="text-gray-600 italic"
+                  class="cv-entry-subtitle"
                 >
                   {{ brick.frontmatter.subtitle }}
                   <span
                     v-if="brick.frontmatter?.location"
-                    class="text-gray-500"
+                    class="cv-entry-location"
                   >
                     | {{ brick.frontmatter.location }}
                   </span>
@@ -384,7 +384,7 @@ function getDateRange(brick: Brick): string {
               </div>
               <span
                 v-if="getDateRange(brick)"
-                class="text-sm text-gray-500 whitespace-nowrap ml-4"
+                class="cv-entry-date"
               >
                 {{ getDateRange(brick) }}
               </span>
@@ -393,18 +393,18 @@ function getDateRange(brick: Brick): string {
             <!-- Rendered Markdown Content -->
             <div
               v-if="getBrickContent(brick)"
-              class="mt-2 text-gray-700 text-sm leading-relaxed cv-content"
+              class="cv-entry-content cv-content"
               v-html="renderMarkdown(getBrickContent(brick))"
             />
 
             <div
               v-if="brick.tags?.length"
-              class="mt-2 flex flex-wrap gap-1"
+              class="cv-tags"
             >
               <span
                 v-for="tag in brick.tags"
                 :key="tag"
-                class="text-xs px-1.5 py-0.5 bg-gray-100 rounded"
+                class="cv-tag"
               >
                 {{ tag }}
               </span>
@@ -414,7 +414,7 @@ function getDateRange(brick: Brick): string {
               v-if="brick.frontmatter?.url"
               :href="brick.frontmatter.url"
               target="_blank"
-              class="text-sm text-blue-600 hover:underline mt-1 inline-block"
+              class="cv-entry-link"
             >
               {{ brick.frontmatter.url }}
             </a>
@@ -427,11 +427,240 @@ function getDateRange(brick: Brick): string {
 
 <style scoped>
 .cv-preview {
-  font-family: 'Georgia', 'Times New Roman', serif;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background: #fff;
+  color: #0f172a;
+  padding: 2rem;
+  min-height: 1122px;
+  border: 1px solid #d1d5db;
+}
+
+.cv-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 2px solid #1f2937;
+}
+
+.cv-kicker {
+  margin-bottom: 0.3rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #475569;
+}
+
+.cv-name {
+  font-size: 1.8rem;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #0f172a;
+}
+
+.cv-pronouns {
+  margin-left: 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #475569;
+}
+
+.cv-academic-subtitle {
+  margin-top: 0.2rem;
+  font-size: 0.84rem;
+  color: #334155;
+}
+
+.cv-contact {
+  margin-top: 0.45rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.8rem;
+  font-size: 0.76rem;
+  color: #334155;
+}
+
+.cv-contact > * {
+  position: relative;
+}
+
+.cv-contact > *:not(:last-child)::after {
+  content: '|';
+  margin-left: 0.45rem;
+  color: #94a3b8;
+}
+
+.cv-contact-icon {
+  display: none;
+}
+
+.cv-contact-link {
+  color: #1e3a8a;
+  text-decoration: none;
+}
+
+.cv-contact-link:hover {
+  text-decoration: underline;
+}
+
+.cv-summary {
+  margin-bottom: 1.35rem;
+}
+
+.cv-summary-text {
+  font-size: 0.84rem;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.cv-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  color: #94a3b8;
+}
+
+.cv-empty-icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.cv-empty-text {
+  font-size: 0.95rem;
+}
+
+.cv-section {
+  margin-bottom: 1.2rem;
+}
+
+.cv-section-title {
+  margin-bottom: 0.7rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid #cbd5e1;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #1e293b;
+}
+
+.cv-skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.cv-skill-pill {
+  padding: 0.22rem 0.45rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.15rem;
+  background: #f8fafc;
+  font-size: 0.74rem;
+  color: #1e293b;
+}
+
+.cv-entry {
+  margin-bottom: 0.9rem;
+}
+
+.cv-entry:last-child {
+  margin-bottom: 0;
+}
+
+.cv-entry-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.cv-entry-main {
+  flex: 1;
+}
+
+.cv-entry-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.cv-entry-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.35;
+}
+
+.cv-entry-subtitle {
+  margin-top: 0.1rem;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #334155;
+}
+
+.cv-entry-location {
+  color: #64748b;
+}
+
+.cv-entry-date {
+  white-space: nowrap;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: #475569;
+}
+
+.cv-publication-authors {
+  margin-top: 0.1rem;
+  font-size: 0.76rem;
+  color: #334155;
+}
+
+.cv-publication-status {
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  font-size: 0.64rem;
+  padding: 0.06rem 0.35rem;
+}
+
+.cv-entry-content {
+  margin-top: 0.32rem;
+  font-size: 0.79rem;
+  color: #1e293b;
+  line-height: 1.55;
+}
+
+.cv-tags {
+  margin-top: 0.45rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.cv-tag {
+  border: 1px solid #d1d5db;
+  border-radius: 0.15rem;
+  background: #f8fafc;
+  font-size: 0.68rem;
+  color: #334155;
+  padding: 0.1rem 0.3rem;
+}
+
+.cv-entry-link {
+  margin-top: 0.35rem;
+  display: inline-block;
+  font-size: 0.75rem;
+  color: #1e3a8a;
+  text-decoration: none;
+}
+
+.cv-entry-link:hover {
+  text-decoration: underline;
 }
 
 .cv-content :deep(p) {
-  margin-top: 0.5rem;
+  margin-top: 0.35rem;
 }
 
 .cv-content :deep(strong) {
@@ -440,8 +669,9 @@ function getDateRange(brick: Brick): string {
 
 @media print {
   .cv-preview {
-    box-shadow: none;
     padding: 0;
+    border: 0;
+    min-height: auto;
   }
 }
 </style>

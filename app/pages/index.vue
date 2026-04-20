@@ -27,10 +27,10 @@ const stats = computed(() => {
   <UContainer class="py-8">
     <div class="mb-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-        Welcome{{ settings?.name ? `, ${settings.name}` : '' }}
+        Bienvenido{{ settings?.name ? `, ${settings.name}` : '' }}
       </h1>
       <p class="text-gray-600 dark:text-gray-400">
-        Build customized CVs by selecting the right bricks for each job application.
+        Crea CVs personalizados seleccionando los bloques adecuados para cada candidatura.
       </p>
     </div>
 
@@ -41,7 +41,7 @@ const stats = computed(() => {
           {{ stats.total }}
         </div>
         <div class="text-sm text-gray-500">
-          Total Bricks
+          Bloques Totales
         </div>
       </UCard>
       <UCard
@@ -73,19 +73,19 @@ const stats = computed(() => {
               class="w-5 h-5 text-primary"
             />
             <h2 class="font-semibold">
-              Manage Bricks
+              Gestionar Bloques
             </h2>
           </div>
         </template>
         <p class="text-gray-600 dark:text-gray-400 mb-4">
-          Add your work experiences, education, projects, and skills as reusable bricks.
+          Agrega experiencias, educacion, proyectos y habilidades como bloques reutilizables.
         </p>
         <UButton
           to="/bricks"
           variant="soft"
           block
         >
-          Go to Bricks
+          Ir a Bloques
         </UButton>
       </UCard>
 
@@ -97,19 +97,19 @@ const stats = computed(() => {
               class="w-5 h-5 text-primary"
             />
             <h2 class="font-semibold">
-              Build CV
+              Construir CV
             </h2>
           </div>
         </template>
         <p class="text-gray-600 dark:text-gray-400 mb-4">
-          Select bricks and use AI to create a customized CV for your target job.
+          Selecciona bloques y usa IA para crear un CV personalizado para tu puesto objetivo.
         </p>
         <UButton
           to="/builder"
           variant="soft"
           block
         >
-          Start Building
+          Empezar
         </UButton>
       </UCard>
 
@@ -121,19 +121,19 @@ const stats = computed(() => {
               class="w-5 h-5 text-primary"
             />
             <h2 class="font-semibold">
-              Personal Info
+              Informacion Personal
             </h2>
           </div>
         </template>
         <p class="text-gray-600 dark:text-gray-400 mb-4">
-          Set up your contact information, summary, and social links.
+          Configura tu informacion de contacto, resumen y enlaces sociales.
         </p>
         <UButton
           to="/settings"
           variant="soft"
           block
         >
-          Edit Settings
+          Editar Configuracion
         </UButton>
       </UCard>
     </div>
@@ -145,14 +145,14 @@ const stats = computed(() => {
     >
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-          Recent Bricks
+          Bloques Recientes
         </h2>
         <UButton
           to="/bricks"
           variant="link"
           trailing-icon="i-lucide-arrow-right"
         >
-          View all
+          Ver todos
         </UButton>
       </div>
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -172,14 +172,14 @@ const stats = computed(() => {
     >
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
-          Shared CVs
+          CVs Compartidos
         </h2>
         <UButton
           to="/builder"
           variant="link"
           trailing-icon="i-lucide-plus"
         >
-          Create new
+          Crear nuevo
         </UButton>
       </div>
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -219,16 +219,16 @@ const stats = computed(() => {
         class="w-16 h-16 mx-auto mb-4 text-gray-400"
       />
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-        No bricks yet
+        Aun no hay bloques
       </h3>
       <p class="text-gray-600 dark:text-gray-400 mb-4">
-        Start by adding your work experience, education, and projects.
+        Empieza agregando experiencia laboral, educacion y proyectos.
       </p>
       <UButton
         to="/bricks"
         icon="i-lucide-plus"
       >
-        Add Your First Brick
+        Agrega tu Primer Bloque
       </UButton>
     </UCard>
   </UContainer>

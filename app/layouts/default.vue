@@ -1,10 +1,10 @@
 <script setup>
 const navigation = [
-  { label: 'Dashboard', icon: 'i-lucide-layout-dashboard', to: '/' },
-  { label: 'Bricks', icon: 'i-lucide-layers', to: '/bricks' },
-  { label: 'Builder', icon: 'i-lucide-file-text', to: '/builder' },
-  { label: 'Roadmap', icon: 'i-lucide-map', to: '/roadmap' },
-  { label: 'Settings', icon: 'i-lucide-settings', to: '/settings' }
+  { label: 'Inicio', icon: 'i-lucide-layout-dashboard', to: '/' },
+  { label: 'Bloques', icon: 'i-lucide-layers', to: '/bricks' },
+  { label: 'Constructor', icon: 'i-lucide-file-text', to: '/builder' },
+  { label: 'Hoja de Ruta', icon: 'i-lucide-map', to: '/roadmap' },
+  { label: 'Configuracion', icon: 'i-lucide-settings', to: '/settings' }
 ]
 </script>
 

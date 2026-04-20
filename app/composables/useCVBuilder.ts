@@ -49,9 +49,9 @@ export function useCVBuilder() {
     return ordered
   })
 
-  // Flat ordered bricks for freeform layout - returns bricks in exact brickOrder sequence
+  // Flat ordered bricks for freeform layout - grouped by category order.
   const flatOrderedBricks = computed(() => {
-    return selectedBricks.value
+    return sectionTypeOrder.value.flatMap(type => selectedBricksByType.value[type] || [])
   })
 
   function toggleBrick(brick: Brick) {
