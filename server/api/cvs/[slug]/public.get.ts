@@ -42,14 +42,14 @@ export default defineEventHandler(async (event) => {
   }
 
   const brickTypeMap = new Map(cvBricksList.map(brick => [brick.id, brick.type as BrickType]))
-  const placements = brickLinks.map((link) => ({
+  const placements = brickLinks.map(link => ({
     brickId: link.brickId,
     sectionType: (link.cvSectionType as BrickType | null) || brickTypeMap.get(link.brickId) || 'custom',
     order: link.sectionOrder
   }))
 
   const placementMap = new Map(placements.map(placement => [placement.brickId, placement.sectionType]))
-  const bricksWithPlacement = cvBricksList.map((brick) => ({
+  const bricksWithPlacement = cvBricksList.map(brick => ({
     ...brick,
     cvSectionType: placementMap.get(brick.id) || brick.type
   }))

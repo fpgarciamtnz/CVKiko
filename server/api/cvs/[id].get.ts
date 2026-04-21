@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const placements = brickLinks.map((link) => ({
+  const placements = brickLinks.map(link => ({
     brickId: link.brickId,
     sectionType: (link.cvSectionType as BrickType | null) || brickTypeMap.get(link.brickId) || 'custom',
     order: link.sectionOrder

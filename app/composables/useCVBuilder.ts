@@ -232,7 +232,7 @@ export function useCVBuilder() {
   }
 
   function selectBricks(brickIds: string[]) {
-    let nextOrder = [...brickOrder.value]
+    const nextOrder = [...brickOrder.value]
     const nextPlacement = { ...brickPlacementById.value }
 
     for (const id of brickIds) {

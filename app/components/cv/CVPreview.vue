@@ -39,7 +39,7 @@ const brickById = computed(() => {
 
 const orderedPlacementBricks = computed(() => {
   return props.orderedPlacements
-    .map(placement => {
+    .map((placement) => {
       const brick = brickById.value[placement.brickId]
       if (!brick) return null
       return {
