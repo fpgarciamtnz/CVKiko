@@ -34,6 +34,13 @@ export default defineEventHandler(async (event) => {
     ;[result] = await db.select().from(settings).where(eq(settings.id, 'default'))
   }
 
+  if (!result) {
+    throw createError({
+      statusCode: 500,
+      message: 'Failed to load default settings'
+    })
+  }
+
   if (!result.pdfLayoutRule || typeof result.pdfLayoutRule !== 'object') {
     result.pdfLayoutRule = DEFAULT_PDF_LAYOUT_RULE
   }

@@ -27,7 +27,7 @@ export default defineEventHandler(async (event) => {
 
   const brickTypeMap = new Map<string, BrickType>()
   if (brickIds.length > 0) {
-    const linkedBricks = await db.select({ id: bricks.id, type: bricks.type }).from(bricks).where(inArray(bricks.id, brickIds))
+    const linkedBricks = await db.select().from(bricks).where(inArray(bricks.id, brickIds))
     for (const brick of linkedBricks) {
       brickTypeMap.set(brick.id, brick.type as BrickType)
     }

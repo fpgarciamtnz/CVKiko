@@ -148,6 +148,13 @@ const modeOptions = CV_MODES.map(m => ({
   value: m
 }))
 
+function getBrickConfig(type: unknown) {
+  const normalizedType = BRICK_TYPES.includes(type as BrickType)
+    ? type as BrickType
+    : 'custom'
+  return BRICK_TYPE_CONFIG[normalizedType]
+}
+
 const selectedBricksForInteractive = computed(() => {
   const placementMap = new Map(orderedPlacements.value.map(placement => [placement.brickId, placement.sectionType]))
   return selectedBricks.value.map(brick => ({
@@ -358,11 +365,11 @@ const selectedBricksForInteractive = computed(() => {
                           class="w-3.5 h-3.5 text-gray-400 cursor-grab brick-handle"
                         />
                         <UIcon
-                          :name="BRICK_TYPE_CONFIG[brick.type].icon"
+                          :name="getBrickConfig(brick.type).icon"
                           class="w-3.5 h-3.5 text-gray-500"
                         />
                         <span class="text-xs flex-1 truncate">{{ brick.title }}</span>
-                        <span class="text-[10px] uppercase text-gray-400">{{ BRICK_TYPE_CONFIG[brick.type].label }}</span>
+                        <span class="text-[10px] uppercase text-gray-400">{{ getBrickConfig(brick.type).label }}</span>
                       </div>
                     </template>
                   </VueDraggable>
