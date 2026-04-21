@@ -14,6 +14,12 @@ const mockSettings = () => ({
   linkedIn: null,
   github: null,
   website: null,
+  pdfLayoutRule: {
+    enforceOnePage: true,
+    compactContactsInline: true,
+    minScale: 0.72,
+    targetPage: 'A4'
+  },
   updatedAt: '2024-01-01'
 })
 
@@ -77,6 +83,28 @@ describe('useSettings', () => {
       const { error, updateSettings } = useSettings()
       await expect(updateSettings({ name: 'Bad' })).rejects.toBeTruthy()
       expect(error.value).toBe('Failed to update settings')
+    })
+  })
+
+  it('normalizes invalid pdf layout rules from API payload', async () => {
+    fetchMock.mockResolvedValue({
+      ...mockSettings(),
+      pdfLayoutRule: {
+        enforceOnePage: 'yes',
+        compactContactsInline: null,
+        minScale: 8,
+        targetPage: 'Letter'
+      }
+    })
+
+    const { settings, fetchSettings } = useSettings()
+    await fetchSettings()
+
+    expect(settings.value?.pdfLayoutRule).toEqual({
+      enforceOnePage: true,
+      compactContactsInline: true,
+      minScale: 1,
+      targetPage: 'A4'
     })
   })
 })

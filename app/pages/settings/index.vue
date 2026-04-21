@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const { settings, fetchSettings, updateSettings, loading } = useSettings()
+const { settings, fetchSettings, updateSettings, loading, normalizePdfLayoutRule } = useSettings()
 const toast = useToast()
 
 await fetchSettings()
@@ -17,7 +17,8 @@ const form = reactive({
   pronouns: settings.value?.pronouns || '',
   academicTitle: settings.value?.academicTitle || '',
   department: settings.value?.department || '',
-  institution: settings.value?.institution || ''
+  institution: settings.value?.institution || '',
+  pdfLayoutRule: normalizePdfLayoutRule(settings.value?.pdfLayoutRule)
 })
 
 // Watch for settings changes and update form
@@ -36,6 +37,7 @@ watch(settings, (newSettings) => {
     form.academicTitle = newSettings.academicTitle || ''
     form.department = newSettings.department || ''
     form.institution = newSettings.institution || ''
+    form.pdfLayoutRule = normalizePdfLayoutRule(newSettings.pdfLayoutRule)
   }
 })
 
@@ -226,6 +228,44 @@ async function handleSubmit() {
                   />
                 </template>
               </UInput>
+            </UFormField>
+          </div>
+        </div>
+
+        <!-- PDF Layout Rule -->
+        <div>
+          <h3 class="text-lg font-semibold mb-4">
+            Regla de Layout PDF
+          </h3>
+          <p class="text-sm text-gray-500 mb-4">
+            Controla compactacion y escala para forzar que el PDF quede en una pagina.
+          </p>
+          <div class="space-y-4">
+            <UFormField
+              label="Forzar una sola pagina"
+              hint="Si esta activo, el exportador no agregara paginas extra."
+            >
+              <USwitch v-model="form.pdfLayoutRule.enforceOnePage" />
+            </UFormField>
+
+            <UFormField
+              label="Compactar contacto en linea"
+              hint="Intenta agrupar email, telefono, ubicacion y links en una linea compacta."
+            >
+              <USwitch v-model="form.pdfLayoutRule.compactContactsInline" />
+            </UFormField>
+
+            <UFormField
+              label="Escala minima permitida"
+              hint="Rango recomendado 0.72 a 1.0"
+            >
+              <UInput
+                v-model.number="form.pdfLayoutRule.minScale"
+                type="number"
+                :min="0.5"
+                :max="1"
+                :step="0.01"
+              />
             </UFormField>
           </div>
         </div>

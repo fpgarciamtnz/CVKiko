@@ -17,6 +17,17 @@ export const settings = sqliteTable('settings', {
   academicTitle: text('academic_title').default(''),
   department: text('department').default(''),
   institution: text('institution').default(''),
+  pdfLayoutRule: text('pdf_layout_rule', { mode: 'json' }).$type<{
+    enforceOnePage: boolean
+    compactContactsInline: boolean
+    minScale: number
+    targetPage: 'A4'
+  }>().default({
+    enforceOnePage: true,
+    compactContactsInline: true,
+    minScale: 0.72,
+    targetPage: 'A4'
+  }),
   updatedAt: integer('updated_at', { mode: 'timestamp' }).$defaultFn(() => new Date())
 })
 

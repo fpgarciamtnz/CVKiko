@@ -1,6 +1,13 @@
 import { useDb, settings } from '../../database'
 import { eq } from 'drizzle-orm'
 
+const DEFAULT_PDF_LAYOUT_RULE = {
+  enforceOnePage: true,
+  compactContactsInline: true,
+  minScale: 0.72,
+  targetPage: 'A4' as const
+}
+
 export default defineEventHandler(async (event) => {
   const db = useDb(event)
   let [result] = await db.select().from(settings).where(eq(settings.id, 'default'))
@@ -21,9 +28,14 @@ export default defineEventHandler(async (event) => {
       pronouns: '',
       academicTitle: '',
       department: '',
-      institution: ''
+      institution: '',
+      pdfLayoutRule: DEFAULT_PDF_LAYOUT_RULE
     })
     ;[result] = await db.select().from(settings).where(eq(settings.id, 'default'))
+  }
+
+  if (!result.pdfLayoutRule || typeof result.pdfLayoutRule !== 'object') {
+    result.pdfLayoutRule = DEFAULT_PDF_LAYOUT_RULE
   }
 
   return result
